@@ -8,6 +8,7 @@ export default antfu(
       overrides: {
         'perfectionist/sort-exports': 'off',
         'ts/no-unused-expressions': ['error', { allowShortCircuit: true }],
+        'no-console': 'off',
       },
     },
     vue: {
