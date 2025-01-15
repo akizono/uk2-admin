@@ -28,11 +28,6 @@ const options = computed(() => {
       icon: () => h(IconGithub),
     },
     {
-      label: 'Gitee',
-      key: 'gitee',
-      icon: renderIcon('simple-icons:gitee'),
-    },
-    {
       label: 'Docs',
       key: 'docs',
       icon: () => h(IconBookOpen),
@@ -64,13 +59,10 @@ function handleSelect(key: string | number) {
     router.push('/userCenter')
 
   if (key === 'guthub')
-    window.open('https://github.com/chansee97/nova-admin')
-
-  if (key === 'gitee')
-    window.open('https://gitee.com/chansee97/nova-admin')
+    window.open('https://github.com/akizono/uk2-admin')
 
   if (key === 'docs')
-    window.open('https://nova-admin-docs.pages.dev/')
+    window.open('https://github.com/akizono/uk2-admin/blob/main/README.md')
 }
 </script>
 

@@ -10,12 +10,12 @@
     "url": "https://github.com/chansee97"
   },
   "license": "MIT",
-  "homepage": "https://github.com/chansee97/nova-admin",
+  "homepage": "https://github.com/akizono/uk2-admin",
   "repository": {
-    "url": "https://github.com/chansee97/nova-admin.git"
+    "url": "https://github.com/akizono/uk2-admin.git"
   },
   "bugs": {
-    "url": "https://github.com/chansee97/nova-admin/issues"
+    "url": "https://github.com/akizono/uk2-admin/issues"
   },
   "keywords": [
     "Vue",

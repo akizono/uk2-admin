@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const text = ref('nova-admin')
+const text = ref('UK2-Admin QR Code')
 </script>
 
 <template>

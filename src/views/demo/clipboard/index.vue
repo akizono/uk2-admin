@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const text = ref('Hello nova-admin')
+const text = ref('Hello UK2-Admin')
 </script>
 
 <template>
