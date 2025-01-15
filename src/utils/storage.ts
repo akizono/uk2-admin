@@ -1,3 +1,25 @@
+import type { UserInfo } from '@/api/auth/interfaces'
+
+/** 設定sessionStorage的類型 */
+interface Session {
+  dict: DictMap
+}
+
+/** 設定localStorage的類型 */
+interface Local {
+  /* 儲存使用者資訊 */
+  userInfo: UserInfo
+  /* 儲存訪問token */
+  accessToken: string
+  /* 儲存刷新token */
+  refreshToken: string
+  /* 儲存登入帳號 */
+  loginAccount: any
+  /* 儲存當前語言 */
+  lang: App.lang
+}
+
+/** 設定storage的前綴 */
 const STORAGE_PREFIX = import.meta.env.VITE_STORAGE_PREFIX
 
 interface StorageData<T> {
@@ -7,8 +29,8 @@ interface StorageData<T> {
 /**
  * LocalStorage部分操作
  */
-function createLocalStorage<T extends Storage.Local>() {
-  // 默认缓存期限为7天
+function createLocalStorage<T extends Local>() {
+  // 默認快取期限為7天
 
   function set<K extends keyof T>(key: K, value: T[K], expire: number = 60 * 60 * 24 * 7) {
     const storageData: StorageData<T[K]> = {
@@ -52,7 +74,7 @@ function createLocalStorage<T extends Storage.Local>() {
  * sessionStorage部分操作
  */
 
-function createSessionStorage<T extends Storage.Session>() {
+function createSessionStorage<T extends Session>() {
   function set<K extends keyof T>(key: K, value: T[K]) {
     const json = JSON.stringify(value)
     window.sessionStorage.setItem(`${STORAGE_PREFIX}${String(key)}`, json)

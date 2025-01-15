@@ -1,5 +1,5 @@
 {
-  "name": "nova-admin",
+  "name": "uk2-admin",
   "type": "module",
   "version": "0.9.8",
   "private": true,
@@ -52,11 +52,13 @@
   "dependencies": {
     "@vueuse/core": "^11.2.0",
     "alova": "^3.2.2",
+    "axios": "^1.7.9",
     "colord": "^2.9.3",
     "echarts": "^5.5.1",
     "md-editor-v3": "^4.21.2",
     "pinia": "^2.2.6",
     "pinia-plugin-persistedstate": "^4.1.2",
+    "qs": "^6.13.1",
     "quill": "^2.0.2",
     "radash": "^12.1.0",
     "vue": "^3.5.12",
@@ -69,6 +71,7 @@
     "@iconify-json/icon-park-outline": "^1.2.1",
     "@iconify/vue": "^4.1.2",
     "@types/node": "^22.9.0",
+    "@types/qs": "^6.9.17",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
     "eslint": "^9.14.0",

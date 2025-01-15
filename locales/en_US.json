@@ -9,6 +9,9 @@
     "inputPlaceholder": "please enter",
     "selectPlaceholder": "please choose"
   },
+  "http": {
+    "networkError": "Network Error"
+  },
   "app": {
     "loginOut": "Login out",
     "loginOutContent": "Confirm to log out of current account?",
@@ -130,21 +133,6 @@
     "accountSetting": "User settings",
     "cascader": "Administrative region selection",
     "dict": "Dictionary example"
-  },
-  "http": {
-    "400": "Syntax error in the request",
-    "401": "User unauthorized",
-    "403": "Server refused access",
-    "404": "Requested resource does not exist",
-    "405": "Request method not allowed",
-    "408": "Network request timed out",
-    "500": "Internal server error",
-    "501": "Server not implemented the requested functionality",
-    "502": "Bad gateway",
-    "503": "Service unavailable",
-    "504": "Gateway timeout",
-    "505": "HTTP version not supported for this request",
-    "defaultTip": "Request error"
   },
   "components": {
     "iconSelector": {

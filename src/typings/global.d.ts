@@ -1,8 +1,8 @@
-/* 存放数据库实体表类型， 具体内容在 ./entities */
+/* 資料庫實體表的型別定義，詳細內容請參考 ./entities 資料夾 */
 declare namespace Entity {
 }
 
-/* 各类接口返回的数据类型， 具体内容在 ./api */
+/* API 介面回傳的資料型別定義，詳細內容請參考 ./api 資料夾 */
 declare namespace Api {
 
 }
@@ -26,25 +26,6 @@ declare module '*.vue' {
 
 declare namespace NaiveUI {
   type ThemeColor = 'default' | 'error' | 'primary' | 'info' | 'success' | 'warning'
-}
-
-declare namespace Storage {
-  interface Session {
-    dict: DictMap
-  }
-
-  interface Local {
-    /* 存储用户信息 */
-    userInfo: Api.Login.Info
-    /* 存储访问token */
-    accessToken: string
-    /* 存储刷新token */
-    refreshToken: string
-    /* 存储登录账号 */
-    loginAccount: any
-    /* 存储当前语言 */
-    lang: App.lang
-  }
 }
 
 declare namespace App {

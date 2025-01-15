@@ -1,21 +1,21 @@
 /**
- *后台服务的环境类型
- * - dev: 后台开发环境
- * - test: 后台测试环境
- * - prod: 后台生产环境
+ *後台服務的環境類型
+ * - dev: 後台開發環境
+ * - test: 後台測試環境
+ * - prod: 後台生產環境
  */
-type ServiceEnvType = 'dev' | 'test' | 'prod'
+ type ServiceEnvType = 'dev' | 'test' | 'prod'
 
 interface ImportMetaEnv {
-  /** 项目基本地址 */
-  readonly VITE_BASE_URL: string
-  /** 项目标题 */
+  /** 專案基本路徑 */
+  readonly VITE_BASE_PATH: string
+  /** 專案標題 */
   readonly VITE_APP_NAME: string
-  /** 开启请求代理 */
+  /** 開啟請求代理 */
   readonly VITE_HTTP_PROXY?: 'Y' | 'N'
-  /** 是否开启打包压缩 */
+  /** 是否開啟打包壓縮 */
   readonly VITE_BUILD_COMPRESS?: 'Y' | 'N'
-  /** 压缩算法类型 */
+  /** 壓縮演算法類型 */
   readonly VITE_COMPRESS_TYPE?:
     | 'gzip'
     | 'brotliCompress'
@@ -23,17 +23,17 @@ interface ImportMetaEnv {
     | 'deflateRaw'
   /** 路由模式 */
   readonly VITE_ROUTE_MODE?: 'hash' | 'web'
-  /** 路由加载模式 */
+  /** 路由載入模式 */
   readonly VITE_ROUTE_LOAD_MODE: 'static' | 'dynamic'
-  /** 首次加载页面 */
+  /** 首次載入頁面 */
   readonly VITE_HOME_PATH: string
-  /** 版权信息 */
+  /** 版權資訊 */
   readonly VITE_COPYRIGHT_INFO: string
-  /** 是否自动刷新token */
+  /** 是否自動更新token */
   readonly VITE_AUTO_REFRESH_TOKEN: 'Y' | 'N'
-  /** 默认语言 */
+  /** 預設語言 */
   readonly VITE_DEFAULT_LANG: App.lang
-  /** 后端服务的环境类型 */
+  /** 後端服務的環境類型 */
   readonly MODE: ServiceEnvType
 }
 

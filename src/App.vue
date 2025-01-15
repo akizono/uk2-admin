@@ -22,3 +22,10 @@ const naiveLocale = computed(() => {
     </naive-provider>
   </n-config-provider>
 </template>
+
+<style scoped>
+/* 目前已知：僅 userCenter 用到了 n-input-number  */
+:deep(.n-input-number) {
+  width: 100%;
+}
+</style>

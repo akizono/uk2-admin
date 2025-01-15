@@ -19,7 +19,7 @@ const rules = computed(() => {
       trigger: 'blur',
       message: t('login.accountRuleTip'),
     },
-    pwd: {
+    password: {
       required: true,
       trigger: 'blur',
       message: t('login.passwordRuleTip'),
@@ -27,8 +27,8 @@ const rules = computed(() => {
   }
 })
 const formValue = ref({
-  account: 'super',
-  pwd: '123456',
+  account: 'admin',
+  password: '123456',
 })
 const isRemember = ref(false)
 const isLoading = ref(false)
@@ -40,14 +40,15 @@ function handleLogin() {
       return
 
     isLoading.value = true
-    const { account, pwd } = formValue.value
+    const { account, password } = formValue.value
 
     if (isRemember.value)
-      local.set('loginAccount', { account, pwd })
+      local.set('loginAccount', { account, password })
     else local.remove('loginAccount')
 
-    await authStore.login(account, pwd)
-    isLoading.value = false
+    authStore.login(account, password).finally(() => {
+      isLoading.value = false
+    })
   })
 }
 onMounted(() => {
@@ -72,8 +73,8 @@ function checkUserAccount() {
       <n-form-item path="account">
         <n-input v-model:value="formValue.account" clearable :placeholder="$t('login.accountPlaceholder')" />
       </n-form-item>
-      <n-form-item path="pwd">
-        <n-input v-model:value="formValue.pwd" type="password" :placeholder="$t('login.passwordPlaceholder')" clearable show-password-on="click">
+      <n-form-item path="password">
+        <n-input v-model:value="formValue.password" type="password" :placeholder="$t('login.passwordPlaceholder')" clearable show-password-on="click">
           <template #password-invisible-icon>
             <icon-park-outline-preview-close-one />
           </template>
