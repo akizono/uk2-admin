@@ -12,13 +12,13 @@ export const useAuthStore = defineStore('auth-store', {
     return {
       userInfo: local.get('userInfo'),
       role: local.get('role') || [],
-      token: local.get('accessToken') || '',
+      accessToken: local.get('accessToken') || '',
     }
   },
   getters: {
     /** 檢查使用者是否已登入 */
     isLogin(state) {
-      return Boolean(state.token)
+      return Boolean(state.accessToken)
     },
   },
   actions: {
@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth-store', {
       local.set('refreshToken', data.token.refreshToken)
       this.userInfo = data.userInfo
       this.role = data.role
-      this.token = data.token.accessToken
+      this.accessToken = data.token.accessToken
 
       // 初始化路由和選單
       const routeStore = useRouteStore()
@@ -83,10 +83,10 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理更新 Token 的回傳資料 */
-    async handleRefreshToken(token: Token) {
-      local.set('accessToken', token.accessToken)
-      local.set('refreshToken', token.refreshToken)
-      this.token = token.accessToken
+    async handleRefreshToken(data: Token) {
+      local.set('accessToken', data.accessToken)
+      local.set('refreshToken', data.refreshToken)
+      this.accessToken = data.accessToken
     },
   },
 })

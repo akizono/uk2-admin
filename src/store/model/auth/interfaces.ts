@@ -5,5 +5,5 @@ export type Role = string
 export interface AuthState {
   userInfo: UserInfo | null
   role: Role[]
-  token: string
+  accessToken: string
 }
