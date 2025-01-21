@@ -1,18 +1,17 @@
-import type { LoginResponseData, Token, UserInfo } from '@/api/auth/interfaces'
+import type { LoginResponseData, Token } from '@/api/auth/interfaces'
+import type { AuthState } from './interfaces'
+
 import { login } from '@/api/auth'
 import { router } from '@/router'
 import { local } from '@/utils'
-import { useRouteStore } from './router'
-import { useTabStore } from './tab'
+import { useRouteStore } from '../../router'
+import { useTabStore } from '../tab'
 
-interface AuthStatus {
-  userInfo: UserInfo | null
-  token: string
-}
 export const useAuthStore = defineStore('auth-store', {
-  state: (): AuthStatus => {
+  state: (): AuthState => {
     return {
       userInfo: local.get('userInfo'),
+      role: local.get('role') || [],
       token: local.get('accessToken') || '',
     }
   },
@@ -34,7 +33,7 @@ export const useAuthStore = defineStore('auth-store', {
       // 清除頁籤列資料
       const tabStore = useTabStore()
       tabStore.clearAllTabs()
-      // 重置目前的 Store
+      // 重設目前的 Store
       this.$reset()
       // 導向登入頁面
       if (route.meta.requiresAuth) {
@@ -64,10 +63,12 @@ export const useAuthStore = defineStore('auth-store', {
     async handleLoginInfo(data: LoginResponseData) {
       // 儲存 Token 和使用者資訊
       local.set('userInfo', data.userInfo)
+      local.set('role', data.role)
       local.set('accessToken', data.token.accessToken)
       local.set('refreshToken', data.token.refreshToken)
-      this.token = data.token.accessToken
       this.userInfo = data.userInfo
+      this.role = data.role
+      this.token = data.token.accessToken
 
       // 初始化路由和選單
       const routeStore = useRouteStore()

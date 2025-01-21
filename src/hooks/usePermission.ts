@@ -1,27 +1,22 @@
+import type { Role } from '@/store/model/auth/interfaces'
 import { useAuthStore } from '@/store'
-import { isArray, isString } from 'radash'
-
-/** 权限判断 */
+/** 權限判斷 */
 export function usePermission() {
   const authStore = useAuthStore()
 
   function hasPermission(
-    permission: Entity.RoleType | Entity.RoleType[] | undefined,
+    permission: Role[] | undefined,
   ) {
     if (!permission)
       return true
 
-    if (!authStore.userInfo)
+    if (!authStore.role)
       return false
-    const { role } = authStore.userInfo
+    const { role } = authStore
 
-    let has = role === 'super'
+    let has = role.includes('super_admin')
     if (!has) {
-      if (isArray(permission))
-        has = permission.includes(role)
-
-      if (isString(permission))
-        has = permission === role
+      has = permission.some(item => role.includes(item))
     }
     return has
   }

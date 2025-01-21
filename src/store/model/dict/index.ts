@@ -10,7 +10,7 @@ export const useDictStore = defineStore('dict-store', {
   },
   actions: {
     async dict(code: string) {
-      // 调用前初始化
+      // 調用前初始化
       if (!this.dictMap) {
         this.initDict()
       }

@@ -19,15 +19,15 @@ export const useTabStore = defineStore('tab-store', {
   },
   actions: {
     addTab(route: RouteLocationNormalized) {
-      // 根据meta确定是否不添加，可用于错误页,登录页等
+      // 根據 meta 確定是否不添加，可用於錯誤頁,登入頁等
       if (route.meta.withoutTab)
         return
 
-      // 如果标签名称已存在则不添加
+      // 如果標籤名稱已存在則不添加
       if (this.hasExistTab(route.fullPath as string))
         return
 
-      // 根据meta.pinTab传递到不同的分组中
+      // 根據 meta.pinTab 傳遞到不同的分組中
       if (route.meta.pinTab)
         this.pinTabs.push(route)
       else
@@ -35,26 +35,26 @@ export const useTabStore = defineStore('tab-store', {
     },
     async closeTab(fullPath: string) {
       const tabsLength = this.tabs.length
-      // 如果动态标签大于一个,才会标签跳转
+      // 如果動態標籤大於一個,才會標籤跳轉
       if (this.tabs.length > 1) {
-        // 获取关闭的标签索引
+        // 獲取關閉的標籤索引
         const index = this.getTabIndex(fullPath)
         const isLast = index + 1 === tabsLength
-        // 如果是关闭的当前页面，路由跳转到原先标签的后一个标签
+        // 如果是關閉的當前頁面，路由跳轉到原先標籤的後一個標籤
         if (this.currentTabPath === fullPath && !isLast) {
-          // 跳转到后一个标签
+          // 跳轉到後一個標籤
           router.push(this.tabs[index + 1].fullPath)
         }
         else if (this.currentTabPath === fullPath && isLast) {
-          // 已经是最后一个了，就跳转前一个
+          // 已經是最後一個了，就跳轉前一個
           router.push(this.tabs[index - 1].fullPath)
         }
       }
-      // 删除标签
+      // 刪除標籤
       this.tabs = this.tabs.filter((item) => {
         return item.fullPath !== fullPath
       })
-      // 删除后如果清空了，就跳转到默认首页
+      // 刪除後如果清空了，就跳轉到默認首頁
       if (tabsLength - 1 === 0)
         router.push('/')
     },
@@ -86,7 +86,7 @@ export const useTabStore = defineStore('tab-store', {
         return item.fullPath === fullPath
       })
     },
-    /* 设置当前激活的标签 */
+    /* 設置當前啟用的標籤 */
     setCurrentTab(fullPath: string) {
       this.currentTabPath = fullPath
     },

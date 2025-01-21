@@ -5,7 +5,7 @@ import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
 
-const { userInfo } = authStore
+const { userInfo, role } = authStore
 const formRef = ref()
 const formValue = ref({
   id: '',
@@ -71,11 +71,11 @@ onMounted(() => {
           <n-descriptions-item label="使用者名稱">
             {{ userInfo?.username }}
           </n-descriptions-item>
-          <n-descriptions-item label="真實名稱">
+          <n-descriptions-item label="暱稱">
             {{ userInfo?.nickname }}
           </n-descriptions-item>
           <n-descriptions-item label="角色">
-            <!-- {{ userInfo?.role }} -->
+            {{ role.join('、 ') }}
           </n-descriptions-item>
         </n-descriptions>
       </n-space>

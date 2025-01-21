@@ -9,6 +9,8 @@ interface Session {
 interface Local {
   /* 儲存使用者資訊 */
   userInfo: UserInfo
+  /* 儲存角色 */
+  role: string[]
   /* 儲存訪問token */
   accessToken: string
   /* 儲存刷新token */

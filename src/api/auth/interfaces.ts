@@ -1,3 +1,5 @@
+import type { Role } from '@/store/model/auth/interfaces'
+
 export interface UserInfo {
   id: string
   username: string
@@ -22,6 +24,7 @@ export interface Token {
 /** 登入介面返回的資料結構 */
 export interface LoginResponseData {
   userInfo: UserInfo
+  role: Role[]
   token: Token
 }
 
