@@ -3,7 +3,7 @@ interface Props {
   maxLength?: string
 }
 const { maxLength } = defineProps<Props>()
-const modelValue = defineModel<string>('value')
+const modelValue = defineModel<string | null>('value')
 </script>
 
 <template>

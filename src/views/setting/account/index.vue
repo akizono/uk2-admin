@@ -1,68 +1,86 @@
 <script setup lang="tsx">
+import type { UserInfo } from '@/api/user/response.type'
 import type { DataTableColumns, FormInst } from 'naive-ui'
+import type { UserListDTO } from '@/api/user/dto.type'
+import { filterObjEmptyValues } from '@/utils/tools/object'
+
+import { NButton, NPopconfirm, NSpace, NSwitch } from 'naive-ui'
 import CopyText from '@/components/custom/CopyText.vue'
-import { Gender } from '@/constants'
-import { useBoolean } from '@/hooks'
-import { fetchUserPage } from '@/service'
-import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
 import TableModal from './components/TableModal.vue'
 
+import { useBoolean } from '@/hooks'
+import { blockUser, deleteUser, getUserList, unblockUser } from '@/api/user'
+
+// 加载的状态
 const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
+// 刪除按鈕的 loading 狀態追蹤
+const deleteButtonLoadingMap = ref<Record<string, boolean>>({})
 
-const initialModel = {
-  condition_1: '',
-  condition_2: '',
-}
-const model = ref({ ...initialModel })
-function handleResetSearch() {
-  model.value = { ...initialModel }
-}
-
+// 查询参数
 const formRef = ref<FormInst | null>()
-const modalRef = ref()
+const total = ref(0)
+const initQueryParams: UserListDTO = {
+  pageSize: 10,
+  currentPage: 1,
 
-function delteteUser(id: number) {
-  window.$message.success(`删除用户id:${id}`)
+  username: '',
+  nickname: '',
+}
+const queryParams = ref({ ...initQueryParams })
+function handleResetSearch() {
+  queryParams.value = { ...initQueryParams }
 }
 
-const columns: DataTableColumns<Entity.User> = [
+// 列表
+const modalRef = ref()
+const list = ref<UserInfo[]>([])
+const columns: DataTableColumns<UserInfo> = [
   {
-    title: '姓名',
+    title: '使用者名稱',
     align: 'center',
-    key: 'userName',
+    key: 'username',
+    fixed: 'left',
+  },
+  {
+    title: '昵称',
+    align: 'center',
+    key: 'nickname',
+  },
+  {
+    title: '年齡',
+    align: 'center',
+    key: 'age',
   },
   {
     title: '性别',
     align: 'center',
-    key: 'gender',
+    key: 'sex',
     render: (row) => {
-      const tagType = {
-        0: 'primary',
-        1: 'success',
-      } as const
-      if (row.gender) {
-        return (
-          <NTag type={tagType[row.gender]}>
-            {Gender[row.gender]}
-          </NTag>
-        )
-      }
+      if (row.sex)
+        return row.sex === 1 ? '男' : '女'
+      else
+        return ''
     },
   },
   {
-    title: '邮箱',
+    title: '電子郵件',
     align: 'center',
     key: 'email',
   },
   {
-    title: '联系方式',
+    title: '手機號碼',
     align: 'center',
     key: 'tel',
     render: (row) => {
       return (
-        <CopyText value={row.tel} />
+        <CopyText value={row.mobile} />
       )
     },
+  },
+  {
+    title: '备注',
+    align: 'center',
+    key: 'remark',
   },
   {
     title: '状态',
@@ -86,6 +104,7 @@ const columns: DataTableColumns<Entity.User> = [
     title: '操作',
     align: 'center',
     key: 'actions',
+    width: 250,
     render: (row) => {
       return (
         <NSpace justify="center">
@@ -95,10 +114,18 @@ const columns: DataTableColumns<Entity.User> = [
           >
             编辑
           </NButton>
-          <NPopconfirm onPositiveClick={() => delteteUser(row.id!)}>
+          <NPopconfirm onPositiveClick={() => delteteUser(row)}>
             {{
               default: () => '确认删除',
-              trigger: () => <NButton size="small" type="error">删除</NButton>,
+              trigger: () => (
+                <NButton
+                  size="small"
+                  type="error"
+                  loading={deleteButtonLoadingMap.value[row.id!]}
+                >
+                  删除
+                </NButton>
+              ),
             }}
           </NPopconfirm>
         </NSpace>
@@ -106,114 +133,101 @@ const columns: DataTableColumns<Entity.User> = [
     },
   },
 ]
+async function getList() {
+  try {
+    startLoading()
+    const { data: result } = await getUserList(filterObjEmptyValues(queryParams.value))
+    list.value = result.list.map(item => item.userInfo)
+    total.value = result.total
+  }
 
-const count = ref(0)
-const listData = ref<Entity.User[]>([])
-function handleUpdateDisabled(value: 0 | 1, id: number) {
-  const index = listData.value.findIndex(item => item.id === id)
-  if (index > -1)
-    listData.value[index].status = value
+  finally {
+    endLoading()
+  }
 }
 
-async function getUserList() {
-  startLoading()
-  await fetchUserPage().then((res: any) => {
-    listData.value = res.data.list
-    count.value = res.data.count
-    endLoading()
-  })
+/** 刪除用戶 */
+async function delteteUser(row: UserInfo) {
+  try {
+    deleteButtonLoadingMap.value[row.id!] = true
+
+    await deleteUser(row.id!)
+    list.value = list.value.filter(item => item.id !== row.id)
+    window.$message.success(`已經删除使用者:${row.username}`)
+  }
+  finally {
+    deleteButtonLoadingMap.value[row.id!] = false
+  }
+}
+
+/** 更新用戶狀態 */
+function handleUpdateDisabled(value: 0 | 1, id: string) {
+  const index = list.value.findIndex(item => item.id === id)
+  if (index > -1)
+    list.value[index].status = value
+
+  if (value === 1)
+    unblockUser(id)
+  else
+    blockUser(id)
+}
+
+/** 分页器 */
+function changePage(page: number, size: number) {
+  queryParams.value.currentPage = page
+  queryParams.value.pageSize = size
+  getList()
 }
 
 onMounted(() => {
-  getUserList()
+  getList()
 })
-
-function changePage(page: number, size: number) {
-  window.$message.success(`分页器:${page},${size}`)
-}
-
-const treeData = ref([
-  {
-    id: '1',
-    label: '安徽总公司',
-    children: [
-      {
-        id: '2',
-        label: '合肥分公司',
-        children: [
-          {
-            id: '4',
-            label: '财务部门',
-          },
-          {
-            id: '5',
-            label: '采购部门',
-          },
-        ],
-      },
-      {
-        id: '3',
-        label: '芜湖分公司',
-      },
-    ],
-  },
-])
 </script>
 
 <template>
-  <n-flex>
-    <n-card class="w-70">
-      <n-tree
-        block-line
-        :data="treeData"
-        key-field="id"
-      />
+  <NSpace vertical class="flex-1">
+    <n-card>
+      <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
+        <n-flex>
+          <n-form-item label="使用者名稱" path="username">
+            <n-input v-model:value="queryParams.username" placeholder="请输入" />
+          </n-form-item>
+          <n-form-item label="暱稱" path="nickname">
+            <n-input v-model:value="queryParams.nickname" placeholder="请输入" />
+          </n-form-item>
+          <n-flex class="ml-auto">
+            <NButton type="primary" @click="getList">
+              <template #icon>
+                <icon-park-outline-search />
+              </template>
+              搜索
+            </NButton>
+            <NButton strong secondary @click="handleResetSearch">
+              <template #icon>
+                <icon-park-outline-redo />
+              </template>
+              重置
+            </NButton>
+          </n-flex>
+        </n-flex>
+      </n-form>
     </n-card>
 
-    <NSpace vertical class="flex-1">
-      <n-card>
-        <n-form ref="formRef" :model="model" label-placement="left" inline :show-feedback="false">
-          <n-flex>
-            <n-form-item label="姓名" path="condition_1">
-              <n-input v-model:value="model.condition_1" placeholder="请输入" />
-            </n-form-item>
-            <n-form-item label="性别" path="condition_2">
-              <n-input v-model:value="model.condition_2" placeholder="请输入" />
-            </n-form-item>
-            <n-flex class="ml-auto">
-              <NButton type="primary" @click="getUserList">
-                <template #icon>
-                  <icon-park-outline-search />
-                </template>
-                搜索
-              </NButton>
-              <NButton strong secondary @click="handleResetSearch">
-                <template #icon>
-                  <icon-park-outline-redo />
-                </template>
-                重置
-              </NButton>
-            </n-flex>
-          </n-flex>
-        </n-form>
-      </n-card>
+    <n-card class="flex-1">
+      <template #header>
+        <NButton type="primary" @click="modalRef.openModal('add')">
+          <template #icon>
+            <icon-park-outline-add-one />
+          </template>
+          新建使用者
+        </NButton>
+      </template>
+      <NSpace vertical>
+        <n-data-table :scroll-x="1300" :columns="columns" :data="list" :loading="loading" />
+        <Pagination :total="total" :page-size="queryParams.pageSize" :current-page="queryParams.currentPage" @change="changePage" />
+      </NSpace>
 
-      <n-card class="flex-1">
-        <template #header>
-          <NButton type="primary" @click="modalRef.openModal('add')">
-            <template #icon>
-              <icon-park-outline-add-one />
-            </template>
-            新建用户
-          </NButton>
-        </template>
-        <NSpace vertical>
-          <n-data-table :columns="columns" :data="listData" :loading="loading" />
-          <Pagination :count="count" @change="changePage" />
-        </NSpace>
-
-        <TableModal ref="modalRef" modal-name="用户" />
-      </n-card>
-    </NSpace>
-  </n-flex>
+      <TableModal ref="modalRef" modal-name="使用者" />
+    </n-card>
+  </NSpace>
 </template>

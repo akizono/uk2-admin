@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FormRules } from 'naive-ui'
 import { updateUser } from '@/api/user'
 import { useAuthStore } from '@/store'
 import { onMounted } from 'vue'
@@ -13,7 +14,7 @@ const formValue = ref({
   age: 33,
   mobile: '',
 })
-const rules = {
+const rules: FormRules = {
   nickname: {
     required: true,
     message: '請輸入姓名',
@@ -27,7 +28,7 @@ const rules = {
   },
   mobile: {
     required: true,
-    message: '請輸入電話號碼',
+    message: '請輸入手機號碼',
     trigger: ['input'],
   },
 }
@@ -89,8 +90,8 @@ onMounted(() => {
           <n-form-item label="年齡" path="age">
             <n-input-number v-model:value="formValue.age" placeholder="輸入年齡" />
           </n-form-item>
-          <n-form-item label="電話號碼" path="mobile">
-            <n-input v-model:value="formValue.mobile" placeholder="電話號碼" />
+          <n-form-item label="手機號碼" path="mobile">
+            <n-input v-model:value="formValue.mobile" placeholder="手機號碼" />
           </n-form-item>
           <n-form-item>
             <n-button type="primary" attr-type="button" block @click="handleValidateClick">

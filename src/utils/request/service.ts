@@ -52,7 +52,9 @@ service.interceptors.response.use(
   async (error: AxiosError) => {
     const { status } = error
     const url = error.config?.url
-    const message = handle.handleNetworkErrorMessage(error.message)
+
+    const message = (error.response?.data as { message?: string })?.message
+      ?? handle.handleNetworkErrorMessage(error.message)
 
     // 如果是重新整理 Token 的請求失敗，直接登出
     if (url === refreshTokenMethodUrl) {
