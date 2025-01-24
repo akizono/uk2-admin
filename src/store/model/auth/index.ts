@@ -1,4 +1,4 @@
-import type { LoginResponseData, Token } from '@/api/auth/interfaces'
+import type { LoginResponse, Token } from '@/api/auth/interfaces'
 import type { AuthState } from './interfaces'
 
 import { login } from '@/api/auth'
@@ -60,7 +60,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理登入後的資料 */
-    async handleLoginInfo(data: LoginResponseData) {
+    async handleLoginInfo(data: LoginResponse) {
       // 儲存 Token 和使用者資訊
       local.set('userInfo', data.userInfo)
       local.set('role', data.role)

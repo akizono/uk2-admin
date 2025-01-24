@@ -1,4 +1,4 @@
-import type { UserInfo } from '@/api/auth/interfaces'
+import type { UserInfo } from '@/api/user/response.type'
 
 export type Role = string
 

@@ -1,12 +1,14 @@
 import type { ApiResponse } from '@/utils/request/types'
-import type * as interfaces from './interfaces'
-import type * as vos from './vos'
-import { local } from '@/utils'
+import type * as reqTypes from './dto.type'
+import type * as resTypes from './response.type'
+
 import request from '@/utils/request'
+
+import { local } from '@/utils'
 
 // 登入（使用帳號密碼）
 export const loginUrl = '/auth/login'
-export function login(data: vos.AuthLoginVO): ApiResponse<interfaces.LoginResponseData> {
+export function login(data: reqTypes.AuthLoginDTO): ApiResponse<resTypes.LoginResponse> {
   return request.post({
     url: loginUrl,
     data,
@@ -18,7 +20,7 @@ export function login(data: vos.AuthLoginVO): ApiResponse<interfaces.LoginRespon
 
 // 更新 Token
 export const refreshTokenMethodUrl = '/auth/refreshTokenMethod'
-export function refreshTokenMethod(): ApiResponse<interfaces.RefreshTokenResponseData> {
+export function refreshTokenMethod(): ApiResponse<resTypes.RefreshTokenResponse> {
   return request.post({
     url: refreshTokenMethodUrl,
     headers: {

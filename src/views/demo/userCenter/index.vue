@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { updateUserInfo } from '@/api/user'
+import { updateUser } from '@/api/user'
 import { useAuthStore } from '@/store'
 import { onMounted } from 'vue'
 
@@ -36,7 +36,7 @@ function handleValidateClick() {
   formRef.value?.validate(async (errors: any) => {
     if (errors)
       return window.$message.error('驗證不通過')
-    updateUserInfo(formValue.value).then(({ message }) => {
+    updateUser(formValue.value).then(({ message }) => {
       window.$message.success(message)
     })
   })
