@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { UserInfo } from '@/api/user/response.type'
 import type { FormRules } from 'naive-ui'
+import type { ModalType, Success } from './TableModal.type'
+
 import { filterObjEmptyValues } from '@/utils/tools/object'
 import { useBoolean } from '@/hooks'
 
@@ -10,12 +12,11 @@ import { createUser, updateUser } from '@/api/user'
 const props = defineProps<{
   modalName?: string
 }>()
-
 const emit = defineEmits<{
-  success: [{ type: ModalType } & UserInfo]
+  success: [Success]
 }>()
 
-// 控制彈窗的顯示
+// 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
 // 控制提交的loading
 const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
@@ -36,7 +37,6 @@ const initFormData: UserInfo = {
 const formData = ref<UserInfo>({ ...initFormData })
 
 // 表單類型與標題
-type ModalType = 'add' | 'view' | 'edit'
 const modalType = shallowRef<ModalType | null>(null)
 const modalTitle = computed(() => {
   if (!modalType.value)
@@ -83,9 +83,13 @@ const rules: FormRules = {
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { message } = await createUser(filterObjEmptyValues(remain))
-  window.$message.success(message)
-  emit('success', { type: modalType.value!, ...formData.value })
+  const { data } = await createUser(filterObjEmptyValues(remain))
+  emit('success', {
+    ...formData.value,
+    type: modalType.value!,
+    id: data.id,
+    password: data.password,
+  })
 }
 
 // 編輯
@@ -98,39 +102,26 @@ async function edit() {
 
 // 提交
 async function submitModal() {
-  if (modalType.value === 'add')
-    await add()
-  else if (modalType.value === 'edit')
-    await edit()
+  try {
+    await formRef.value?.validate()
+    startLoading()
 
-  // const handlers = {
-  //   async add() {
+    if (modalType.value === 'add') {
+      await add()
+      closeModal()
+    }
 
-  //     // return new Promise((resolve) => {
-  //     //   setTimeout(() => {
-  //     //     window.$message.success('模拟新增成功')
-  //     //     resolve(true)
-  //     //   }, 2000)
-  //     // })
-  //   },
-  //   async edit() {
-  //     return new Promise((resolve) => {
-  //       setTimeout(() => {
-  //         window.$message.success('模拟编辑成功')
-  //         resolve(true)
-  //       }, 2000)
-  //     })
-  //   },
-  //   async view() {
-  //     return true
-  //   },
-  // }
-  // await formRef.value?.validate()
-  // startLoading()
-  // await handlers[modalType.value]() && closeModal()
+    else if (modalType.value === 'edit') {
+      await edit()
+      closeModal()
+    }
+  }
+  catch {
+    endLoading()
+  }
 }
 
-// 打開彈窗
+// 打開彈出視窗
 async function openModal(type: ModalType, data: UserInfo) {
   modalType.value = type
   showModal()
@@ -153,10 +144,10 @@ async function openModal(type: ModalType, data: UserInfo) {
   await handlers[type]()
 }
 
-// 關閉彈窗
+// 關閉彈出視窗
 function closeModal() {
-  hiddenModal()
   endLoading()
+  hiddenModal()
 }
 
 defineExpose({
@@ -193,7 +184,7 @@ defineExpose({
         <n-form-item-grid-item :span="1" label="年齡" path="age">
           <n-input-number v-model:value="formData.age" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="性别" path="sex">
+        <n-form-item-grid-item :span="1" label="性別" path="sex">
           <n-radio-group v-model:value="formData.sex">
             <n-space>
               <n-radio :value="1">
@@ -205,7 +196,7 @@ defineExpose({
             </n-space>
           </n-radio-group>
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="邮箱" path="email">
+        <n-form-item-grid-item :span="1" label="信箱" path="email">
           <n-input v-model:value="formData.email" />
         </n-form-item-grid-item>
         <n-form-item-grid-item :span="1" label="手機號碼" path="mobile">
@@ -220,16 +211,16 @@ defineExpose({
             :options="options"
           />
         </n-form-item-grid-item> -->
-        <n-form-item-grid-item :span="2" label="备注" path="remark">
+        <n-form-item-grid-item :span="2" label="備註" path="remark">
           <n-input v-model:value="formData.remark" type="textarea" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="使用者状态" path="status">
+        <n-form-item-grid-item :span="1" label="使用者狀態" path="status">
           <n-switch
             v-model:value="formData.status"
             :checked-value="1" :unchecked-value="0"
           >
             <template #checked>
-              启用
+              啟用
             </template>
             <template #unchecked>
               禁用
