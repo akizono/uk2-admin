@@ -4,11 +4,9 @@ import { darkTheme } from 'naive-ui'
 import { useAppStore } from './store'
 
 const appStore = useAppStore()
-
 const naiveLocale = computed(() => {
   return naiveI18nOptions[appStore.lang] ? naiveI18nOptions[appStore.lang] : naiveI18nOptions.enUS
-},
-)
+})
 </script>
 
 <template>

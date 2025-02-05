@@ -12,3 +12,7 @@ export interface UserList {
     role: Role[]
   }[]
 }
+
+export interface CreateUserResponse extends UserInfo {
+  password: string
+}
