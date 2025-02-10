@@ -1,4 +1,4 @@
-import type { LoginResponse, Token } from '@/api/auth/interfaces'
+import type * as AUTH_DTO from '@/api/auth/response.type'
 import type { AuthState } from './interfaces'
 
 import { login } from '@/api/auth'
@@ -60,7 +60,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理登入後的資料 */
-    async handleLoginInfo(data: LoginResponse) {
+    async handleLoginInfo(data: AUTH_DTO.Login) {
       // 儲存 Token 和使用者資訊
       local.set('userInfo', data.userInfo)
       local.set('role', data.role)
@@ -83,7 +83,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理更新 Token 的回傳資料 */
-    async handleRefreshToken(data: Token) {
+    async handleRefreshToken(data: AUTH_DTO.Token) {
       local.set('accessToken', data.accessToken)
       local.set('refreshToken', data.refreshToken)
       this.accessToken = data.accessToken

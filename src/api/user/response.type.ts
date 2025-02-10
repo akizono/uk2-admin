@@ -1,7 +1,7 @@
 import type { Role } from '@/store/model/auth/interfaces'
-import type { BaseUserDTO } from './dto.type'
+import type { BaseUser } from './dto.type'
 
-export interface UserInfo extends BaseUserDTO {
+export interface UserInfo extends BaseUser {
   id: string
 }
 
@@ -13,6 +13,6 @@ export interface UserList {
   }[]
 }
 
-export interface CreateUserResponse extends UserInfo {
+export interface CreateUser extends UserInfo {
   password: string
 }

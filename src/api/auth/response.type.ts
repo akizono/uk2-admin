@@ -7,11 +7,11 @@ export interface Token {
 }
 
 /** 登入介面返回的資料結構 */
-export interface LoginResponse {
+export interface Login {
   userInfo: UserInfo
   role: Role[]
   token: Token
 }
 
 /** 刷新 Token 的介面返回的資料結構 */
-export type RefreshTokenResponse = Token
+export type RefreshToken = Token

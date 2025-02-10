@@ -1,9 +1,9 @@
-import type { UserInfo } from '@/api/user/response.type'
+import type * as USER_RESPONSE from '@/api/user/response.type'
 
 export type Role = string
 
 export interface AuthState {
-  userInfo: UserInfo | null
+  userInfo: USER_RESPONSE.UserInfo | null
   role: Role[]
   accessToken: string
 }

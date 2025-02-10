@@ -8,7 +8,7 @@ import { local } from '@/utils'
 
 // 登入（使用帳號密碼）
 export const loginUrl = '/auth/login'
-export function login(data: DTO.AuthLoginDTO): ApiResponse<RESPONSE.LoginResponse> {
+export function login(data: DTO.LoginCredentials): ApiResponse<RESPONSE.Login> {
   return request.post({
     url: loginUrl,
     data,
@@ -20,7 +20,7 @@ export function login(data: DTO.AuthLoginDTO): ApiResponse<RESPONSE.LoginRespons
 
 // 更新 Token
 export const refreshTokenMethodUrl = '/auth/refreshTokenMethod'
-export function refreshTokenMethod(): ApiResponse<RESPONSE.RefreshTokenResponse> {
+export function refreshTokenMethod(): ApiResponse<RESPONSE.RefreshToken> {
   return request.post({
     url: refreshTokenMethodUrl,
     headers: {

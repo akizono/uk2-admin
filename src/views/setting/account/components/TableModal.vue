@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserInfo } from '@/api/user/response.type'
+import type * as USER_RESPONSE from '@/api/user/response.type'
 import type { FormRules } from 'naive-ui'
 import type { ModalType, Success } from './TableModal.type'
 
@@ -23,7 +23,7 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 
 // 表單數據
 const formRef = ref()
-const initFormData: UserInfo = {
+const initFormData: USER_RESPONSE.UserInfo = {
   id: '',
   username: '',
   nickname: '',
@@ -34,7 +34,7 @@ const initFormData: UserInfo = {
   remark: '',
   status: 1,
 }
-const formData = ref<UserInfo>({ ...initFormData })
+const formData = ref<USER_RESPONSE.UserInfo>({ ...initFormData })
 
 // 表單類型與標題
 const modalType = shallowRef<ModalType | null>(null)
@@ -122,7 +122,7 @@ async function submitModal() {
 }
 
 // 打開彈出視窗
-async function openModal(type: ModalType, data: UserInfo) {
+async function openModal(type: ModalType, data: USER_RESPONSE.UserInfo) {
   modalType.value = type
   showModal()
   // getRoleList()

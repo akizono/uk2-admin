@@ -1,4 +1,4 @@
-import type { UserInfo } from '@/api/user/response.type'
+import type * as USER_RESPONSE from '@/api/user/response.type'
 
 /** 設定sessionStorage的類型 */
 interface Session {
@@ -8,7 +8,7 @@ interface Session {
 /** 設定localStorage的類型 */
 interface Local {
   /* 儲存使用者資訊 */
-  userInfo: UserInfo
+  userInfo: USER_RESPONSE.UserInfo
   /* 儲存角色 */
   role: string[]
   /* 儲存訪問token */

@@ -1,7 +1,7 @@
 <script setup lang="tsx">
-import type { UserInfo } from '@/api/user/response.type'
+import type * as USER_RESPONSE from '@/api/user/response.type'
+import type * as USER_DTO from '@/api/user/dto.type'
 import type { DataTableColumns, FormInst } from 'naive-ui'
-import type { UserListDTO } from '@/api/user/dto.type'
 import { filterObjEmptyValues } from '@/utils/tools/object'
 import { createCopyableDialog } from '@/utils/dialog'
 
@@ -21,7 +21,7 @@ const deleteButtonLoadingMap = ref<Record<string, boolean>>({})
 // 查詢參數
 const formRef = ref<FormInst | null>()
 const total = ref(0)
-const initQueryParams: UserListDTO = {
+const initQueryParams: USER_DTO.UserList = {
   pageSize: 10,
   currentPage: 1,
 
@@ -40,8 +40,8 @@ function handleResetSearch() {
 
 // 列表
 const modalRef = ref()
-const list = ref<UserInfo[]>([])
-const columns: DataTableColumns<UserInfo> = [
+const list = ref<USER_RESPONSE.UserInfo[]>([])
+const columns: DataTableColumns<USER_RESPONSE.UserInfo> = [
   {
     title: '使用者名稱',
     align: 'center',
@@ -154,7 +154,7 @@ async function getList() {
 }
 
 /** 刪除用戶 */
-async function delteteUser(row: UserInfo) {
+async function delteteUser(row: USER_RESPONSE.UserInfo) {
   try {
     deleteButtonLoadingMap.value[row.id!] = true
 

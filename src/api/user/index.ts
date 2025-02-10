@@ -4,17 +4,17 @@ import type * as RESPONSE from './response.type'
 import request from '@/utils/request'
 
 /** 獲取用戶列表 */
-export function getUserList(params: DTO.UserListDTO): ApiResponse<RESPONSE.UserList> {
+export function getUserList(params: DTO.UserList): ApiResponse<RESPONSE.UserList> {
   return request.get({ url: '/user', params })
 }
 
 /** 新增使用者 */
-export function createUser(data: DTO.CreateUserDTO): ApiResponse<RESPONSE.CreateUserResponse> {
+export function createUser(data: DTO.CreateUser): ApiResponse<RESPONSE.CreateUser> {
   return request.post({ url: '/user/create', data })
 }
 
 /** 修改使用者個人資訊 */
-export function updateUser(data: DTO.UpdateUserDTO) {
+export function updateUser(data: DTO.UpdateUser) {
   return request.put({ url: '/user/update', data })
 }
 

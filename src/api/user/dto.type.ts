@@ -1,4 +1,4 @@
-export interface BaseUserDTO {
+export interface BaseUser {
   username?: string
   nickname?: string
   age?: number
@@ -10,15 +10,15 @@ export interface BaseUserDTO {
   status?: number
 }
 
-export interface UserListDTO extends BaseUserDTO {
+export interface UserList extends BaseUser {
   pageSize?: number
   currentPage?: number
 }
 
-export interface CreateUserDTO extends BaseUserDTO {
+export interface CreateUser extends BaseUser {
 
 }
 
-export interface UpdateUserDTO extends BaseUserDTO {
+export interface UpdateUser extends BaseUser {
   id: string
 }
