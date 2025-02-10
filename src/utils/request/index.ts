@@ -1,9 +1,16 @@
 import { config } from './config'
 import { service } from './service'
+import { filterObjEmptyValues } from '../tools/object'
 
 const { defaultHeaders } = config
 
 function request(option: any) {
+  if (option.params)
+    option.params = filterObjEmptyValues(option.params)
+
+  if (option.data)
+    option.data = filterObjEmptyValues(option.data)
+
   const { headersType, headers, ...otherOption } = option
   return service({
     ...otherOption,

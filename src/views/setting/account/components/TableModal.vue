@@ -3,7 +3,6 @@ import type * as USER_RESPONSE from '@/api/user/response.type'
 import type { FormRules } from 'naive-ui'
 import type { ModalType, Success } from './TableModal.type'
 
-import { filterObjEmptyValues } from '@/utils/tools/object'
 import { useBoolean } from '@/hooks'
 
 // import { fetchRoleList } from '@/service'
@@ -65,6 +64,7 @@ const rules: FormRules = {
     trigger: ['blur', 'input'],
   },
   sex: {
+    type: 'number',
     message: '請選擇性別',
     trigger: ['blur', 'change'],
   },
@@ -83,7 +83,7 @@ const rules: FormRules = {
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { data } = await createUser(filterObjEmptyValues(remain))
+  const { data } = await createUser(remain)
   emit('success', {
     ...formData.value,
     type: modalType.value!,
@@ -94,7 +94,7 @@ async function add() {
 
 // 編輯
 async function edit() {
-  const { id, username, ...remain } = filterObjEmptyValues(formData.value)
+  const { id, username, ...remain } = formData.value
   const { message } = await updateUser({ id: id!, ...remain })
   window.$message.success(message)
   emit('success', { type: modalType.value!, ...formData.value })

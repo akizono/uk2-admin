@@ -1,15 +1,14 @@
 <script setup lang="tsx">
-import type * as USER_RESPONSE from '@/api/user/response.type'
-import type * as USER_DTO from '@/api/user/dto.type'
 import type { DataTableColumns, FormInst } from 'naive-ui'
-import { filterObjEmptyValues } from '@/utils/tools/object'
 import { createCopyableDialog } from '@/utils/dialog'
+import { useBoolean } from '@/hooks'
 
 import { NButton, NPopconfirm, NSpace, NSwitch } from 'naive-ui'
 import CopyText from '@/components/custom/CopyText.vue'
 import TableModal from './components/TableModal.vue'
 
-import { useBoolean } from '@/hooks'
+import type * as USER_DTO from '@/api/user/dto.type'
+import type * as USER_RESPONSE from '@/api/user/response.type'
 import { blockUser, deleteUser, getUserList, unblockUser } from '@/api/user'
 import type { Success } from './components/TableModal.type'
 
@@ -143,7 +142,7 @@ const columns: DataTableColumns<USER_RESPONSE.UserInfo> = [
 async function getList() {
   try {
     startLoading()
-    const { data: result } = await getUserList(filterObjEmptyValues(queryParams.value))
+    const { data: result } = await getUserList(queryParams.value)
     list.value = result.list.map(item => item.userInfo)
     total.value = result.total
   }
