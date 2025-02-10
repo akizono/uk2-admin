@@ -44,6 +44,8 @@ service.interceptors.request.use(
   },
 )
 
+// 錯誤狀態
+
 // 回應攔截器
 service.interceptors.response.use(
   async (response: AxiosResponse<any>) => {
@@ -53,8 +55,30 @@ service.interceptors.response.use(
     const { status } = error
     const url = error.config?.url
 
-    const message = (error.response?.data as { message?: string })?.message
-      ?? handle.handleNetworkErrorMessage(error.message)
+    // 讀取後端返回的錯誤消息
+    // const message = (error.response?.data as { message?: string })?.message
+    //   ?? handle.handleNetworkErrorMessage(error.message)
+
+    // 前端預設的錯誤訊息
+    const errorStatus = {
+      400: '請求格式錯誤',
+      401: '未經授權，請重新登入',
+      402: '需要付費才能繼續操作',
+      403: '無權限存取該資源',
+      404: '請求的資源不存在',
+      405: '不允許使用該請求方法',
+      408: '請求超時，請稍後再試',
+      420: '帳號或密碼錯誤',
+      500: '伺服器發生錯誤',
+      501: '伺服器不支援該功能',
+      502: '閘道器錯誤',
+      503: '服務暫時無法使用',
+      504: '閘道器超時',
+      505: 'HTTP 版本不支援',
+    }
+    const message = error.response?.status
+      ? errorStatus[error.response.status as keyof typeof errorStatus]
+      : handle.handleNetworkErrorMessage(error.message)
 
     // 如果是重新整理 Token 的請求失敗，直接登出
     if (url === refreshTokenMethodUrl) {
