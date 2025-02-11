@@ -9,13 +9,13 @@ import TableModal from './components/TableModal.vue'
 
 import type * as USER_DTO from '@/api/user/dto.type'
 import type * as USER_RESPONSE from '@/api/user/response.type'
-import { blockUser, deleteUser, getUserList, unblockUser } from '@/api/user'
 import type { Success } from './components/TableModal.type'
+import { blockUser, deleteUser, getUserList, unblockUser } from '@/api/user'
 
 // 列表的載入狀態
 const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
 // 刪除按鈕的 loading 狀態追蹤
-const deleteButtonLoadingMap = ref<Record<string, boolean>>({})
+const delBtnLoadMap = ref<Record<string, boolean>>({})
 
 // 查詢參數
 const formRef = ref<FormInst | null>()
@@ -120,14 +120,14 @@ const columns: DataTableColumns<USER_RESPONSE.UserInfo> = [
           >
             編輯
           </NButton>
-          <NPopconfirm onPositiveClick={() => delteteUser(row)}>
+          <NPopconfirm onPositiveClick={() => handleDelete(row)}>
             {{
               default: () => '確認刪除',
               trigger: () => (
                 <NButton
                   size="small"
                   type="error"
-                  loading={deleteButtonLoadingMap.value[row.id!]}
+                  loading={delBtnLoadMap.value[row.id!]}
                 >
                   刪除
                 </NButton>
@@ -153,16 +153,16 @@ async function getList() {
 }
 
 /** 刪除用戶 */
-async function delteteUser(row: USER_RESPONSE.UserInfo) {
+async function handleDelete(row: USER_RESPONSE.UserInfo) {
   try {
-    deleteButtonLoadingMap.value[row.id!] = true
+    delBtnLoadMap.value[row.id!] = true
 
     await deleteUser(row.id!)
     list.value = list.value.filter(item => item.id !== row.id)
     window.$message.success(`已經刪除使用者:${row.username}`)
   }
   finally {
-    deleteButtonLoadingMap.value[row.id!] = false
+    delBtnLoadMap.value[row.id!] = false
   }
 }
 
@@ -191,9 +191,9 @@ function changePage(page: number, size: number) {
  * 如果是編輯使用者，則更新列表中對應使用者的資料
  */
 function tableModalSuccess(params: Success) {
-  const { type, password, ...remain } = params
+  const { ModalType, password, ...remain } = params
 
-  if (type === 'add') {
+  if (ModalType === 'add') {
     const tips = `帳號：${remain.username}<br />密碼：${password}<br />請盡快登錄系統修改您的默認密碼。`
     createCopyableDialog({
       title: '新增使用者成功',
@@ -204,7 +204,7 @@ function tableModalSuccess(params: Success) {
     list.value.push(remain)
   }
 
-  if (type === 'edit') {
+  if (ModalType === 'edit') {
     const index = list.value.findIndex(item => item.id === remain.id)
     if (index > -1)
       list.value[index] = { ...list.value[index], ...remain }

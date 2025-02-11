@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type * as USER_RESPONSE from '@/api/user/response.type'
+import type * as USER_DTO from '@/api/user/dto.type'
 import type { FormRules } from 'naive-ui'
 import type { ModalType, Success } from './TableModal.type'
 
 import { useBoolean } from '@/hooks'
-
 // import { fetchRoleList } from '@/service'
 import { createUser, updateUser } from '@/api/user'
 
@@ -22,18 +21,18 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 
 // 表單數據
 const formRef = ref()
-const initFormData: USER_RESPONSE.UserInfo = {
-  id: '',
-  username: '',
-  nickname: '',
+const initFormData: USER_DTO.BaseUser = {
+  id: undefined,
+  username: undefined,
+  nickname: undefined,
   age: undefined,
   sex: undefined,
-  email: '',
-  mobile: '',
-  remark: '',
+  email: undefined,
+  mobile: undefined,
+  remark: undefined,
   status: 1,
 }
-const formData = ref<USER_RESPONSE.UserInfo>({ ...initFormData })
+const formData = ref<USER_DTO.BaseUser>({ ...initFormData })
 
 // 表單類型與標題
 const modalType = shallowRef<ModalType | null>(null)
@@ -86,7 +85,7 @@ async function add() {
   const { data } = await createUser(remain)
   emit('success', {
     ...formData.value,
-    type: modalType.value!,
+    ModalType: modalType.value!,
     id: data.id,
     password: data.password,
   })
@@ -94,10 +93,10 @@ async function add() {
 
 // 編輯
 async function edit() {
-  const { id, username, ...remain } = formData.value
-  const { message } = await updateUser({ id: id!, ...remain })
+  const { username, ...remain } = formData.value
+  const { message } = await updateUser({ ...remain })
   window.$message.success(message)
-  emit('success', { type: modalType.value!, ...formData.value })
+  emit('success', { ModalType: modalType.value!, ...formData.value })
 }
 
 // 提交
@@ -122,7 +121,7 @@ async function submitModal() {
 }
 
 // 打開彈出視窗
-async function openModal(type: ModalType, data: USER_RESPONSE.UserInfo) {
+async function openModal(type: ModalType, data: USER_DTO.UpdateUser) {
   modalType.value = type
   showModal()
   // getRoleList()

@@ -1,4 +1,5 @@
 export interface BaseUser {
+  id?: string
   username?: string
   nickname?: string
   age?: number
@@ -10,15 +11,15 @@ export interface BaseUser {
   status?: number
 }
 
-export interface UserList extends BaseUser {
+export interface UserList extends Omit<BaseUser, 'id'> {
   pageSize?: number
   currentPage?: number
 }
 
-export interface CreateUser extends BaseUser {
+export interface CreateUser extends Omit<BaseUser, 'id'> {
 
 }
 
 export interface UpdateUser extends BaseUser {
-  id: string
+
 }
