@@ -7,10 +7,9 @@ import { NButton, NPopconfirm, NSpace, NSwitch } from 'naive-ui'
 import CopyText from '@/components/custom/CopyText.vue'
 import TableModal from './components/TableModal.vue'
 
-import type * as USER_DTO from '@/api/user/dto.type'
 import type * as USER_RESPONSE from '@/api/user/response.type'
-import type { Success } from './components/TableModal.type'
-import { blockUser, deleteUser, getUserList, unblockUser } from '@/api/user'
+import type { UserVo } from '@/api/user'
+import { UserApi } from '@/api/user'
 
 // 列表的載入狀態
 const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
@@ -20,10 +19,9 @@ const delBtnLoadMap = ref<Record<string, boolean>>({})
 // 查詢參數
 const formRef = ref<FormInst | null>()
 const total = ref(0)
-const initQueryParams: USER_DTO.UserList = {
+const initQueryParams = {
   pageSize: 10,
   currentPage: 1,
-
   username: '',
   nickname: '',
   age: undefined,
@@ -39,8 +37,8 @@ function handleResetSearch() {
 
 // 列表
 const modalRef = ref()
-const list = ref<USER_RESPONSE.UserInfo[]>([])
-const columns: DataTableColumns<USER_RESPONSE.UserInfo> = [
+const list = ref<UserVo[]>([])
+const columns: DataTableColumns<UserVo> = [
   {
     title: '使用者名稱',
     align: 'center',
@@ -142,11 +140,10 @@ const columns: DataTableColumns<USER_RESPONSE.UserInfo> = [
 async function getList() {
   try {
     startLoading()
-    const { data: result } = await getUserList(queryParams.value)
+    const { data: result } = await UserApi.getUserPage(queryParams.value)
     list.value = result.list.map(item => item.userInfo)
     total.value = result.total
   }
-
   finally {
     endLoading()
   }
@@ -157,7 +154,7 @@ async function handleDelete(row: USER_RESPONSE.UserInfo) {
   try {
     delBtnLoadMap.value[row.id!] = true
 
-    await deleteUser(row.id!)
+    await UserApi.deleteUser(row.id!)
     list.value = list.value.filter(item => item.id !== row.id)
     window.$message.success(`已經刪除使用者:${row.username}`)
   }
@@ -173,9 +170,9 @@ function handleUpdateDisabled(value: 0 | 1, id: string) {
     list.value[index].status = value
 
   if (value === 1)
-    unblockUser(id)
+    UserApi.unblockUser(id)
   else
-    blockUser(id)
+    UserApi.blockUser(id)
 }
 
 /** 分頁器 */
@@ -190,7 +187,7 @@ function changePage(page: number, size: number) {
  * 如果是新增使用者，則顯示帳號密碼提示框並將使用者加入列表
  * 如果是編輯使用者，則更新列表中對應使用者的資料
  */
-function tableModalSuccess(params: Success) {
+function tableModalSuccess(params: { ModalType: string, password?: string } & UserVo) {
   const { ModalType, password, ...remain } = params
 
   if (ModalType === 'add') {

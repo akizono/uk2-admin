@@ -35,3 +35,24 @@ declare namespace App {
 interface DictMap {
   [key: string]: Entity.Dict[]
 }
+
+// API 回應介面
+type ApiResponse<T = any> = Promise<{
+  message: string
+  data: T
+}>
+
+// 分頁回應介面
+type PageRes<T> = ApiResponse<{
+  total: number
+  list: T[]
+}>
+
+// 分頁參數介面
+interface PageParams {
+  pageSize?: number
+  currentPage?: number
+}
+
+// 彈窗類型
+type ModalType = 'add' | 'view' | 'edit'

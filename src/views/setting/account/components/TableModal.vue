@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import type * as USER_DTO from '@/api/user/dto.type'
 import type { FormRules } from 'naive-ui'
-import type { ModalType, Success } from './TableModal.type'
 
 import { useBoolean } from '@/hooks'
-// import { fetchRoleList } from '@/service'
-import { createUser, updateUser } from '@/api/user'
+import { UserApi } from '@/api/user'
 
 const props = defineProps<{
   modalName?: string
 }>()
-const emit = defineEmits<{
-  success: [Success]
-}>()
+const emit = defineEmits(['success'])
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
@@ -21,7 +17,7 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 
 // 表單數據
 const formRef = ref()
-const initFormData: USER_DTO.BaseUser = {
+const initFormData = {
   id: undefined,
   username: undefined,
   nickname: undefined,
@@ -32,7 +28,7 @@ const initFormData: USER_DTO.BaseUser = {
   remark: undefined,
   status: 1,
 }
-const formData = ref<USER_DTO.BaseUser>({ ...initFormData })
+const formData = ref({ ...initFormData })
 
 // 表單類型與標題
 const modalType = shallowRef<ModalType | null>(null)
@@ -82,7 +78,7 @@ const rules: FormRules = {
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { data } = await createUser(remain)
+  const { data } = await UserApi.createUser(remain)
   emit('success', {
     ...formData.value,
     ModalType: modalType.value!,
@@ -94,7 +90,7 @@ async function add() {
 // 編輯
 async function edit() {
   const { username, ...remain } = formData.value
-  const { message } = await updateUser({ ...remain })
+  const { message } = await UserApi.updateUser({ ...remain })
   window.$message.success(message)
   emit('success', { ModalType: modalType.value!, ...formData.value })
 }
@@ -152,12 +148,6 @@ function closeModal() {
 defineExpose({
   openModal,
 })
-
-// const options = ref()
-// async function getRoleList() {
-//   const { data } = await fetchRoleList()
-//   options.value = data
-// }
 </script>
 
 <template>
@@ -201,15 +191,6 @@ defineExpose({
         <n-form-item-grid-item :span="1" label="手機號碼" path="mobile">
           <n-input v-model:value="formData.mobile" />
         </n-form-item-grid-item>
-
-        <!-- <n-form-item-grid-item :span="2" label="角色" path="role">
-          <n-select
-            v-model:value="formData.role" multiple filterable
-            label-field="role"
-            value-field="id"
-            :options="options"
-          />
-        </n-form-item-grid-item> -->
         <n-form-item-grid-item :span="2" label="備註" path="remark">
           <n-input v-model:value="formData.remark" type="textarea" />
         </n-form-item-grid-item>
