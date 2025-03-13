@@ -1,9 +1,11 @@
 <script setup lang="tsx">
+import type { InitFormData, InitQueryParams, TableRow } from './type'
 // TODO：每一頁都需要遞進的index
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
+
 import { useBoolean } from '@/hooks'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
-import type { InitFormData, InitQueryParams, TableRow } from './type'
+
 import TableModal from './TableModal.vue'
 
 const props = defineProps<{

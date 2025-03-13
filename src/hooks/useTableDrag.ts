@@ -1,4 +1,5 @@
 import type { NDataTable } from 'naive-ui'
+
 import { useDraggable } from 'vue-draggable-plus'
 
 export function useTableDrag<T = unknown>(params: {

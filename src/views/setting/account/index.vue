@@ -8,8 +8,8 @@ import type { DataTableColumns, FormRules } from 'naive-ui'
 import { UserApi } from '@/api/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import CopyText from '@/components/custom/CopyText.vue'
-import { NSwitch } from 'naive-ui'
 import { createCopyableDialog } from '@/utils/dialog'
+import { NSwitch } from 'naive-ui'
 
 // 初始化查詢參數
 const initQueryParams: InitQueryParams[] = [

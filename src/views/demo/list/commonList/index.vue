@@ -1,9 +1,11 @@
 <script setup lang="tsx">
 import type { DataTableColumns, FormInst } from 'naive-ui'
+
 import { Gender } from '@/constants'
 import { useBoolean } from '@/hooks'
 import { fetchUserPage } from '@/service'
 import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
+
 import TableModal from './components/TableModal.vue'
 
 const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MenuInst } from 'naive-ui'
+
 import { useAppStore, useRouteStore } from '@/store'
 
 const route = useRoute()

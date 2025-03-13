@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormRules } from 'naive-ui'
+
 import { updateUser } from '@/api/user'
 import { useAuthStore } from '@/store'
 import { onMounted } from 'vue'

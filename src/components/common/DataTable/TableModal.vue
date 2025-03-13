@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { FormRules } from 'naive-ui'
-import { useBoolean } from '@/hooks'
 import type { InitFormData, TableRow } from './type'
+import type { FormRules } from 'naive-ui'
+
+import { useBoolean } from '@/hooks'
 
 const props = defineProps<{
   modalName?: string

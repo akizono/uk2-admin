@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { group } from 'radash'
+
 import NoticeList from '../common/NoticeList.vue'
 
 const MassageData = ref<Entity.Message[]>([

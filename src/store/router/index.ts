@@ -1,9 +1,11 @@
 import type { MenuOption } from 'naive-ui'
+
 import { router } from '@/router'
 import { staticRoutes } from '@/router/routes.static'
 import { fetchUserRoutes } from '@/service'
 import { useAuthStore } from '@/store/model/auth/'
 import { $t, local } from '@/utils'
+
 import { createMenus, createRoutes, generateCacheRoutes } from './helper'
 
 interface RoutesStatus {

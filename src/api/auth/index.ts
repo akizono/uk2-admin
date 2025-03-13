@@ -1,10 +1,9 @@
-import type { ApiResponse } from '@/utils/request/types'
 import type * as DTO from './dto.type'
 import type * as RESPONSE from './response.type'
-
-import request from '@/utils/request'
+import type { ApiResponse } from '@/utils/request/types'
 
 import { local } from '@/utils'
+import request from '@/utils/request'
 
 // 登入（使用帳號密碼）
 export const loginUrl = '/auth/login'

@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import type { DataTableColumns, FormInst, NDataTable } from 'naive-ui'
+
 import { Gender } from '@/constants'
 import { useBoolean } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'

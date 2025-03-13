@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store/app'
+
 import { SettingDrawer } from './components'
 import leftMenu from './leftMenu.layout.vue'
 import mixMenu from './mixMenu.layout.vue'

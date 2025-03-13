@@ -1,9 +1,11 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+
 import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/auth'
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
 import axios from 'axios'
 import qs from 'qs'
+
 import { config } from './config'
 import * as handle from './handle'
 

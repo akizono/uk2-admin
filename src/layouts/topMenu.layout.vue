@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useAppStore, useRouteStore } from '@/store'
+
 import {
   BackTop,
   FullScreen,

@@ -1,7 +1,9 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
+
 import { local, setLocale } from '@/utils'
 import { colord } from 'colord'
 import { set } from 'radash'
+
 import themeConfig from './theme.json'
 
 export type TransitionAnimation = '' | 'fade-slide' | 'fade-bottom' | 'fade-scale' | 'zoom-fade' | 'zoom-out'

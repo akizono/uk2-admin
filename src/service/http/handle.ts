@@ -1,6 +1,7 @@
 import { fetchUpdateToken } from '@/service'
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
+
 import {
   ERROR_NO_TIP_STATUS,
   ERROR_STATUS,

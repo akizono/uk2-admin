@@ -2,7 +2,6 @@
 import {
   fetchGet,
 } from '@/service'
-
 import { useRequest } from 'alova/client'
 
 const emit = defineEmits<{

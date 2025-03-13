@@ -3,6 +3,7 @@ import { createAlova } from 'alova'
 import { createServerTokenAuthentication } from 'alova/client'
 import adapterFetch from 'alova/fetch'
 import VueHook, { type VueHookType } from 'alova/vue'
+
 import {
   DEFAULT_ALOVA_OPTIONS,
   DEFAULT_BACKEND_OPTIONS,

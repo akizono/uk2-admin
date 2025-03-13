@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormInst } from 'naive-ui'
+
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
 

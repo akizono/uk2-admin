@@ -7,7 +7,19 @@ export default antfu(
     typescript: {
       overrides: {
         'perfectionist/sort-exports': 'off',
-        'perfectionist/sort-imports': 'off',
+        'perfectionist/sort-imports': ['error', {
+          type: 'natural',
+          order: 'asc',
+          groups: [
+            'type',
+            ['builtin', 'external'],
+            'internal',
+            ['parent', 'sibling', 'index'],
+            'style',
+            'object',
+            'unknown',
+          ],
+        }],
         'ts/no-unused-expressions': ['error', { allowShortCircuit: true }],
         'no-console': 'off',
       },

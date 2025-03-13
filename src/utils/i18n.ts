@@ -1,4 +1,5 @@
 import type { NDateLocale, NLocale } from 'naive-ui'
+
 import { i18n } from '@/modules/i18n'
 import { dateZhCN, zhCN } from 'naive-ui'
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store'
+import { NFlex } from 'naive-ui'
 import IconAuto from '~icons/icon-park-outline/laptop-computer'
 import IconMoon from '~icons/icon-park-outline/moon'
 import IconSun from '~icons/icon-park-outline/sun-one'
-import { NFlex } from 'naive-ui'
 
 const { t } = useI18n()
 

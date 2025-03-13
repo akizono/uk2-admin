@@ -1,4 +1,5 @@
 import type { DialogApi } from 'naive-ui'
+
 import { h } from 'vue'
 
 let dialog: DialogApi | null = null

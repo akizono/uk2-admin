@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Quill from 'quill'
 import { useTemplateRef } from 'vue'
+
 import 'quill/dist/quill.snow.css'
 
 defineOptions({

@@ -1,5 +1,5 @@
-import type { Role } from '@/store/model/auth/interfaces'
 import type { UserInfo } from '@/api/user/response.type'
+import type { Role } from '@/store/model/auth/interfaces'
 
 export interface Token {
   accessToken: string

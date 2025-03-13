@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store'
+
 import LayoutSelector from './LayoutSelector.vue'
 
 const appStore = useAppStore()

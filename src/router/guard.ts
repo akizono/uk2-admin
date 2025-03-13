@@ -1,4 +1,5 @@
 import type { Router } from 'vue-router'
+
 import { useAppStore, useRouteStore, useTabStore } from '@/store'
 import { local } from '@/utils'
 

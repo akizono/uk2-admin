@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Chart from './components/chart.vue'
 import Chart2 from './components/chart2.vue'
 import Chart3 from './components/chart3.vue'
+import Chart from './components/chart.vue'
 
 const tableData = [
   {

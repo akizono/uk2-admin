@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormRules } from 'naive-ui'
+
 import { useBoolean } from '@/hooks'
 
 interface Props {

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { MenuInst, MenuOption } from 'naive-ui'
+
 import { useAppStore, useRouteStore } from '@/store'
+
 import {
   BackTop,
   CollapaseButton,

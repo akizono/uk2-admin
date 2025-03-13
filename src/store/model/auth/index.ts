@@ -1,9 +1,10 @@
-import type * as AUTH_DTO from '@/api/auth/response.type'
 import type { AuthState } from './interfaces'
+import type * as AUTH_DTO from '@/api/auth/response.type'
 
 import { login } from '@/api/auth'
 import { router } from '@/router'
 import { local } from '@/utils'
+
 import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
 

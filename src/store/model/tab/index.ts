@@ -1,4 +1,5 @@
 import type { RouteLocationNormalized } from 'vue-router'
+
 import { router } from '@/router'
 
 interface TabState {

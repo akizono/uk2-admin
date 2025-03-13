@@ -1,5 +1,6 @@
 import type { Role } from '@/store/model/auth/interfaces'
 import type { App, Directive } from 'vue'
+
 import { usePermission } from '@/hooks'
 
 export function install(app: App) {

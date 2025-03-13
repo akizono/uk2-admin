@@ -1,4 +1,5 @@
 import type { Role } from '@/store/model/auth/interfaces'
+
 import { useAuthStore } from '@/store'
 /** 權限判斷 */
 export function usePermission() {

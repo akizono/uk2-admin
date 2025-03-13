@@ -1,4 +1,5 @@
 import type { ProxyOptions } from 'vite'
+
 import { mapEntries } from 'radash'
 
 export function generateProxyPattern(envConfig: Record<string, string>) {

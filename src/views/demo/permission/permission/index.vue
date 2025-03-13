@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Role } from '@/store/model/auth/interfaces'
+
 import { usePermission } from '@/hooks'
 import { useAuthStore } from '@/store'
 

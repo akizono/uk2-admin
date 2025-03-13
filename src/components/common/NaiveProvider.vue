@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
 import { setdialog } from '@/utils/dialog'
+import { useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
 
 // 掛載naive元件的方法至window, 以便在路由鉤子函數和請求函數裡面調用
 function registerNaiveTools() {

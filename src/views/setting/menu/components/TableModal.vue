@@ -2,6 +2,7 @@
 import type {
   FormItemRule,
 } from 'naive-ui'
+
 import HelpInfo from '@/components/common/HelpInfo.vue'
 import { Regex } from '@/constants'
 import { useBoolean } from '@/hooks'

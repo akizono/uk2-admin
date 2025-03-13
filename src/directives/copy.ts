@@ -1,4 +1,5 @@
 import type { App, Directive } from 'vue'
+
 import { $t } from '@/utils'
 
 interface CopyHTMLElement extends HTMLElement {
