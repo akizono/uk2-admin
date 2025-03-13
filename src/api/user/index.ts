@@ -1,6 +1,3 @@
-import type { ApiResponse } from '@/utils/request/types'
-import type * as DTO from './dto.type'
-import type * as RESPONSE from './response.type'
 import request from '@/utils/request'
 
 export interface UserVo {

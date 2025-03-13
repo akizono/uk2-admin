@@ -1,14 +1,23 @@
 <script setup lang="ts">
-import type * as USER_DTO from '@/api/user/dto.type'
 import type { FormRules } from 'naive-ui'
-
 import { useBoolean } from '@/hooks'
-import { UserApi } from '@/api/user'
+import type { InitFormData, TableRow } from './type'
 
 const props = defineProps<{
   modalName?: string
+
+  updateFunction: (...args: any[]) => Promise<any> // 更新列表數據的函數
+  createFunction: (...args: any[]) => Promise<any> // 新增列表數據的函數
+
+  rules?: FormRules
+  initFormData?: InitFormData[]
 }>()
+
 const emit = defineEmits(['success'])
+
+defineExpose({
+  openModal,
+})
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
@@ -17,18 +26,16 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 
 // 表單數據
 const formRef = ref()
-const initFormData = {
-  id: undefined,
-  username: undefined,
-  nickname: undefined,
-  age: undefined,
-  sex: undefined,
-  email: undefined,
-  mobile: undefined,
-  remark: undefined,
-  status: 1,
+const formData = ref<Record<string, any>>({})
+const formDataMapping = ref<Record<string, InitFormData>>({})
+function resetFormData() {
+  if (props.initFormData && Array.isArray(props.initFormData)) {
+    props.initFormData.forEach((item: InitFormData) => {
+      formData.value[item.name] = item.value
+      formDataMapping.value[item.name] = item
+    })
+  }
 }
-const formData = ref({ ...initFormData })
 
 // 表單類型與標題
 const modalType = shallowRef<ModalType | null>(null)
@@ -42,55 +49,22 @@ const modalTitle = computed(() => {
   }[modalType.value] + (props.modalName ?? '')
 })
 
-// 表單驗證規則
-const rules: FormRules = {
-  username: {
-    required: true,
-    message: '請輸入使用者名稱',
-    trigger: ['blur', 'input'],
-  },
-  nickname: {
-    message: '請輸入暱稱',
-    trigger: ['blur', 'input'],
-  },
-  age: {
-    type: 'number',
-    message: '請輸入年齡',
-    trigger: ['blur', 'input'],
-  },
-  sex: {
-    type: 'number',
-    message: '請選擇性別',
-    trigger: ['blur', 'change'],
-  },
-  email: {
-    type: 'email',
-    message: '請輸入正確的電子郵件格式',
-    trigger: ['blur', 'input'],
-  },
-  mobile: {
-    pattern: /^[\d\s+]{1,20}$/,
-    message: '請輸入正確的手機號碼格式',
-    trigger: ['blur', 'input'],
-  },
-}
-
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { data } = await UserApi.createUser(remain)
+  const { data } = await props.createFunction(remain)
+
   emit('success', {
-    ...formData.value,
     ModalType: modalType.value!,
-    id: data.id,
-    password: data.password,
+    ...formData.value,
+    ...data,
   })
 }
 
 // 編輯
 async function edit() {
   const { username, ...remain } = formData.value
-  const { message } = await UserApi.updateUser({ ...remain })
+  const { message } = await props.updateFunction({ ...remain })
   window.$message.success(message)
   emit('success', { ModalType: modalType.value!, ...formData.value })
 }
@@ -117,22 +91,23 @@ async function submitModal() {
 }
 
 // 打開彈出視窗
-async function openModal(type: ModalType, data: USER_DTO.UpdateUser) {
+async function openModal(type: ModalType, data?: TableRow) {
   modalType.value = type
   showModal()
-  // getRoleList()
   const handlers = {
     async add() {
-      formData.value = { ...initFormData }
+      resetFormData()
     },
     async view() {
       if (!data)
         return
+      resetFormData()
       formData.value = { ...data }
     },
     async edit() {
       if (!data)
         return
+      resetFormData()
       formData.value = { ...data }
     },
   }
@@ -144,10 +119,6 @@ function closeModal() {
   endLoading()
   hiddenModal()
 }
-
-defineExpose({
-  openModal,
-})
 </script>
 
 <template>
@@ -162,18 +133,9 @@ defineExpose({
       action: true,
     }"
   >
-    <n-form ref="formRef" :rules="rules" label-placement="left" :model="formData" :label-width="100" :disabled="modalType === 'view'">
+    <n-form ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100" :disabled="modalType === 'view'">
       <n-grid :cols="2" :x-gap="18">
-        <n-form-item-grid-item :span="1" label="使用者名稱" path="username">
-          <n-input v-model:value="formData.username" :disabled="modalType === 'edit'" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="暱稱" path="nickname">
-          <n-input v-model:value="formData.nickname" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="年齡" path="age">
-          <n-input-number v-model:value="formData.age" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="性別" path="sex">
+        <!-- <n-form-item-grid-item :span="1" label="性別" path="sex">
           <n-radio-group v-model:value="formData.sex">
             <n-space>
               <n-radio :value="1">
@@ -184,17 +146,8 @@ defineExpose({
               </n-radio>
             </n-space>
           </n-radio-group>
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="信箱" path="email">
-          <n-input v-model:value="formData.email" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="手機號碼" path="mobile">
-          <n-input v-model:value="formData.mobile" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="2" label="備註" path="remark">
-          <n-input v-model:value="formData.remark" type="textarea" />
-        </n-form-item-grid-item>
-        <n-form-item-grid-item :span="1" label="使用者狀態" path="status">
+        </n-form-item-grid-item> -->
+        <!-- <n-form-item-grid-item :span="1" label="使用者狀態" path="status">
           <n-switch
             v-model:value="formData.status"
             :checked-value="1" :unchecked-value="0"
@@ -206,7 +159,16 @@ defineExpose({
               禁用
             </template>
           </n-switch>
-        </n-form-item-grid-item>
+        </n-form-item-grid-item> -->
+
+        <template v-for="item in formDataMapping" :key="item.name">
+          <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :label="item.label" :path="item.name">
+            <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+          </n-form-item-grid-item>
+        </template>
       </n-grid>
     </n-form>
     <template #action>

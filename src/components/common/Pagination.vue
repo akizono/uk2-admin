@@ -17,6 +17,15 @@ const emit = defineEmits<{
 const page = ref(propCurrentPage)
 const pageSize = ref(propPageSize)
 const displayOrder: Array<'pages' | 'size-picker' | 'quick-jumper'> = ['size-picker', 'pages']
+const pageSizeOptions = computed(() => {
+  const arr = [10, 20, 30, 50]
+  if (arr.includes(propPageSize)) {
+    return arr
+  }
+  else {
+    return [...arr, propPageSize].sort((a, b) => a - b)
+  }
+})
 
 function changePage() {
   emit('change', page.value, pageSize.value)
@@ -28,7 +37,7 @@ function changePage() {
     v-if="propTotal > 0"
     v-model:page="page"
     v-model:page-size="pageSize"
-    :page-sizes="[10, 20, 30, 50]"
+    :page-sizes="pageSizeOptions"
     :item-count="propTotal"
     :display-order="displayOrder"
     show-size-picker
