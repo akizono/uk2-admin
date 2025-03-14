@@ -1,0 +1,52 @@
+import type { UserVo } from '../user'
+
+import request from '@/utils/request'
+
+export interface DeptVo {
+  id: string
+  parentId: string
+  name: string
+  sort: number
+  leaderUserId: string
+  leaderUser: UserVo
+
+  remark?: string
+  status?: number
+  isDeleted?: number
+  creator?: string
+  createTime?: string
+  updater?: string
+  updateTime?: string
+}
+
+export const DeptApi = {
+  /** 獲取部門分頁列表 */
+  getDeptPage: async (params: PageParams): PageRes<{ deptInfo: DeptVo }> => {
+    return await request.get({ url: '/system/dept/page', params })
+  },
+
+  /** 新增部門 */
+  createDept: async (data: DeptVo) => {
+    return await request.post({ url: '/system/dept/create', data })
+  },
+
+  /** 修改部門 */
+  updateDept: async (data: DeptVo) => {
+    return await request.put({ url: '/system/dept/update', data })
+  },
+
+  /** 刪除部門 */
+  deleteDept: async (id: string) => {
+    return await request.delete({ url: `/system/dept/delete/${id}` })
+  },
+
+  /** 封鎖部門 */
+  blockDept: async (id: string) => {
+    return await request.put({ url: `/system/dept/block/${id}` })
+  },
+
+  /** 解封部門 */
+  unblockDept: async (id: string) => {
+    return await request.put({ url: `/system/dept/unblock/${id}` })
+  },
+}

@@ -17,7 +17,7 @@ const props = defineProps<{
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
 
-  columns: DataTableColumns // 表格列定義
+  columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
   getFunction: (...args: any[]) => Promise<any> // 獲取列表數據的函數
@@ -159,7 +159,29 @@ async function getList() {
   try {
     startLoading()
     const { data: result } = await props.getFunction(queryParams.value)
-    list.value = result.list.map((item: any) => item.userInfo)
+
+    // 將巢狀物件攤平化
+    const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
+      return Object.keys(obj).reduce((acc: Record<string, any>, key: string) => {
+        const value = obj[key]
+        const newKey = prefix ? `${prefix}.${key}` : key
+
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          Object.assign(acc, flattenObject(value, newKey))
+        }
+        else {
+          acc[newKey] = value
+        }
+
+        return acc
+      }, {})
+    }
+
+    const flattenData = (data: any[]): any[] => {
+      return data.map((item: any) => flattenObject(item))
+    }
+
+    list.value = flattenData(result.list)
     total.value = result.total
   }
   finally {

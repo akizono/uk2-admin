@@ -108,7 +108,7 @@ const columns: DataTableColumns<UserVo> = [
   {
     title: '手機號碼',
     align: 'center',
-    key: 'tel',
+    key: 'mobile',
     render: (row) => {
       return (
         <CopyText value={row.mobile} />
