@@ -104,9 +104,9 @@ service.interceptors.response.use(
         }
 
         // 取得新的 Token
-        const { data } = await refreshTokenMethod()
+        const { data: result } = await refreshTokenMethod()
         const authStore = useAuthStore()
-        authStore.handleRefreshToken(data)
+        authStore.handleRefreshToken(result)
 
         // 重新整理成功後，執行佇列中的請求
         requestList.forEach(callback => callback())

@@ -1,5 +1,4 @@
-import type { AuthState } from './interfaces'
-import type * as AUTH_DTO from '@/api/system/auth/response.type'
+import type { Token, UserVo } from '@/api/system/user'
 
 import { login } from '@/api/system/auth'
 import { router } from '@/router'
@@ -9,10 +8,9 @@ import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
 
 export const useAuthStore = defineStore('auth-store', {
-  state: (): AuthState => {
+  state: () => {
     return {
-      userInfo: local.get('userInfo'),
-      role: local.get('role') || [],
+      user: local.get('user'),
       accessToken: local.get('accessToken') || '',
     }
   },
@@ -49,27 +47,27 @@ export const useAuthStore = defineStore('auth-store', {
     clearAuthStorage() {
       local.remove('accessToken')
       local.remove('refreshToken')
-      local.remove('userInfo')
+      local.remove('user')
     },
 
     /** 處理使用者登入 */
     async login(username: string, password: string) {
-      const { data } = await login({ username, password })
+      const { data: result } = await login({ username, password })
+      console.log('result', result)
 
       // 處理登入資訊
-      await this.handleLoginInfo(data)
+      await this.handleLoginInfo(result)
     },
 
     /** 處理登入後的資料 */
-    async handleLoginInfo(data: AUTH_DTO.Login) {
+    async handleLoginInfo(user: UserVo) {
+      console.log('user', user)
       // 儲存 Token 和使用者資訊
-      local.set('userInfo', data.userInfo)
-      local.set('role', data.role)
-      local.set('accessToken', data.token.accessToken)
-      local.set('refreshToken', data.token.refreshToken)
-      this.userInfo = data.userInfo
-      this.role = data.role
-      this.accessToken = data.token.accessToken
+      local.set('user', user)
+      local.set('accessToken', user.token!.accessToken)
+      local.set('refreshToken', user.token!.refreshToken)
+      this.user = user
+      this.accessToken = user.token!.accessToken
 
       // 初始化路由和選單
       const routeStore = useRouteStore()
@@ -84,10 +82,10 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理更新 Token 的回傳資料 */
-    async handleRefreshToken(data: AUTH_DTO.Token) {
-      local.set('accessToken', data.accessToken)
-      local.set('refreshToken', data.refreshToken)
-      this.accessToken = data.accessToken
+    async handleRefreshToken(token: Token) {
+      local.set('accessToken', token.accessToken)
+      local.set('refreshToken', token.refreshToken)
+      this.accessToken = token.accessToken
     },
   },
 })

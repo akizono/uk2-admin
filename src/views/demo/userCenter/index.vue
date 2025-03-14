@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { FormRules } from 'naive-ui'
 
-import { updateUser } from '@/api/system/user'
+import { UserApi } from '@/api/system/user'
 import { useAuthStore } from '@/store'
 import { onMounted } from 'vue'
 
 const authStore = useAuthStore()
 
-const { userInfo, role } = authStore
+const { user } = authStore
 const formRef = ref()
 const formValue = ref({
   id: '',
@@ -38,19 +38,20 @@ function handleValidateClick() {
   formRef.value?.validate(async (errors: any) => {
     if (errors)
       return window.$message.error('驗證不通過')
-    updateUser(formValue.value).then(({ message }) => {
+
+    UserApi.updateUser(formValue.value).then(({ message }) => {
       window.$message.success(message)
     })
   })
 }
 
 onMounted(() => {
-  if (userInfo) {
+  if (user) {
     formValue.value = {
-      id: userInfo.id,
-      nickname: userInfo.nickname ?? '',
-      age: userInfo.age ?? 33,
-      mobile: userInfo.mobile ?? '',
+      id: user.id!,
+      nickname: user.nickname ?? '',
+      age: user.age ?? 33,
+      mobile: user.mobile ?? '',
     }
   }
 })
@@ -60,24 +61,24 @@ onMounted(() => {
   <n-space vertical>
     <n-card title="個人資訊">
       <n-space size="large">
-        <n-avatar round :size="128" :src="userInfo?.avatar || ''" />
+        <n-avatar round :size="128" :src="user?.avatar || ''" />
 
         <n-descriptions
           label-placement="left"
           :column="2"
-          :title="`傍晚好，${userInfo?.nickname || userInfo?.username}，這裡是簡單的個人中心模板`"
+          :title="`傍晚好，${user?.nickname || user?.username}，這裡是簡單的個人中心模板`"
         >
           <n-descriptions-item label="id">
-            {{ userInfo?.id }}
+            {{ user!.id }}
           </n-descriptions-item>
           <n-descriptions-item label="使用者名稱">
-            {{ userInfo?.username }}
+            {{ user!.username }}
           </n-descriptions-item>
           <n-descriptions-item label="暱稱">
-            {{ userInfo?.nickname }}
+            {{ user?.nickname }}
           </n-descriptions-item>
           <n-descriptions-item label="角色">
-            {{ role.join('、 ') }}
+            {{ user!.role!.join('、 ') }}
           </n-descriptions-item>
         </n-descriptions>
       </n-space>

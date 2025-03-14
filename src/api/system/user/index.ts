@@ -1,5 +1,10 @@
 import request from '@/utils/request'
 
+export interface Token {
+  accessToken: string
+  refreshToken: string
+}
+
 export interface UserVo {
   id?: string
   username?: string
@@ -9,6 +14,9 @@ export interface UserVo {
   email?: string
   mobile?: string
   avatar?: string
+
+  role?: string[]
+  token?: Token
 
   remark?: string
   status?: number
@@ -21,7 +29,7 @@ export interface UserVo {
 
 export const UserApi = {
   /** 獲取用戶分頁列表 */
-  getUserPage: async (params: PageParams): PageRes<{ userInfo: UserVo }> => {
+  getUserPage: async (params: PageParams): PageRes<UserVo> => {
     return await request.get({ url: '/system/user/page', params })
   },
 

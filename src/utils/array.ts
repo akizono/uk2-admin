@@ -1,37 +1,37 @@
 /**
- * 将给定的数组转换为树形结构。
- * @param arr - 原始数组，其中每个元素包含id和pid属性，pid表示父级id。
- * @returns 返回转换后的树形结构数组。
+ * 將給定的數組轉換為樹形結構。
+ * @param arr - 原始數組，其中每個元素包含id和parentId屬性
+ * @returns 返迴轉換後的樹形結構數組。
  */
 export function arrayToTree(arr: any[]) {
-  // 初始化结果数组
-  const res: any = []
-  // 使用Map存储数组元素，以id为键，元素本身为值
+  // 初始化結果數組
+  const res: any[] = []
+  // 使用Map儲存數組元素，以id為鍵，元素本身為值
   const map = new Map()
 
-  // 遍历数组，将每个元素以id为键存储到Map中
+  // 遍歷數組，將每個元素以id為鍵儲存到Map中
   arr.forEach((item) => {
     map.set(item.id, item)
   })
 
-  // 再次遍历数组，根据pid将元素组织成树形结构
+  // 再次遍歷數組，根據parentId將元素組織成樹形結構
   arr.forEach((item) => {
-    // 获取当前元素的父级元素
-    const parent = item.pid && map.get(item.pid)
-    // 如果有父级元素
+    // 獲取當前元素的父級元素
+    const parent = item.parentId && map.get(item.parentId)
+    // 如果有父級元素
     if (parent) {
-      // 如果父级元素已有子元素，则将当前元素追加到子元素数组中
+      // 如果父級元素已有子元素，則將當前元素追加到子元素數組中
       if (parent?.children)
         parent.children.push(item)
-      // 如果父级元素没有子元素，则创建子元素数组，并将当前元素作为第一个元素
+      // 如果父級元素沒有子元素，則創建子元素數組，並將當前元素作為第一個元素
       else
         parent.children = [item]
     }
-    // 如果没有父级元素，则将当前元素直接添加到结果数组中
+    // 如果沒有父級元素，則將當前元素直接添加到結果數組中
     else {
       res.push(item)
     }
   })
-  // 返回组织好的树形结构数组
+  // 返回組織好的樹形結構數組
   return res
 }

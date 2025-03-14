@@ -1,0 +1,414 @@
+<script setup lang="ts">
+import type { InitFormData, ModalType, TableRow } from '../type'
+import type { FormRules } from 'naive-ui'
+
+import { useBoolean } from '@/hooks'
+import { useDebounceFn } from '@vueuse/core'
+
+// 樹狀結構的節點
+interface TreeNode {
+  label: string
+  value: string | number
+  key: string | number
+  children?: TreeNode[]
+}
+
+const props = defineProps<{
+  modalName?: string
+
+  updateFunction: (...args: any[]) => Promise<any> // 更新列表數據的函數
+  createFunction: (...args: any[]) => Promise<any> // 新增列表數據的函數
+
+  rules?: FormRules
+  initFormData?: InitFormData[]
+}>()
+
+const emit = defineEmits(['success'])
+
+defineExpose({
+  openModal,
+})
+
+// 控制彈出視窗的顯示
+const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
+// 控制提交的loading
+const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
+
+// 為每個帶選項的欄位創建獨立的儲存區域
+const optionsMap = ref<Record<string, any[]>>({})
+// 為每個 select 添加獨立的 loading 狀態
+const selectLoadingMap = ref<Record<string, boolean>>({})
+// 設置選項的共用函數，使用 nextTick 確保 DOM 更新
+async function setOptionsWithNextTick(
+  fieldName: string,
+  list: any[],
+  labelKey: string,
+  valueKey: string,
+) {
+  // 先設置為空數組，強制更新
+  optionsMap.value[fieldName] = []
+  // 使用 nextTick 確保 DOM 已更新
+  await nextTick()
+
+  // 檢查是否包含 parentId
+  const hasParentId = list.length > 0 && 'parentId' in list[0]
+
+  if (hasParentId) {
+    // 先建立所有節點
+    const nodeMap = new Map<string | number, TreeNode>()
+
+    // 第一次遍歷：建立所有節點
+    list.forEach((item: any) => {
+      const node: TreeNode = {
+        label: item[labelKey],
+        value: item[valueKey],
+        key: item[valueKey],
+      }
+      nodeMap.set(item[valueKey], node)
+    })
+
+    // 第二次遍歷：建立父子關係
+    list.forEach((item: any) => {
+      if (item.parentId) {
+        const parentNode = nodeMap.get(item.parentId)
+        const currentNode = nodeMap.get(item[valueKey])
+        if (parentNode && currentNode) {
+          if (!parentNode.children) {
+            parentNode.children = []
+          }
+          parentNode.children.push(currentNode)
+        }
+      }
+    })
+
+    // 找出所有根節點（沒有 parentId 的節點）
+    const treeData = list
+      .filter(item => !item.parentId)
+      .map(item => nodeMap.get(item[valueKey]))
+      .filter((node): node is TreeNode => node !== undefined)
+
+    optionsMap.value[fieldName] = treeData
+  }
+  else {
+    // 原有的扁平結構處理
+    optionsMap.value[fieldName] = list.map((resultItem: any) => ({
+      label: resultItem[labelKey],
+      value: resultItem[valueKey],
+    }))
+  }
+}
+
+// 搜索下拉框選項
+const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => {
+  const fieldName = item.name
+
+  // 如果搜索內容為空，清空選項並返回
+  if (!query) {
+    optionsMap.value[fieldName] = []
+    return
+  }
+
+  // 設置 loading 狀態為 true
+  selectLoadingMap.value[fieldName] = true
+
+  if (item.options?.api) {
+    try {
+      const { data: result } = await item.options.api({ [item.options.selectParam!]: query })
+      if (result.list.length > 0) {
+        await setOptionsWithNextTick(
+          fieldName,
+          result.list,
+          item.options.itemMapping!.label,
+          item.options.itemMapping!.value,
+        )
+      }
+      else {
+        optionsMap.value[fieldName] = []
+      }
+    }
+    finally {
+      selectLoadingMap.value[fieldName] = false
+    }
+  }
+  else {
+    // 如果沒有 API，也要設置 loading 狀態為 false
+    selectLoadingMap.value[fieldName] = false
+  }
+}, 300)
+
+// 表單數據
+const formRef = ref()
+const formData = ref<Record<string, any>>({})
+const formDataMapping = ref<Record<string, InitFormData>>({})
+// 重設表單數據
+function resetFormData(data?: TableRow, parentData?: TableRow) {
+  // 重設表單數據
+  formData.value = {}
+  formDataMapping.value = {}
+  optionsMap.value = {}
+  selectLoadingMap.value = {} // 重設搜索 loading 狀態
+
+  // 初始化表單數據
+  if (props.initFormData && Array.isArray(props.initFormData)) {
+    props.initFormData.forEach(async (item: InitFormData) => {
+      formData.value[item.name] = item.value
+      formDataMapping.value[item.name] = item
+
+      // 如果選單類型
+      if (item.type === 'select') {
+        /**
+         * 由於 optionsMap.value 初始化時沒有數據，n-select 或者 n-tree-select 組件會直接顯示ID
+         * 如果data如果可以拿到ID的具體數據的話， 我們可以先將當前ID的lable和value塞進去
+         * 這樣在網速正常的情況下，使用者可以一進來就看到label
+         */
+
+        // 通常「某ID」是從「某數據」查詢過來的，如果「某數據」也在介面的返回值中，則可以透過去掉「某Id」的「Id」字串來獲取
+        const itemNameMinusId = item.name.replace('Id', '')
+        if (data && data![itemNameMinusId] && itemNameMinusId) {
+          optionsMap.value[item.name] = [
+            {
+              label: data![itemNameMinusId][item.options!.itemMapping!.label],
+              value: data![itemNameMinusId][item.options!.itemMapping!.value],
+            },
+          ]
+        }
+
+        // 如果data中存在parentId這個屬性
+        else if (data && parentData) {
+          console.log('data', data, parentData)// todo
+          optionsMap.value[item.name] = [
+            {
+              label: parentData.name,
+              value: parentData.id,
+            },
+          ]
+        }
+
+        // 如果拿不到ID的具體數據的話， 則需要初始化一個空數組
+        else {
+          optionsMap.value[item.name] = []
+        }
+
+        // 如果懶載入已開放
+        if (item.options?.lazy) {
+          // 初始化為非 loading 狀態
+          selectLoadingMap.value[item.name] = false
+        }
+
+        // 如果懶載入未開放 則載入全部選項
+        else {
+          // 設置 loading 狀態為 true
+          selectLoadingMap.value[item.name] = true
+
+          try {
+            const { data: result } = await item.options!.api({ pageSize: 2000, currentPage: 1 })
+            if (result.list.length > 0) {
+              await setOptionsWithNextTick(
+                item.name,
+                result.list,
+                item.options!.itemMapping!.label,
+                item.options!.itemMapping!.value,
+              )
+            }
+          }
+          finally {
+            selectLoadingMap.value[item.name] = false
+          }
+        }
+      }
+    })
+  }
+
+  // 如果傳入了數據，則將數據填充到表單中(通常只有新增和編輯時會傳入數據)
+  if (data) {
+    for (const key in formData.value) {
+      formData.value[key] = data[key]
+    }
+  }
+}
+
+// 表單類型與標題
+const modalType = shallowRef<ModalType | null>(null)
+const modalTitle = computed(() => {
+  if (!modalType.value)
+    return ''
+  return {
+    add: '新增',
+    view: '檢視',
+    edit: '編輯',
+  }[modalType.value] + (props.modalName ?? '')
+})
+
+// 新增
+async function add() {
+  const { id, ...remain } = formData.value
+  const { data } = await props.createFunction(remain)
+
+  emit('success', {
+    modalType: modalType.value!,
+    ...formData.value,
+    ...data,
+  })
+}
+
+// 編輯
+async function edit() {
+  // 過濾掉不應該被修改的欄位
+  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = formData.value
+  for (const key of Object.keys(formDataMapping.value)) {
+    const item = formDataMapping.value[key]
+    if (item.disableEdit)
+      delete remain[key]
+  }
+
+  const { message } = await props.updateFunction({ ...remain })
+  window.$message.success(message)
+  emit('success', { modalType: modalType.value!, ...formData.value })
+}
+
+// 提交
+async function submitModal() {
+  try {
+    await formRef.value?.validate()
+    startLoading()
+
+    if (modalType.value === 'add') {
+      await add()
+      closeModal()
+    }
+
+    else if (modalType.value === 'edit') {
+      await edit()
+      closeModal()
+    }
+  }
+  catch {
+    endLoading()
+  }
+}
+
+// 打開彈出視窗
+// 如果parentData存在，則表示是子級的彈出視窗
+async function openModal(type: ModalType, data?: TableRow, parentData?: TableRow) {
+  modalType.value = type
+  showModal()
+  resetFormData(data, parentData)
+}
+
+// 關閉彈出視窗
+function closeModal() {
+  endLoading()
+  hiddenModal()
+}
+</script>
+
+<template>
+  <n-modal
+    v-model:show="modalVisible"
+    :mask-closable="false"
+    preset="card"
+    :title="modalTitle"
+    class="w-700px"
+    :segmented="{
+      content: true,
+      action: true,
+    }"
+  >
+    <template v-if="modalType === 'view'">
+      <n-descriptions :column="2" bordered label-placement="left">
+        <template v-for="(item, key) in formDataMapping" :key="key">
+          <n-descriptions-item v-if="!item.hidden" :label="item.label" :span="item.span || 1">
+            <template v-if="item.type === 'switch'">
+              {{ formData[item.name] === 1 ? '啟用' : '停用' }}
+            </template>
+            <template v-else>
+              {{ formData[item.name] }}
+            </template>
+          </n-descriptions-item>
+        </template>
+      </n-descriptions>
+    </template>
+
+    <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100">
+      <n-grid :cols="2" :x-gap="18">
+        <!-- <n-form-item-grid-item :span="1" label="性別" path="sex">
+          <n-radio-group v-model:value="formData.sex">
+            <n-space>
+              <n-radio :value="1">
+                男
+              </n-radio>
+              <n-radio :value="2">
+                女
+              </n-radio>
+            </n-space>
+          </n-radio-group>
+        </n-form-item-grid-item> -->
+        <!-- <n-form-item-grid-item :span="1" label="使用者狀態" path="status">
+          <n-switch
+            v-model:value="formData.status"
+            :checked-value="1" :unchecked-value="0"
+          >
+            <template #checked>
+              啟用
+            </template>
+            <template #unchecked>
+              禁用
+            </template>
+          </n-switch>
+        </n-form-item-grid-item> -->
+
+        <template v-for="item in formDataMapping" :key="item.name">
+          <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :label="item.label" :path="item.name">
+            <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+            <template v-else-if="item.type === 'select'">
+              <!-- 如果數據中包含 parentId，使用樹狀選擇器 -->
+              <n-tree-select
+                v-if="optionsMap[item.name]?.[0]?.children"
+                v-model:value="formData[item.name]"
+                :options="optionsMap[item.name]"
+                :disabled="item.disableEdit ? modalType === 'edit' : false"
+                filterable
+                remote
+                :loading="selectLoadingMap[item.name]"
+                :clear-filter-after-select="false"
+                placeholder="請輸入關鍵字搜索"
+                :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                key-field="key"
+                label-field="label"
+                children-field="children"
+                @search="(query) => handleSearch(query, item)"
+              />
+              <!-- 否則使用普通選擇器 -->
+              <n-select
+                v-else
+                v-model:value="formData[item.name]"
+                :options="optionsMap[item.name]"
+                :disabled="item.disableEdit ? modalType === 'edit' : false"
+                filterable
+                remote
+                :loading="selectLoadingMap[item.name]"
+                :clear-filter-after-select="false"
+                placeholder="請輸入關鍵字搜索"
+                :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                @search="(query) => handleSearch(query, item)"
+              />
+            </template>
+          </n-form-item-grid-item>
+        </template>
+      </n-grid>
+    </n-form>
+    <template #action>
+      <n-space justify="center">
+        <n-button type="primary" :loading="submitLoading" @click="submitModal">
+          提交
+        </n-button>
+        <n-button @click="closeModal">
+          取消
+        </n-button>
+      </n-space>
+    </template>
+  </n-modal>
+</template>

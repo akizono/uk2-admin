@@ -1,10 +1,24 @@
 <script setup lang="tsx">
-import type { DeptVo } from '@/api/system/dept'
-import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
+// TODO：禁用之後 所有子項也會被禁用
+// TODO：表但需要一個父ID選項
+// TODO：刪除的時候是否刪除所有的子項
+import type { DeptVO } from '@/api/system/dept'
+import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DeptApi } from '@/api/system/dept'
+import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
+
+/** 更新用戶狀態 */
+// const dataTableRef = ref()
+// function handleUpdateDisabled(value: 0 | 1, id: string) {
+//   dataTableRef.value.setListItemFieldValue(id, 'status', value)
+//   if (value === 1)
+//     DeptApi.unblockDept(id)
+//   else
+//     DeptApi.blockDept(id)
+// }
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -28,7 +42,7 @@ const initQueryParams: InitQueryParams[] = [
 ]
 
 /** 表格列定義 */
-const columns: DataTableColumns<DeptVo> = [
+const columns: DataTableColumns<DeptVO> = [
   {
     title: '部門名稱',
     align: 'center',
@@ -53,17 +67,6 @@ const columns: DataTableColumns<DeptVo> = [
     },
   },
 ]
-const viewEntranceColumns = ['name'] // 點擊後能進入查看視窗的欄位
-
-/** 更新用戶狀態 */
-const dataTableRef = ref()
-function handleUpdateDisabled(value: 0 | 1, id: string) {
-  dataTableRef.value.setListItemFieldValue(id, 'status', value)
-  if (value === 1)
-    DeptApi.unblockDept(id)
-  else
-    DeptApi.blockDept(id)
-}
 
 /** 表單驗證規則 */
 const rules: FormRules = {
@@ -89,7 +92,14 @@ const initFormData: InitFormData[] = [
   {
     name: 'parentId',
     value: undefined,
-    hidden: true,
+    span: 2,
+    label: '父級部門',
+    type: 'select',
+    options: {
+      api: DeptApi.getDeptPage,
+      selectParam: 'name',
+      itemMapping: { label: 'name', value: 'id' },
+    },
   },
   {
     name: 'name',
@@ -104,6 +114,12 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '負責人',
     type: 'select',
+    options: {
+      api: UserApi.getUserPage,
+      selectParam: 'username',
+      itemMapping: { label: 'nickname', value: 'id' },
+      lazy: true,
+    },
   },
   {
     name: 'sort',
@@ -127,30 +143,38 @@ const initFormData: InitFormData[] = [
     type: 'switch',
   },
 ]
+
+/** 元件的配置 */
+const options = {
+  /** 表格的顯示功能 */
+  view: true, // 是否顯示「查看按鈕」
+  edit: true, // 是否顯示「編輯按鈕」
+  del: true, // 是否顯示「刪除按鈕」
+  search: true, // 是否顯示「頂部搜索框」
+  add: true, // 是否顯示「新增按鈕」
+  index: true, // 是否顯示「索引」
+
+  /** 表格配置 */
+  columns, // 表格欄位的定義
+  viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
+  initQueryParams, // 初始化查詢參數
+  getFunction: DeptApi.getDeptPage, // 獲取表格數據的 API
+  deleteFunction: DeptApi.deleteDept, // 刪除表格數據的 API
+  updateFunction: DeptApi.updateDept, // 更新表格數據的 API
+  createFunction: DeptApi.createDept, // 新增表格數據的 API
+
+  /** 表單配置 */
+  rules, // 表單驗證規則
+  initFormData, // 初始化表單數據
+
+  /** 其他配置 */
+  modalName: '部門', // 表格中的數據名稱
+  ref: 'dataTableRef', // 表格的 ref
+}
 </script>
 
 <template>
   <DataTable
-    ref="dataTableRef"
-    modal-name="部門"
-
-    view
-    edit
-    del
-    search
-    add
-    index
-
-    :columns="columns"
-    :view-entrance-columns="viewEntranceColumns"
-    :init-query-params="initQueryParams"
-    :update-disabled="handleUpdateDisabled"
-    :get-function="DeptApi.getDeptPage"
-    :delete-function="DeptApi.deleteDept"
-    :update-function="DeptApi.updateDept"
-    :create-function="DeptApi.createDept"
-
-    :rules="rules"
-    :init-form-data="initFormData"
+    v-bind="options"
   />
 </template>

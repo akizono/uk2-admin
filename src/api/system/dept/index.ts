@@ -2,7 +2,7 @@ import type { UserVo } from '../user'
 
 import request from '@/utils/request'
 
-export interface DeptVo {
+export interface DeptVO {
   id: string
   parentId: string
   name: string
@@ -21,17 +21,17 @@ export interface DeptVo {
 
 export const DeptApi = {
   /** 獲取部門分頁列表 */
-  getDeptPage: async (params: PageParams): PageRes<{ deptInfo: DeptVo }> => {
+  getDeptPage: async (params: PageParams): PageRes<{ deptInfo: DeptVO }> => {
     return await request.get({ url: '/system/dept/page', params })
   },
 
   /** 新增部門 */
-  createDept: async (data: DeptVo) => {
+  createDept: async (data: DeptVO) => {
     return await request.post({ url: '/system/dept/create', data })
   },
 
   /** 修改部門 */
-  updateDept: async (data: DeptVo) => {
+  updateDept: async (data: DeptVO) => {
     return await request.put({ url: '/system/dept/update', data })
   },
 

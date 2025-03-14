@@ -42,8 +42,23 @@ export interface InitFormData {
    * - textarea: 多行文字輸入框
    * - input-number: 數字輸入框
    * - switch: 開關
+   * - select: 下拉選單
    */
   type?: string
+  /** 選單配置 */
+  options?: {
+    /** 選單 API */
+    api?: any
+    /** 選單 API 參數 */
+    selectParam?: string
+    /** 選單選項映射返回的數據 */
+    itemMapping?: {
+      label: string
+      value: string
+    }
+    /** 是否啟用懶載入 */
+    lazy?: boolean
+  }
   /** 編輯時是否禁用此欄位 */
   disableEdit?: boolean
 }

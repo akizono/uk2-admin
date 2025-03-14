@@ -10,7 +10,27 @@ import CopyText from '@/components/custom/CopyText.vue'
 import { createCopyableDialog } from '@/utils/dialog'
 import { NSwitch } from 'naive-ui'
 
-/** 初始化查詢參數 */
+/** 更新用戶狀態 */
+const dataTableRef = ref()
+function handleUpdateDisabled(value: 0 | 1, id: string) {
+  dataTableRef.value.setListItemFieldValue(id, 'status', value)
+  if (value === 1)
+    UserApi.unblockUser(id)
+  else
+    UserApi.blockUser(id)
+}
+
+/** 處理 Modal 提交成功後返回的數據 */
+function handleCreateSuccess(params: TableRow) {
+  const tips = `帳號：${params.username}<br />密碼：${params.password}<br />請盡快登錄系統修改您的默認密碼。`
+  createCopyableDialog({
+    title: '新增使用者成功',
+    content: tips,
+    positiveText: '確認',
+    negativeText: '複製資訊',
+  })
+}
+
 const initQueryParams: InitQueryParams[] = [
   {
     name: 'username',
@@ -63,7 +83,7 @@ const initQueryParams: InitQueryParams[] = [
   },
   {
     name: 'status',
-    value: 1,
+    value: undefined,
     label: '狀態',
     class: '!w-64',
     inputType: 'select',
@@ -71,7 +91,6 @@ const initQueryParams: InitQueryParams[] = [
   },
 ]
 
-/** 表格列定義 */
 const columns: DataTableColumns<UserVo> = [
   {
     title: '使用者名稱',
@@ -140,19 +159,7 @@ const columns: DataTableColumns<UserVo> = [
   },
 
 ]
-const viewEntranceColumns = ['username'] // 點擊後能進入查看視窗的欄位
 
-/** 更新用戶狀態 */
-const dataTableRef = ref()
-function handleUpdateDisabled(value: 0 | 1, id: string) {
-  dataTableRef.value.setListItemFieldValue(id, 'status', value)
-  if (value === 1)
-    UserApi.unblockUser(id)
-  else
-    UserApi.blockUser(id)
-}
-
-/** 表單驗證規則 */
 const rules: FormRules = {
   username: {
     required: true,
@@ -185,7 +192,6 @@ const rules: FormRules = {
   },
 }
 
-/** 初始化表單數據 */
 const initFormData: InitFormData[] = [
   {
     name: 'id',
@@ -251,41 +257,38 @@ const initFormData: InitFormData[] = [
   },
 ]
 
-/** 處理 Modal 提交成功後返回的數據 */
-function handleCreateSuccess(params: TableRow) {
-  const tips = `帳號：${params.username}<br />密碼：${params.password}<br />請盡快登錄系統修改您的默認密碼。`
-  createCopyableDialog({
-    title: '新增使用者成功',
-    content: tips,
-    positiveText: '確認',
-    negativeText: '複製資訊',
-  })
+/** 元件的配置 */
+const options = {
+  /** 表格的顯示功能 */
+  view: true, // 是否顯示「查看按鈕」
+  edit: true, // 是否顯示「編輯按鈕」
+  del: true, // 是否顯示「刪除按鈕」
+  search: true, // 是否顯示「頂部搜索框」
+  add: true, // 是否顯示「新增按鈕」
+  index: true, // 是否顯示「索引」
+
+  /** 表格配置 */
+  columns, // 表格欄位的定義
+  viewEntranceColumns: ['username'], // 點擊後能進入「查看視窗」的欄位
+  initQueryParams, // 初始化查詢參數
+  getFunction: UserApi.getUserPage, // 獲取表格數據的 API
+  deleteFunction: UserApi.deleteUser, // 刪除表格數據的 API
+  updateFunction: UserApi.updateUser, // 更新表格數據的 API
+  createFunction: UserApi.createUser, // 新增表格數據的 API
+
+  /** 表單配置 */
+  rules, // 表單驗證規則
+  initFormData, // 初始化表單數據
+
+  /** 其他配置 */
+  modalName: '使用者', // 表格中的數據名稱
+  ref: 'dataTableRef', // 表格的 ref
 }
 </script>
 
 <template>
   <DataTable
-    ref="dataTableRef"
-    modal-name="使用者"
-
-    view
-    edit
-    del
-    search
-    add
-    index
-
-    :columns="columns"
-    :view-entrance-columns="viewEntranceColumns"
-    :init-query-params="initQueryParams"
-    :get-function="UserApi.getUserPage"
-    :delete-function="UserApi.deleteUser"
-    :update-function="UserApi.updateUser"
-    :create-function="UserApi.createUser"
-
-    :rules="rules"
-    :init-form-data="initFormData"
-
+    v-bind="options"
     @create-success="handleCreateSuccess"
   />
 </template>
