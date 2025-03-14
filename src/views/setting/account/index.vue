@@ -10,7 +10,7 @@ import CopyText from '@/components/custom/CopyText.vue'
 import { createCopyableDialog } from '@/utils/dialog'
 import { NSwitch } from 'naive-ui'
 
-// 初始化查詢參數
+/** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
   {
     name: 'username',
@@ -71,7 +71,7 @@ const initQueryParams: InitQueryParams[] = [
   },
 ]
 
-// 表格列定義
+/** 表格列定義 */
 const columns: DataTableColumns<UserVo> = [
   {
     title: '使用者名稱',
@@ -140,6 +140,7 @@ const columns: DataTableColumns<UserVo> = [
   },
 
 ]
+const viewEntranceColumns = ['username'] // 點擊後能進入查看視窗的欄位
 
 /** 更新用戶狀態 */
 const dataTableRef = ref()
@@ -151,7 +152,7 @@ function handleUpdateDisabled(value: 0 | 1, id: string) {
     UserApi.blockUser(id)
 }
 
-// 表單驗證規則
+/** 表單驗證規則 */
 const rules: FormRules = {
   username: {
     required: true,
@@ -184,7 +185,7 @@ const rules: FormRules = {
   },
 }
 
-// 初始化表單數據
+/** 初始化表單數據 */
 const initFormData: InitFormData[] = [
   {
     name: 'id',
@@ -250,7 +251,7 @@ const initFormData: InitFormData[] = [
   },
 ]
 
-// 處理 Modal 提交成功後返回的數據
+/** 處理 Modal 提交成功後返回的數據 */
 function handleCreateSuccess(params: TableRow) {
   const tips = `帳號：${params.username}<br />密碼：${params.password}<br />請盡快登錄系統修改您的默認密碼。`
   createCopyableDialog({
@@ -267,6 +268,7 @@ function handleCreateSuccess(params: TableRow) {
     ref="dataTableRef"
     modal-name="使用者"
 
+    view
     edit
     del
     search
@@ -274,6 +276,7 @@ function handleCreateSuccess(params: TableRow) {
     index
 
     :columns="columns"
+    :view-entrance-columns="viewEntranceColumns"
     :init-query-params="initQueryParams"
     :get-function="UserApi.getUserPage"
     :delete-function="UserApi.deleteUser"

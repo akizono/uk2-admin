@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import type { InitFormData, InitQueryParams, TableRow } from './type'
+import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
@@ -15,8 +15,10 @@ const props = defineProps<{
   search?: boolean // 開啟搜索
   add?: boolean // 開啟新建
   index?: boolean // 開啟序號
+  view?: boolean // 開啟查看
 
   columns: DataTableColumns // 表格列定義
+  viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
   getFunction: (...args: any[]) => Promise<any> // 獲取列表數據的函數
   deleteFunction: (...args: any[]) => Promise<any> // 刪除列表數據的函數
@@ -80,6 +82,25 @@ const columns = computed(() => {
       ]
     : []
 
+  const actualColumns = props.columns.map((column) => {
+    const newColumn = { ...column }
+    if ('key' in newColumn
+      && !('children' in newColumn)
+      && props.viewEntranceColumns?.includes(newColumn.key as string)) {
+      return {
+        ...newColumn,
+        render: (row: TableRow) => {
+          return (
+            <n-button type="primary" text onClick={() => modalRef.value.openModal('view', row)}>
+              {row[newColumn.key]}
+            </n-button>
+          )
+        },
+      }
+    }
+    return newColumn
+  })
+
   const operateColumn = [
     {
       title: '操作',
@@ -89,6 +110,14 @@ const columns = computed(() => {
       render: (row: TableRow) => {
         return (
           <NSpace justify="center">
+            {props.view && (
+              <NButton
+                size="small"
+                onClick={() => modalRef.value.openModal('view', row)}
+              >
+                查看
+              </NButton>
+            )}
             {props.edit && (
               <NButton
                 size="small"
@@ -122,7 +151,7 @@ const columns = computed(() => {
   return [
     ...batchDeleteColumn,
     ...indexColumn,
-    ...props.columns,
+    ...actualColumns,
     ...operateColumn,
   ]
 })
@@ -212,15 +241,15 @@ function changePage(page: number, size: number) {
  * 如果是新增使用者，則顯示帳號密碼提示框並將使用者加入列表
  * 如果是編輯使用者，則更新列表中對應使用者的資料
  */
-function tableModalSuccess(params: { ModalType: string, password?: string } & TableRow) {
-  const { ModalType, ...remain } = params
+function tableModalSuccess(params: { modalType: ModalType, password?: string } & TableRow) {
+  const { modalType, ...remain } = params
 
-  if (ModalType === 'add') {
+  if (modalType === 'add') {
     list.value.push(remain)
     emit('createSuccess', remain)
   }
 
-  if (ModalType === 'edit') {
+  if (modalType === 'edit') {
     const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
     if (index > -1)
       list.value[index] = { ...list.value[index], ...remain }

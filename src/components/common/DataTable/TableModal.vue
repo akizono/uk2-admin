@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { InitFormData, TableRow } from './type'
+import type { InitFormData, ModalType, TableRow } from './type'
 import type { FormRules } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
@@ -56,7 +56,7 @@ async function add() {
   const { data } = await props.createFunction(remain)
 
   emit('success', {
-    ModalType: modalType.value!,
+    modalType: modalType.value!,
     ...formData.value,
     ...data,
   })
@@ -67,7 +67,7 @@ async function edit() {
   const { username, ...remain } = formData.value
   const { message } = await props.updateFunction({ ...remain })
   window.$message.success(message)
-  emit('success', { ModalType: modalType.value!, ...formData.value })
+  emit('success', { modalType: modalType.value!, ...formData.value })
 }
 
 // 提交
@@ -134,7 +134,22 @@ function closeModal() {
       action: true,
     }"
   >
-    <n-form ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100" :disabled="modalType === 'view'">
+    <template v-if="modalType === 'view'">
+      <n-descriptions :column="2" bordered label-placement="left">
+        <template v-for="(item, key) in formDataMapping" :key="key">
+          <n-descriptions-item v-if="!item.hidden" :label="item.label" :span="item.span || 1">
+            <template v-if="item.type === 'switch'">
+              {{ formData[item.name] === 1 ? '啟用' : '停用' }}
+            </template>
+            <template v-else>
+              {{ formData[item.name] }}
+            </template>
+          </n-descriptions-item>
+        </template>
+      </n-descriptions>
+    </template>
+
+    <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100">
       <n-grid :cols="2" :x-gap="18">
         <!-- <n-form-item-grid-item :span="1" label="性別" path="sex">
           <n-radio-group v-model:value="formData.sex">
