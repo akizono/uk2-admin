@@ -1,6 +1,5 @@
 <script setup lang="tsx">
 import type { InitFormData, InitQueryParams, TableRow } from './type'
-// TODO：每一頁都需要遞進的index
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
@@ -12,9 +11,10 @@ const props = defineProps<{
   modalName: string // 模態框名稱
 
   edit?: boolean // 開啟編輯
-  delete?: boolean // 開啟刪除
+  del?: boolean // 開啟刪除
   search?: boolean // 開啟搜索
   add?: boolean // 開啟新建
+  index?: boolean // 開啟序號
 
   columns: DataTableColumns // 表格列定義
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
@@ -52,48 +52,80 @@ function handleResetSearch() {
   }
 }
 
-// 列表
+/** 列表 */
 const modalRef = ref()
 const list = ref<TableRow[]>([])
-const columns = computed(() => ([
-  ...props.columns,
-  {
-    title: '操作',
-    align: 'center',
-    key: 'actions',
-    width: 250,
-    render: (row: TableRow) => {
-      return (
-        <NSpace justify="center">
-          {props.edit && (
-            <NButton
-              size="small"
-              onClick={() => modalRef.value.openModal('edit', row)}
-            >
-              編輯
-            </NButton>
-          )}
-          {props.delete && (
-            <NPopconfirm onPositiveClick={() => handleDelete(row.id)}>
-              {{
-                default: () => '確認刪除?',
-                trigger: () => (
-                  <NButton
-                    size="small"
-                    type="error"
-                    loading={delBtnLoadMap.value[row.id!]}
-                  >
-                    刪除
-                  </NButton>
-                ),
-              }}
-            </NPopconfirm>
-          )}
-        </NSpace>
-      )
+const columns = computed(() => {
+  const batchDeleteColumn = props.del
+    ? [
+        {
+          type: 'selection',
+          fixed: 'left',
+          align: 'center',
+          width: 50,
+        },
+      ]
+    : []
+
+  const indexColumn = props.index
+    ? [
+        {
+          title: '序號',
+          key: 'index',
+          width: 80,
+          align: 'center',
+          fixed: 'left',
+          render: (_: unknown, index: number) => getRowIndex(index),
+        },
+      ]
+    : []
+
+  const operateColumn = [
+    {
+      title: '操作',
+      align: 'center',
+      key: 'actions',
+      width: 250,
+      render: (row: TableRow) => {
+        return (
+          <NSpace justify="center">
+            {props.edit && (
+              <NButton
+                size="small"
+                onClick={() => modalRef.value.openModal('edit', row)}
+              >
+                編輯
+              </NButton>
+            )}
+            {props.del && (
+              <NPopconfirm onPositiveClick={() => handleDelete(row.id)}>
+                {{
+                  default: () => '確認刪除?',
+                  trigger: () => (
+                    <NButton
+                      size="small"
+                      type="error"
+                      loading={delBtnLoadMap.value[row.id!]}
+                    >
+                      刪除
+                    </NButton>
+                  ),
+                }}
+              </NPopconfirm>
+            )}
+          </NSpace>
+        )
+      },
     },
-  },
-]))
+  ]
+
+  return [
+    ...batchDeleteColumn,
+    ...indexColumn,
+    ...props.columns,
+    ...operateColumn,
+  ]
+})
 async function getList() {
   try {
     startLoading()
@@ -105,8 +137,14 @@ async function getList() {
     endLoading()
   }
 }
+// 計算序號
+function getRowIndex(rowIndex: number): number {
+  const currentPage = queryParams.value.currentPage || 1
+  const pageSize = queryParams.value.pageSize || 10
+  return (currentPage - 1) * pageSize + rowIndex + 1
+}
 
-/** 刪除 */
+/** 點擊「刪除」按鈕 */
 async function handleDelete(id: string) {
   try {
     delBtnLoadMap.value[id!] = true
@@ -117,6 +155,40 @@ async function handleDelete(id: string) {
   }
   finally {
     delBtnLoadMap.value[id!] = false
+  }
+}
+
+/**  批次刪除 */
+const showBatchDeleteModalRef = ref(false)
+const batchDeleteLoading = ref(false)
+const checkedRowKeys = ref<string[]>([])
+async function handleBatchDelete() {
+  if (checkedRowKeys.value.length === 0) {
+    window.$message.warning('請至少選擇一條紀錄')
+    return
+  }
+  showBatchDeleteModalRef.value = true
+}
+
+async function confirmBatchDelete() {
+  try {
+    batchDeleteLoading.value = true
+    // 依序刪除選中的紀錄
+    for (const id of checkedRowKeys.value) {
+      await props.deleteFunction(id)
+      list.value = list.value.filter((item: TableRow) => item.id !== id)
+    }
+
+    window.$message.success(`已批次刪除${checkedRowKeys.value.length}條紀錄`)
+    checkedRowKeys.value = [] // 清空選中項
+    showBatchDeleteModalRef.value = false
+  }
+  catch (error) {
+    console.error('批次刪除失敗:', error)
+    window.$message.error('批次刪除失敗')
+  }
+  finally {
+    batchDeleteLoading.value = false
   }
 }
 
@@ -220,9 +292,22 @@ onMounted(async () => {
           </template>
           新建使用者
         </NButton>
+        <NButton v-if="del" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+          <template #icon>
+            <icon-park-outline-delete />
+          </template>
+          批次刪除
+        </NButton>
       </template>
       <NSpace vertical>
-        <n-data-table :scroll-x="1300" :columns="columns as DataTableColumns" :data="list" :loading="loading" />
+        <n-data-table
+          v-model:checked-row-keys="checkedRowKeys"
+          :scroll-x="1300"
+          :columns="columns as DataTableColumns"
+          :data="list"
+          :loading="loading"
+          :row-key="row => row.id"
+        />
         <Pagination
           v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
           :current-page="queryParams.currentPage" @change="changePage"
@@ -243,5 +328,21 @@ onMounted(async () => {
 
       @success="tableModalSuccess"
     />
+
+    <!-- 批次刪除確認 Modal -->
+    <n-modal
+      v-model:show="showBatchDeleteModalRef"
+      preset="dialog"
+      title="確認刪除"
+      positive-text="確認"
+      negative-text="取消"
+      :loading="batchDeleteLoading"
+      @positive-click="confirmBatchDelete"
+      @negative-click="() => { showBatchDeleteModalRef = false }"
+    >
+      <template #default>
+        確定要刪除選中的 {{ checkedRowKeys.length }} 條紀錄嗎？此操作無法復原！
+      </template>
+    </n-modal>
   </NSpace>
 </template>

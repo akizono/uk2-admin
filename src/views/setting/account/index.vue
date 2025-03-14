@@ -1,6 +1,5 @@
 <script setup lang="tsx">
-// TODO：隱藏顯示左側菜單、適配彈窗
-// TODO：有search提示需要提供搜索的欄位
+// TODO：隱藏顯示左側菜單、適配彈出視窗
 import type { UserVo } from '@/api/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
@@ -78,7 +77,7 @@ const columns: DataTableColumns<UserVo> = [
     title: '使用者名稱',
     align: 'center',
     key: 'username',
-    fixed: 'left',
+    // fixed: 'left',
   },
   {
     title: '暱稱',
@@ -269,9 +268,10 @@ function handleCreateSuccess(params: TableRow) {
     modal-name="使用者"
 
     edit
-    delete
+    del
     search
     add
+    index
 
     :columns="columns"
     :init-query-params="initQueryParams"
