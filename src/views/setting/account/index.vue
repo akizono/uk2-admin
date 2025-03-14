@@ -1,10 +1,10 @@
 <script setup lang="tsx">
 // TODO：隱藏顯示左側菜單、適配彈出視窗
-import type { UserVo } from '@/api/user'
+import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { UserApi } from '@/api/user'
+import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import CopyText from '@/components/custom/CopyText.vue'
 import { createCopyableDialog } from '@/utils/dialog'

@@ -1,7 +1,7 @@
 import type { AuthState } from './interfaces'
-import type * as AUTH_DTO from '@/api/auth/response.type'
+import type * as AUTH_DTO from '@/api/system/auth/response.type'
 
-import { login } from '@/api/auth'
+import { login } from '@/api/system/auth'
 import { router } from '@/router'
 import { local } from '@/utils'
 

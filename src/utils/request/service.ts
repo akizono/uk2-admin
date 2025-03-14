@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
-import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/auth'
+import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/system/auth'
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
 import axios from 'axios'

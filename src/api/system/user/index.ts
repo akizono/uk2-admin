@@ -6,11 +6,17 @@ export interface UserVo {
   nickname?: string
   age?: number
   sex?: number
-  remark?: string
   email?: string
   mobile?: string
   avatar?: string
+
+  remark?: string
   status?: number
+  isDeleted?: number
+  creator?: string
+  createTime?: string
+  updater?: string
+  updateTime?: string
 }
 
 export const UserApi = {
