@@ -97,7 +97,6 @@ async function setOptionsWithNextTick(
     }))
   }
 }
-
 // 搜索下拉框選項
 const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => {
   const fieldName = item.name
@@ -141,7 +140,7 @@ const formRef = ref()
 const formData = ref<Record<string, any>>({})
 const formDataMapping = ref<Record<string, InitFormData>>({})
 // 重設表單數據
-function resetFormData(data?: TableRow, parentData?: TableRow) {
+function resetFormData(data?: TableRow, parent?: TableRow) {
   // 重設表單數據
   formData.value = {}
   formDataMapping.value = {}
@@ -174,12 +173,11 @@ function resetFormData(data?: TableRow, parentData?: TableRow) {
         }
 
         // 如果data中存在parentId這個屬性
-        else if (data && parentData) {
-          console.log('data', data, parentData)// todo
+        else if (data && parent) {
           optionsMap.value[item.name] = [
             {
-              label: parentData.name,
-              value: parentData.id,
+              label: parent.name,
+              value: parent.id,
             },
           ]
         }
@@ -226,7 +224,6 @@ function resetFormData(data?: TableRow, parentData?: TableRow) {
     }
   }
 }
-
 // 表單類型與標題
 const modalType = shallowRef<ModalType | null>(null)
 const modalTitle = computed(() => {
@@ -239,16 +236,52 @@ const modalTitle = computed(() => {
   }[modalType.value] + (props.modalName ?? '')
 })
 
+/**
+ * 處理ID相關的資料映射
+ * 為什麼這麼做？
+ * 例如，當我們從父組件打開TableModal時 ，leaderUserId在選項未載入出來，這時候需要拿從後端返回的leaderUser的數據來進行映射
+ * 但是我們新建和編輯後的數據是沒有leaderUser的，這時候我們需要手動填充返回父組件
+ * @param baseData - 基礎資料物件
+ * @param sourceData - 來源資料物件（用於映射）
+ * @returns 處理後的資料物件
+ */
+function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<string, any>): Record<string, any> {
+  const result = { ...baseData }
+
+  //  遍歷 sourceData 物件中的所有屬性
+  for (const key in sourceData) {
+    // 檢查屬性名稱是否以 'Id' 結尾，且不是 'parentId'
+    if (key.endsWith('Id') && key !== 'parentId') {
+      // 移除屬性名稱中的 'Id' 後綴
+      const keyWithoutId = key.replace('Id', '')
+      // 在 result 中建立新的物件結構
+      result[keyWithoutId] = {
+        // 使用 formDataMapping 中定義的標籤映射作為鍵名
+        [formDataMapping.value[key].options!.itemMapping!.label]: optionsMap.value[key][0].label,
+        // 儲存選項的實際值（ID）
+        id: optionsMap.value[key][0].value,
+      }
+    }
+  }
+
+  return result
+}
+
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
   const { data } = await props.createFunction(remain)
 
-  emit('success', {
-    modalType: modalType.value!,
-    ...formData.value,
-    ...data,
-  })
+  const emitData = handleIdDataMapping(
+    {
+      modalType: modalType.value!,
+      ...formData.value,
+      ...data,
+    },
+    remain,
+  )
+
+  emit('success', emitData)
 }
 
 // 編輯
@@ -263,7 +296,16 @@ async function edit() {
 
   const { message } = await props.updateFunction({ ...remain })
   window.$message.success(message)
-  emit('success', { modalType: modalType.value!, ...formData.value })
+
+  const emitData = handleIdDataMapping(
+    {
+      modalType: modalType.value!,
+      ...formData.value,
+    },
+    formData.value,
+  )
+
+  emit('success', emitData)
 }
 
 // 提交
@@ -288,11 +330,11 @@ async function submitModal() {
 }
 
 // 打開彈出視窗
-// 如果parentData存在，則表示是子級的彈出視窗
-async function openModal(type: ModalType, data?: TableRow, parentData?: TableRow) {
+// 如果parent存在，則表示是子級的彈出視窗
+async function openModal(type: ModalType, data?: TableRow, parent?: TableRow) {
   modalType.value = type
   showModal()
-  resetFormData(data, parentData)
+  resetFormData(data, parent)
 }
 
 // 關閉彈出視窗

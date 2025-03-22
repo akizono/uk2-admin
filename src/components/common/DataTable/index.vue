@@ -455,7 +455,7 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
             if (!items[i].children) {
               items[i].children = []
             }
-            items[i].children.push(remain)
+            items[i].children.push({ ...remain, parentId })
             return true
           }
 
@@ -494,7 +494,6 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
       // 沒有指定父項，直接添加到最外層
       list.value.push(remain)
     }
-
     emit('createSuccess', remain)
   }
 
