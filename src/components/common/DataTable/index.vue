@@ -19,20 +19,87 @@ const props = defineProps<{
   add?: boolean // 開啟新建
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
+  pagination?: boolean // 開啟分頁
 
   columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
   getFunction: (...args: any[]) => Promise<any> // 獲取列表數據的函數
-  deleteFunction: (...args: any[]) => Promise<any> // 刪除列表數據的函數
-  updateFunction: (...args: any[]) => Promise<any> // 更新列表數據的函數（傳遞到 Modal）
-  createFunction: (...args: any[]) => Promise<any> // 新增列表數據的函數（傳遞到 Modal）
+  deleteFunction?: (...args: any[]) => Promise<any> // 刪除列表數據的函數
+  updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數（傳遞到 Modal）
+  createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數（傳遞到 Modal）
 
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
 }>()
-
 const emit = defineEmits(['createSuccess', 'editSuccess'])
+
+const propsVerifyPassed = ref(false)
+const propsVerifyErrorMsg = ref('')
+function propsVerify() {
+  // 分頁器已開啟，pageSize不能為0
+  const paginationON = props.pagination
+  const initQueryParamsIncludePageSize0 = props.initQueryParams?.some((item: InitQueryParams) => item.name === 'pageSize' && item.value === 0)
+  if (initQueryParamsIncludePageSize0 && paginationON) {
+    propsVerifyErrorMsg.value = '分頁器已開啟，pageSize不能為0'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // 檢查必要的 CRUD 函數
+  if (!props.getFunction) {
+    propsVerifyErrorMsg.value = '缺少 getFunction'
+    propsVerifyPassed.value = false
+    return
+  }
+  if (props.del && !props.deleteFunction) {
+    propsVerifyErrorMsg.value = '開啟刪除功能但缺少 deleteFunction'
+    propsVerifyPassed.value = false
+    return
+  }
+  if (props.edit && !props.updateFunction) {
+    propsVerifyErrorMsg.value = '開啟編輯功能但缺少 updateFunction'
+    propsVerifyPassed.value = false
+    return
+  }
+  if (props.add && !props.createFunction) {
+    propsVerifyErrorMsg.value = '開啟新增功能但缺少 createFunction'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // 開啟了search，initQueryParams必須有除了pageSize和currentPageq以外的其他屬性
+  const searchON = props.search
+  const hasPageOutside = props.initQueryParams?.some(item => item.name !== 'pageSize' && item.name !== 'currentPage') || false
+  if (searchON && !hasPageOutside) {
+    propsVerifyErrorMsg.value = '開啟了search，initQueryParams必須有除了pageSize和currentPageq以外的其他屬性'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  /** initQueryParams進行循環然後對每一項進行校驗: */
+  // 首先第一個if，所有的屬性都要包含name、value、inputType
+  const hasEssential = props.initQueryParams?.every((item: InitQueryParams) =>
+    ['name', 'value', 'inputType'].every(key => key in item),
+  ) || false
+  if (props.initQueryParams && !hasEssential) {
+    propsVerifyErrorMsg.value = 'initQueryParams必須包含name、value、inputType'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // inputType是select的時候，必須包含dict
+  const hasSelectCarryDict = !props.initQueryParams?.some((item: InitQueryParams) =>
+    item.inputType === 'select' && !item.dict,
+  )
+  if (!hasSelectCarryDict) {
+    propsVerifyErrorMsg.value = 'inputType是select的時候，必須包含dict'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  propsVerifyPassed.value = true
+}
 
 defineExpose({
   setListItemFieldValue,
@@ -249,7 +316,7 @@ async function handleDelete(row: TableRow) {
     delBtnLoadMap.value[row.id!] = true
 
     // 先確保後端刪除成功
-    await props.deleteFunction(row.id!)
+    await props.deleteFunction!(row.id!)
 
     // 後端刪除成功後，再從前端移除
     // 定義遞迴尋找並刪除項目的函數
@@ -331,7 +398,7 @@ async function confirmBatchDelete() {
     // 依序刪除選中的紀錄，先完成所有後端刪除請求
     for (const id of checkedRowKeys.value) {
       try {
-        await props.deleteFunction(id)
+        await props.deleteFunction!(id)
         // 後端刪除成功，將 ID 添加到成功列表
         successDeletedIds.push(id)
       }
@@ -546,6 +613,8 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
 // }
 
 onMounted(async () => {
+  await propsVerify()
+
   // 打開載入狀態
   await startTableLoading()
   await startQueryLoading()
@@ -558,7 +627,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <NSpace vertical class="flex-1">
+  <n-result
+    v-if="!propsVerifyPassed"
+    status="error"
+    title="請檢查props參數"
+    :description="propsVerifyErrorMsg"
+  />
+
+  <NSpace v-else vertical class="flex-1">
     <n-card v-if="search && initQueryParams">
       <n-spin :show="queryLoading" size="large">
         <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
@@ -633,11 +709,13 @@ onMounted(async () => {
           :loading="tableLoading"
           :row-key="row => row.id"
         />
-        <Pagination
-          v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
-          :current-page="queryParams.currentPage" @change="changePage"
-        />
-        <Pagination v-else :total="total" @change="changePage" />
+        <template v-if="pagination">
+          <Pagination
+            v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
+            :current-page="queryParams.currentPage" @change="changePage"
+          />
+          <Pagination v-else :total="total" @change="changePage" />
+        </template>
       </NSpace>
     </n-card>
 
@@ -645,8 +723,8 @@ onMounted(async () => {
       ref="modalRef"
       modal-name="使用者"
 
-      :update-function="updateFunction"
-      :create-function="createFunction"
+      :update-function="updateFunction || undefined"
+      :create-function="createFunction || undefined"
 
       :rules="rules"
       :init-form-data="initFormData"

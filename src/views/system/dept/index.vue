@@ -23,6 +23,11 @@ import DataTable from '@/components/common/DataTable/index.vue'
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
   {
+    name: 'pageSize',
+    value: 0,
+    inputType: 'pagination',
+  },
+  {
     name: 'name',
     value: undefined,
     label: '部門名稱',
@@ -153,6 +158,7 @@ const options = {
   search: true, // 是否顯示「頂部搜索框」
   add: true, // 是否顯示「新增按鈕」
   index: true, // 是否顯示「索引」
+  pagination: false, // 是否開啟分頁
 
   /** 表格配置 */
   columns, // 表格欄位的定義

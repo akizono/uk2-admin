@@ -16,8 +16,8 @@ interface TreeNode {
 const props = defineProps<{
   modalName?: string
 
-  updateFunction: (...args: any[]) => Promise<any> // 更新列表數據的函數
-  createFunction: (...args: any[]) => Promise<any> // 新增列表數據的函數
+  updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數
+  createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數
 
   rules?: FormRules
   initFormData?: InitFormData[]
