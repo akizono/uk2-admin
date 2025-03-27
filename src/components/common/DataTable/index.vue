@@ -5,7 +5,7 @@ import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
-import { arrayToTree } from '@/utils/'
+import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
 import TableModal from './components/TableModal.vue'
@@ -303,7 +303,8 @@ async function getList() {
       })
     }
 
-    list.value = arrayToTree(flattenData(result.list))
+    // 先將數據轉換為樹狀結構，然後進行排序
+    list.value = sortTreeData(arrayToTree(flattenData(result.list)))
     total.value = result.total
   }
   finally {

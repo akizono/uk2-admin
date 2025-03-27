@@ -35,3 +35,23 @@ export function arrayToTree(arr: any[]) {
   // 返回組織好的樹形結構數組
   return res
 }
+
+/**
+ * 對傳入的數據進行排序，根據每個元素的 sort 屬性進行升序排列
+ * @param data - 需要排序的數據
+ * @returns 排序後的數據
+ */
+export function sortTreeData(data: any[]): any[] {
+  const sortedData = data.sort((a, b) => a.sort - b.sort)
+
+  // 遍歷排序後的數據，對每個節點的子節點進行遞迴排序
+  sortedData.forEach((item) => {
+    // 檢查當前元素是否有子節點，且子節點是一個數組且長度大於0
+    if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+      // 對子節點進行遞迴調用 sortTreeData 函數進行排序
+      item.children = sortTreeData(item.children)
+    }
+  })
+
+  return sortedData
+}
