@@ -4,21 +4,13 @@
 // TODO：刪除的時候是否刪除所有的子項
 import type { DeptVO } from '@/api/system/dept'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
-import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
-/** 更新用戶狀態 */
-// const dataTableRef = ref()
-// function handleUpdateDisabled(value: 0 | 1, id: string) {
-//   dataTableRef.value.setListItemFieldValue(id, 'status', value)
-//   if (value === 1)
-//     DeptApi.unblockDept(id)
-//   else
-//     DeptApi.blockDept(id)
-// }
+const dataTableRef = ref()
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -68,7 +60,7 @@ const columns: DataTableColumns<DeptVO> = [
     align: 'center',
     key: 'status',
     render: (row) => {
-      return row.status === 1 ? '啟用' : '禁用'
+      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
 ]
@@ -168,6 +160,9 @@ const options = {
   deleteFunction: DeptApi.deleteDept, // 刪除表格數據的 API
   updateFunction: DeptApi.updateDept, // 更新表格數據的 API
   createFunction: DeptApi.createDept, // 新增表格數據的 API
+
+  blockFunction: DeptApi.blockDept, // 封鎖表格數據的 API
+  unblockFunction: DeptApi.unblockDept, // 解封鎖表格數據的 API
 
   /** 表單配置 */
   rules, // 表單驗證規則

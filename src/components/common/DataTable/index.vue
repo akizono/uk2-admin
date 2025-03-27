@@ -4,7 +4,7 @@
 import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 
-import { useBoolean } from '@/hooks'
+import { useBoolean, useThrottleAction } from '@/hooks'
 import { arrayToTree } from '@/utils/'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
@@ -28,6 +28,9 @@ const props = defineProps<{
   deleteFunction?: (...args: any[]) => Promise<any> // 刪除列表數據的函數
   updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數（傳遞到 Modal）
   createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數（傳遞到 Modal）
+
+  blockFunction?: (...args: any[]) => Promise<any> // 封鎖列表數據的函數
+  unblockFunction?: (...args: any[]) => Promise<any> // 解封鎖列表數據的函數
 
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
@@ -98,11 +101,20 @@ function propsVerify() {
     return
   }
 
+  // 如果 columns 存在 status 欄位，則必須包含 blockFunction 和 unblockFunction
+  const hasStatusColumn = props.columns.some(item => 'key' in item && item.key === 'status')
+  if (hasStatusColumn && (!props.blockFunction || !props.unblockFunction)) {
+    propsVerifyErrorMsg.value = '當表格包含 status 欄位時，必須提供 blockFunction 和 unblockFunction'
+    propsVerifyPassed.value = false
+    return
+  }
+
   propsVerifyPassed.value = true
 }
 
 defineExpose({
   setListItemFieldValue,
+  handleStatusChange,
 })
 
 // 表格的載入狀態
@@ -486,11 +498,127 @@ function changePage(page: number, size: number) {
 }
 
 /**
+ * 遞迴更新子項狀態並進行封鎖操作
+ * 這個函數主要用於處理樹狀結構中的父子關係：
+ * 1. 當一個父項被封鎖（status設為0）時
+ * 2. 它的所有子項也需要被封鎖
+ * 3. 但只有原本狀態為啟用（status=1）的子項才需要調用封鎖API
+ * @param item - 要處理的父項目
+ */
+async function updateChildrenStatus(item: TableRow) {
+  /**
+   * 在整個列表中尋找指定ID的項目
+   * 因為列表是樹狀結構，所以需要遞迴搜尋每一層
+   * @param items - 要搜尋的項目列表
+   * @param targetId - 要尋找的項目ID
+   * @returns 找到的項目，如果沒找到則返回null
+   */
+  const findItemInList = (items: TableRow[], targetId: string): TableRow | null => {
+    for (const listItem of items) {
+      if (listItem.id === targetId) {
+        return listItem
+      }
+      if (listItem.children && listItem.children.length > 0) {
+        const found = findItemInList(listItem.children, targetId)
+        if (found)
+          return found
+      }
+    }
+    return null
+  }
+
+  // 先找到完整的父項數據（包含children）
+  const fullItem = findItemInList(list.value, item.id)
+  if (fullItem?.children && fullItem.children.length > 0) {
+    /**
+     * 第一步：記錄所有子項的原始狀態
+     * 為什麼要記錄？因為我們需要知道哪些子項原本是啟用的（status=1）
+     * 只有這些子項才需要調用封鎖API
+     */
+    const originalStatus = new Map<string, number>()
+    const recordOriginalStatus = (items: TableRow[]) => {
+      for (const child of items) {
+        originalStatus.set(child.id!, child.status)
+        if (child.children && child.children.length > 0) {
+          recordOriginalStatus(child.children)
+        }
+      }
+    }
+    recordOriginalStatus(fullItem.children)
+
+    /**
+     * 第二步：更新前端顯示
+     * 將所有子項的狀態都設為已封鎖（status=0）
+     */
+    const updateStatusRecursively = (items: TableRow[]) => {
+      for (const child of items) {
+        child.status = 0
+        if (child.children && child.children.length > 0) {
+          updateStatusRecursively(child.children)
+        }
+      }
+    }
+    updateStatusRecursively(fullItem.children)
+
+    /**
+     * 第三步：處理後端API調用
+     * 遍歷所有子項，但只對原本狀態為啟用（status=1）的項目調用封鎖API
+     * 如果API調用失敗，會恢復該項的狀態為啟用
+     */
+    const processBlockOperations = async (items: TableRow[]) => {
+      for (const child of items) {
+        // 只有原本狀態為啟用的子項才需要調用封鎖API
+        if (props.blockFunction && originalStatus.get(child.id!) === 1) {
+          try {
+            await props.blockFunction(child.id)
+          }
+          catch (error) {
+            console.error(`Block operation failed for id ${child.id}:`, error)
+            // API調用失敗，恢復狀態為啟用
+            child.status = 1
+            window.$message.error(`封鎖操作失敗: ${child.id}`)
+          }
+        }
+        // 繼續處理這個子項的子項（如果有的話）
+        if (child.children && child.children.length > 0) {
+          await processBlockOperations(child.children)
+        }
+      }
+    }
+
+    // 開始執行封鎖操作
+    processBlockOperations(fullItem.children)
+  }
+}
+
+/** 處理狀態變更 */
+async function handleStatusChange(row: TableRow, value: boolean) {
+  const newStatus = value ? 1 : 0
+
+  // 使用節流 hook
+  useThrottleAction(
+    `${props.modalName}_status_${row.id}`,
+    1000,
+    async () => {
+      setListItemFieldValue(row.id!, 'status', newStatus)
+      if (value) {
+        await props.unblockFunction!(row.id!)
+      }
+      else {
+        await props.blockFunction!(row.id!)
+        // 如果是 block 操作，同時處理子項
+        await updateChildrenStatus(row)
+      }
+    },
+  )
+}
+
+/**
  * 處理表單提交成功後的操作
  * 如果是新增使用者，則顯示帳號密碼提示框並將使用者加入列表
  * 如果是編輯使用者，則更新列表中對應使用者的資料
  */
-function tableModalSuccess(params: { modalType: ModalType, password?: string, parentId?: string } & TableRow) {
+async function tableModalSuccess(params: { modalType: ModalType, password?: string, parentId?: string } & TableRow) {
   const { modalType, parentId, ...remain } = params
 
   if (modalType === 'add') {
@@ -565,7 +693,7 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
   }
 
   if (modalType === 'edit') {
-    // 定義遞迴尋找並更新函數
+    /** 遞迴更新資料表項目 */
     const updateRecursively = (items: TableRow[]): boolean => {
       for (let i = 0; i < items.length; i++) {
         if (items[i].id === remain.id) {
@@ -583,7 +711,6 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
       }
       return false
     }
-
     // 先在最外層尋找
     const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
     if (index > -1) {
@@ -594,23 +721,14 @@ function tableModalSuccess(params: { modalType: ModalType, password?: string, pa
       updateRecursively(list.value)
     }
 
+    /** status 是0的話同時 block 子項 */
+    if (remain.status === 0) {
+      await updateChildrenStatus(remain)
+    }
+
     emit('editSuccess', remain)
   }
 }
-
-/** 獲取菜單的數據 */
-// async function getMenuList() {
-//   try {
-//     const { data: result } = await DeptApi.getDeptPage({
-//       currentPage: 1,
-//       pageSize: 1000,
-//     })
-//     console.log(result.list)
-//   }
-//   finally {
-
-//   }
-// }
 
 onMounted(async () => {
   await propsVerify()
@@ -621,7 +739,6 @@ onMounted(async () => {
 
   // 排隊查詢
   await handleResetSearch()
-  // await getMenuList()
   await getList()
 })
 </script>

@@ -270,7 +270,7 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { data } = await props.createFunction(remain)
+  const { data } = await props.createFunction!(remain)
 
   const emitData = handleIdDataMapping(
     {
@@ -294,7 +294,7 @@ async function edit() {
       delete remain[key]
   }
 
-  const { message } = await props.updateFunction({ ...remain })
+  const { message } = await props.updateFunction!({ ...remain })
   window.$message.success(message)
 
   const emitData = handleIdDataMapping(
