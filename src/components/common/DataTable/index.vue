@@ -32,8 +32,8 @@ const props = defineProps<{
   blockFunction?: (...args: any[]) => Promise<any> // 封鎖列表數據的函數
   unblockFunction?: (...args: any[]) => Promise<any> // 解封鎖列表數據的函數
 
-  rules?: FormRules // 表單驗證規則（傳遞到 Modal）
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
+  rules?: FormRules // 表單驗證規則（傳遞到 Modal）
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
 
@@ -91,12 +91,29 @@ function propsVerify() {
     return
   }
 
-  // inputType是select的時候，必須包含dict
+  // initQueryParams中如果inputType是select的時候，必須包含dict
   const hasSelectCarryDict = !props.initQueryParams?.some((item: InitQueryParams) =>
     item.inputType === 'select' && !item.dict,
   )
   if (!hasSelectCarryDict) {
     propsVerifyErrorMsg.value = 'inputType是select的時候，必須包含dict'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // initFormData中如果type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
+  const hasSelectCarryOptions = !props.initFormData?.some((item: InitFormData) =>
+    item.type === 'select' && (
+      !item.options
+      || !item.options.api
+      || !item.options.selectParam
+      || !item.options.itemMapping
+      || !item.options.itemMapping.label
+      || !item.options.itemMapping.value
+    ),
+  )
+  if (!hasSelectCarryOptions) {
+    propsVerifyErrorMsg.value = 'type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
     propsVerifyPassed.value = false
     return
   }

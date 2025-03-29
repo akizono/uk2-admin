@@ -19,8 +19,8 @@ const props = defineProps<{
   updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數
   createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數
 
-  rules?: FormRules
   initFormData?: InitFormData[]
+  rules?: FormRules
 }>()
 
 const emit = defineEmits(['success'])

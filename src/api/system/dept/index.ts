@@ -10,18 +10,18 @@ export interface DeptVO {
   leaderUserId: string
   leaderUser: UserVo
 
-  remark?: string
-  status?: number
-  isDeleted?: number
-  creator?: string
-  createTime?: string
-  updater?: string
-  updateTime?: string
+  remark: string
+  status: number
+  isDeleted: number
+  creator: string
+  createTime: string
+  updater: string
+  updateTime: string
 }
 
 export const DeptApi = {
   /** 獲取部門分頁列表 */
-  getDeptPage: async (params: PageParams): PageRes<{ deptInfo: DeptVO }> => {
+  getDeptPage: async (params: PageParams): PageRes<DeptVO> => {
     return await request.get({ url: '/system/dept/page', params })
   },
 

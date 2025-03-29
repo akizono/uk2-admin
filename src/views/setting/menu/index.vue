@@ -1,179 +1,240 @@
 <script setup lang="tsx">
-import type { DataTableColumns } from 'naive-ui'
+// TODO：還需要最佳化
+import type { MenuVO } from '@/api/system/menu'
+import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
-import CopyText from '@/components/custom/CopyText.vue'
-import { useBoolean } from '@/hooks'
-import { fetchAllRoutes } from '@/service'
-import { arrayToTree, createIcon } from '@/utils'
-import { NButton, NPopconfirm, NSpace, NTag } from 'naive-ui'
+import { MenuApi } from '@/api/system/menu'
+import DataTable from '@/components/common/DataTable/index.vue'
+import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
-import TableModal from './components/TableModal.vue'
+const dataTableRef = ref()
 
-const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
-
-function deleteData(id: number) {
-  window.$message.success(`删除菜单id:${id}`)
-}
-
-const tableModalRef = ref()
-
-const columns: DataTableColumns<AppRoute.RowRoute> = [
+/** 初始化查詢參數 */
+const initQueryParams: InitQueryParams[] = [
   {
-    type: 'selection',
-    width: 30,
+    name: 'name',
+    value: undefined,
+    label: '部門名稱',
+    class: '!w-64',
+    placeholder: '請填寫部門名稱',
+    inputType: 'input',
   },
   {
-    title: '名称',
+    name: 'status',
+    value: undefined,
+    label: '狀態',
+    class: '!w-64',
+    placeholder: '請填寫狀態',
+    inputType: 'select',
+    dict: 'status',
+  },
+]
+
+/** 表格列定義 */
+const columns: DataTableColumns<MenuVO> = [
+  {
+    title: '菜單名稱',
+    align: 'center',
     key: 'name',
-    width: 200,
   },
   {
-    title: '图标',
+    title: '路由路徑',
+    align: 'center',
+    key: 'path',
+  },
+  {
+    title: '路由元件',
+    align: 'center',
+    key: 'component',
+  },
+  {
+    title: '路由權限',
+    align: 'center',
+    key: 'permission',
+  },
+  {
+    title: '菜單類型',
+    align: 'center',
+    key: 'type',
+
+  },
+  {
+    title: '菜單圖示',
     align: 'center',
     key: 'icon',
-    width: '6em',
-    render: (row) => {
-      return row.icon && createIcon(row.icon, { size: 20 })
-    },
   },
   {
-    title: '标题',
+    title: '狀態',
     align: 'center',
-    key: 'title',
-    ellipsis: {
-      tooltip: true,
-    },
-  },
-  {
-    title: '路径',
-    key: 'path',
+    key: 'status',
     render: (row) => {
-      return (
-        <CopyText value={row.path} />
-      )
-    },
-  },
-  {
-    title: '组件路径',
-    key: 'componentPath',
-    ellipsis: {
-      tooltip: true,
-    },
-    render: (row) => {
-      return row.componentPath || '-'
-    },
-  },
-  {
-    title: '排序值',
-    key: 'order',
-    align: 'center',
-    width: '6em',
-  },
-  {
-    title: '菜单类型',
-    align: 'center',
-    key: 'menuType',
-    width: '6em',
-    render: (row) => {
-      const menuType = row.menuType || 'page'
-      const menuTagType: Record<AppRoute.MenuType, NaiveUI.ThemeColor> = {
-        dir: 'primary',
-        page: 'warning',
-      }
-      return <NTag type={menuTagType[menuType]}>{menuType}</NTag>
-    },
-  },
-  {
-    title: '操作',
-    align: 'center',
-    key: 'actions',
-    width: '15em',
-    render: (row) => {
-      return (
-        <NSpace justify="center">
-          <NButton
-            size="small"
-            onClick={() => tableModalRef.value.openModal('view', row)}
-          >
-            查看
-          </NButton>
-          <NButton
-            size="small"
-            onClick={() => tableModalRef.value.openModal('edit', row)}
-          >
-            编辑
-          </NButton>
-          <NPopconfirm onPositiveClick={() => deleteData(row.id)}>
-            {{
-              default: () => '确认删除',
-              trigger: () => <NButton size="small" type="error">删除</NButton>,
-            }}
-          </NPopconfirm>
-        </NSpace>
-      )
+      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
 ]
 
-const tableData = ref<AppRoute.RowRoute[]>([])
+/** 初始化表單數據 */
+const initFormData: InitFormData[] = [
+  {
+    name: 'id',
+    value: undefined,
+    hidden: true,
+  },
+  {
+    name: 'parentId',
+    value: undefined,
+    span: 2,
+    label: '父級菜單',
+    type: 'select',
+    options: {
+      api: MenuApi.getMenuPage,
+      selectParam: 'name',
+      itemMapping: { label: 'name', value: 'id' },
+    },
+  },
+  {
+    name: 'name',
+    value: undefined,
+    span: 2,
+    label: '菜單名稱',
+    type: 'input',
+  },
+  {
+    name: 'path',
+    value: undefined,
+    span: 2,
+    label: '路由路徑',
+    type: 'input',
+  },
+  {
+    name: 'component',
+    value: undefined,
+    span: 2,
+    label: '路由元件',
+    type: 'input',
+  },
+  {
+    name: 'permission',
+    value: undefined,
+    span: 2,
+    label: '路由權限',
+  },
+  {
+    name: 'type',
+    value: undefined,
+    span: 2,
+    label: '菜單類型',
+    type: 'input',
+  },
+  {
+    name: 'icon',
+    value: undefined,
+    span: 2,
+    label: '菜單圖示',
+  },
+  {
+    name: 'link',
+    value: undefined,
+    span: 2,
+    label: '外鏈',
+    type: 'input',
+  },
+  {
+    name: 'isCache',
+    value: undefined,
+    span: 2,
+    label: '是否快取',
+    type: 'switch',
+  },
+  {
+    name: 'isShowTag',
+    value: undefined,
+    span: 2,
+    label: '是否顯示標籤',
+    type: 'switch',
+  },
+  {
+    name: 'isKeepAlive',
+    value: undefined,
+    span: 2,
+    label: '是否快取',
+    type: 'switch',
+  },
+  {
+    name: 'isShowSide',
+    value: undefined,
+    span: 2,
+    label: '是否顯示側邊欄',
+    type: 'switch',
+  },
+  {
+    name: 'sort',
+    value: undefined,
+    span: 2,
+    label: '排序',
+    type: 'input-number',
+  },
+  {
+    name: 'remark',
+    value: undefined,
+    span: 2,
+    label: '備註',
+    type: 'textarea',
+  },
+  {
+    name: 'status',
+    value: 1,
+    span: 2,
+    label: '狀態',
+    type: 'switch',
+  },
 
-onMounted(() => {
-  getAllRoutes()
-})
-async function getAllRoutes() {
-  startLoading()
-  const { data } = await fetchAllRoutes()
-  tableData.value = arrayToTree(data)
-  endLoading()
+]
+
+/** 表單驗證規則 */
+const rules: FormRules = {
+  name: {
+    required: true,
+    message: '請填寫菜單名稱',
+    trigger: ['blur', 'input'],
+  },
 }
 
-const checkedRowKeys = ref<number[]>([])
-async function handlePositiveClick() {
-  window.$message.success(`批量删除id:${checkedRowKeys.value.join(',')}`)
+/** 元件的配置 */
+const options = {
+  /** 表格的顯示功能 */
+  view: true, // 是否顯示「查看按鈕」
+  edit: true, // 是否顯示「編輯按鈕」
+  del: true, // 是否顯示「刪除按鈕」
+  search: true, // 是否顯示「頂部搜索框」
+  add: true, // 是否顯示「新增按鈕」
+  index: true, // 是否顯示「索引」
+  pagination: false, // 是否開啟分頁
+
+  /** 表格配置 */
+  columns, // 表格欄位的定義
+  viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
+  initQueryParams, // 初始化查詢參數
+  getFunction: MenuApi.getMenuPage, // 獲取表格數據的 API
+  deleteFunction: MenuApi.deleteMenu, // 刪除表格數據的 API
+  updateFunction: MenuApi.updateMenu, // 更新表格數據的 API
+  createFunction: MenuApi.createMenu, // 新增表格數據的 API
+
+  blockFunction: MenuApi.blockMenu, // 封鎖表格數據的 API
+  unblockFunction: MenuApi.unblockMenu, // 解封鎖表格數據的 API
+
+  /** 表單配置 */
+  initFormData, // 初始化表單數據
+  rules, // 表單驗證規則
+
+  /** 其他配置 */
+  modalName: '菜單', // 表格中的數據名稱
+  ref: 'dataTableRef', // 表格的 ref
 }
 </script>
 
 <template>
-  <n-card>
-    <template #header>
-      <NButton type="primary" @click="tableModalRef.openModal('add')">
-        <template #icon>
-          <icon-park-outline-add-one />
-        </template>
-        新建
-      </NButton>
-    </template>
-
-    <template #header-extra>
-      <n-flex>
-        <NButton type="primary" secondary @click="getAllRoutes">
-          <template #icon>
-            <icon-park-outline-refresh />
-          </template>
-          刷新
-        </NButton>
-        <NPopconfirm
-          @positive-click="handlePositiveClick"
-        >
-          <template #trigger>
-            <NButton type="error" secondary>
-              <template #icon>
-                <icon-park-outline-delete-five />
-              </template>
-              批量删除
-            </NButton>
-          </template>
-          确认删除所有选中菜单？
-        </NPopconfirm>
-      </n-flex>
-    </template>
-    <n-data-table
-      v-model:checked-row-keys="checkedRowKeys"
-      :row-key="(row:AppRoute.RowRoute) => row.id" :columns="columns" :data="tableData"
-      :loading="loading"
-      size="small"
-      :scroll-x="1200"
-    />
-    <TableModal ref="tableModalRef" :all-routes="tableData" modal-name="菜单" />
-  </n-card>
+  <DataTable
+    v-bind="options"
+  />
 </template>

@@ -1,7 +1,4 @@
 <script setup lang="tsx">
-// TODO：禁用之後 所有子項也會被禁用
-// TODO：表但需要一個父ID選項
-// TODO：刪除的時候是否刪除所有的子項
 import type { DeptVO } from '@/api/system/dept'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
@@ -65,20 +62,6 @@ const columns: DataTableColumns<DeptVO> = [
   },
 ]
 
-/** 表單驗證規則 */
-const rules: FormRules = {
-  name: {
-    required: true,
-    message: '請填寫部門名稱',
-    trigger: ['blur', 'input'],
-  },
-  leaderUserId: {
-    required: true,
-    message: '請選擇負責人',
-    trigger: ['blur', 'change'],
-  },
-}
-
 /** 初始化表單數據 */
 const initFormData: InitFormData[] = [
   {
@@ -141,6 +124,25 @@ const initFormData: InitFormData[] = [
   },
 ]
 
+/** 表單驗證規則 */
+const rules: FormRules = {
+  name: {
+    required: true,
+    message: '請填寫部門名稱',
+    trigger: ['blur', 'input'],
+  },
+  leaderUserId: {
+    required: true,
+    message: '請選擇負責人',
+    trigger: ['blur', 'change'],
+  },
+  sort: {
+    required: true,
+    message: '請填寫排序',
+    trigger: ['blur', 'input'],
+  },
+}
+
 /** 元件的配置 */
 const options = {
   /** 表格的顯示功能 */
@@ -165,8 +167,8 @@ const options = {
   unblockFunction: DeptApi.unblockDept, // 解封鎖表格數據的 API
 
   /** 表單配置 */
-  rules, // 表單驗證規則
   initFormData, // 初始化表單數據
+  rules, // 表單驗證規則
 
   /** 其他配置 */
   modalName: '部門', // 表格中的數據名稱
