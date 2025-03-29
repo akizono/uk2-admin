@@ -140,6 +140,7 @@ const rules: FormRules = {
     required: true,
     message: '請填寫排序',
     trigger: ['blur', 'input'],
+    type: 'number',
   },
 }
 

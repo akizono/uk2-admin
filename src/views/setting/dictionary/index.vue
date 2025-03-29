@@ -1,207 +1,151 @@
 <script setup lang="tsx">
-import type { DataTableColumns } from 'naive-ui'
+import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
+import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import CopyText from '@/components/custom/CopyText.vue'
-import { useBoolean } from '@/hooks'
-import { fetchDictList } from '@/service'
-import { useDictStore } from '@/store'
-import { NButton, NFlex, NPopconfirm } from 'naive-ui'
+import { DictTypeApi, type DictTypeVO } from '@/api/system/dict-type'
+import { NSwitch } from 'naive-ui'
 
-import DictModal from './components/DictModal.vue'
+const dataTableRef = ref()
 
-const { bool: dictLoading, setTrue: startDictLoading, setFalse: endDictLoading } = useBoolean(false)
-const { bool: contentLoading, setTrue: startContentLoading, setFalse: endContentLoading } = useBoolean(false)
-
-const { getDictByNet } = useDictStore()
-
-const dictRef = ref<InstanceType<typeof DictModal>>()
-const dictContentRef = ref<InstanceType<typeof DictModal>>()
-
-onMounted(() => {
-  getDictList()
-})
-
-const dictData = ref<Entity.Dict[]>([])
-const dictContentData = ref<Entity.Dict[]>([])
-
-async function getDictList() {
-  startDictLoading()
-  const { data, isSuccess } = await fetchDictList()
-  if (isSuccess) {
-    dictData.value = data
-  }
-  endDictLoading()
-}
-
-const lastDictCode = ref('')
-async function getDictContent(code: string) {
-  startContentLoading()
-  dictContentData.value = await getDictByNet(code)
-  lastDictCode.value = code
-  endContentLoading()
-}
-
-const dictColumns: DataTableColumns<Entity.Dict> = [
+/** 初始化查詢參數 */
+const initQueryParams: InitQueryParams[] = [
   {
-    title: '字典项',
-    key: 'label',
+    name: 'name',
+    value: undefined,
+    label: '字典名稱',
+    class: '!w-64',
+    placeholder: '請填寫字典名稱',
+    inputType: 'input',
   },
+]
+
+/** 表格列定義 */
+const columns: DataTableColumns<DictTypeVO> = [
   {
-    title: '字典码',
-    key: 'code',
-    render: (row) => {
-      return (
-        <CopyText value={row.code} />
-      )
-    },
-  },
-  {
-    title: '操作',
-    key: 'actions',
+    title: '字典名稱',
     align: 'center',
+    key: 'name',
+  },
+  {
+    title: '字典類型',
+    align: 'center',
+    key: 'type',
+  },
+  {
+    title: '排序',
+    align: 'center',
+    key: 'sort',
+  },
+  {
+    title: '狀態',
+    align: 'center',
+    key: 'status',
     render: (row) => {
-      return (
-        <NFlex justify="center">
-          <NButton
-            size="small"
-            onClick={() => getDictContent(row.code)}
-          >
-            查看字典
-          </NButton>
-          <NButton
-            size="small"
-            onClick={() => dictRef.value!.openModal('edit', row)}
-          >
-            编辑
-          </NButton>
-          <NPopconfirm onPositiveClick={() => deleteDict(row.id!)}>
-            {{
-              default: () => (
-                <span>
-                  确认删除字典
-                  <b>{row.label}</b>
-                  {' '}
-                  ？
-                </span>
-              ),
-              trigger: () => <NButton size="small" type="error">删除</NButton>,
-            }}
-          </NPopconfirm>
-        </NFlex>
-      )
+      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
 ]
 
-const contentColumns: DataTableColumns<Entity.Dict> = [
+/** 初始化表單數據 */
+const initFormData: InitFormData[] = [
   {
-    title: '字典名称',
-    key: 'label',
+    name: 'id',
+    value: undefined,
+    hidden: true,
   },
   {
-    title: '字典码',
-    key: 'code',
+    name: 'name',
+    value: undefined,
+    span: 1,
+    label: '字典名稱',
+    type: 'input',
   },
   {
-    title: '字典值',
-    key: 'value',
+    name: 'type',
+    value: undefined,
+    span: 1,
+    label: '字典類型',
+    type: 'input',
   },
   {
-    title: '操作',
-    key: 'actions',
-    align: 'center',
-    width: '15em',
-    render: (row) => {
-      return (
-        <NFlex justify="center">
-          <NButton
-            size="small"
-            onClick={() => dictContentRef.value!.openModal('edit', row)}
-          >
-            编辑
-          </NButton>
-          <NPopconfirm onPositiveClick={() => deleteDict(row.id!)}>
-            {{
-              default: () => (
-                <span>
-                  确认删除字典值
-                  <b>{row.label}</b>
-                  {' '}
-                  ？
-                </span>
-              ),
-              trigger: () => <NButton size="small" type="error">删除</NButton>,
-            }}
-          </NPopconfirm>
-        </NFlex>
-      )
-    },
+    name: 'sort',
+    value: undefined,
+    span: 1,
+    label: '排序',
+    type: 'input-number',
   },
+  {
+    name: 'remark',
+    value: undefined,
+    span: 2,
+    label: '備註',
+    type: 'textarea',
+  },
+  {
+    name: 'status',
+    value: 1,
+    span: 1,
+    label: '狀態',
+    type: 'switch',
+  },
+
 ]
 
-function deleteDict(id: number) {
-  window.$message.error(`删除字典${id}`)
+/** 表單驗證規則 */
+const rules: FormRules = {
+  name: {
+    required: true,
+    message: '請填寫字典名稱',
+    trigger: ['blur', 'input'],
+  },
+  type: {
+    required: true,
+    message: '請填寫字典類型',
+    trigger: ['blur', 'input'],
+  },
+  sort: {
+    required: true,
+    message: '請填寫排序',
+    trigger: ['blur', 'input'],
+    type: 'number',
+  },
+}
+
+/** 元件的配置 */
+const options = {
+  /** 表格的顯示功能 */
+  view: true, // 是否顯示「查看按鈕」
+  edit: true, // 是否顯示「編輯按鈕」
+  del: true, // 是否顯示「刪除按鈕」
+  search: true, // 是否顯示「頂部搜索框」
+  add: true, // 是否顯示「新增按鈕」
+  index: true, // 是否顯示「索引」
+  pagination: false, // 是否開啟分頁
+
+  /** 表格配置 */
+  columns, // 表格欄位的定義
+  viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
+  initQueryParams, // 初始化查詢參數
+  getFunction: DictTypeApi.getDictTypePage, // 獲取表格數據的 API
+  deleteFunction: DictTypeApi.deleteDictType, // 刪除表格數據的 API
+  updateFunction: DictTypeApi.updateDictType, // 更新表格數據的 API
+  createFunction: DictTypeApi.createDictType, // 新增表格數據的 API
+
+  blockFunction: DictTypeApi.blockDictType, // 封鎖表格數據的 API
+  unblockFunction: DictTypeApi.unblockDictType, // 解封鎖表格數據的 API
+
+  /** 表單配置 */
+  initFormData, // 初始化表單數據
+  rules, // 表單驗證規則
+
+  /** 其他配置 */
+  modalName: '字典', // 表格中的數據名稱
+  ref: 'dataTableRef', // 表格的 ref
 }
 </script>
 
 <template>
-  <NFlex>
-    <div class="basis-2/5">
-      <n-card>
-        <template #header>
-          <NButton type="primary" @click="dictRef!.openModal('add')">
-            <template #icon>
-              <icon-park-outline-add-one />
-            </template>
-            新建
-          </NButton>
-        </template>
-        <template #header-extra>
-          <NFlex>
-            <NButton type="primary" secondary @click="getDictList">
-              <template #icon>
-                <icon-park-outline-refresh />
-              </template>
-              刷新
-            </NButton>
-          </NFlex>
-        </template>
-        <n-data-table
-          :columns="dictColumns" :data="dictData" :loading="dictLoading" :pagination="false"
-          :bordered="false"
-        />
-      </n-card>
-    </div>
-    <div class="flex-1">
-      <n-card>
-        <template #header>
-          <NButton type="primary" :disabled="!lastDictCode" @click="dictContentRef!.openModal('add')">
-            <template #icon>
-              <icon-park-outline-add-one />
-            </template>
-            新建
-          </NButton>
-        </template>
-        <template #header-extra>
-          <NFlex>
-            <NButton type="primary" :disabled="!lastDictCode" secondary @click="getDictContent(lastDictCode)">
-              <template #icon>
-                <icon-park-outline-refresh />
-              </template>
-              刷新
-            </NButton>
-          </NFlex>
-        </template>
-        <n-data-table
-          :columns="contentColumns" :data="dictContentData" :loading="contentLoading" :pagination="false"
-          :bordered="false"
-        />
-      </n-card>
-    </div>
-
-    <DictModal ref="dictRef" modal-name="字典项" is-root />
-    <DictModal ref="dictContentRef" modal-name="字典值" :dict-code="lastDictCode" />
-  </NFlex>
+  <DataTable
+    v-bind="options"
+  />
 </template>
-
-<style scoped></style>
