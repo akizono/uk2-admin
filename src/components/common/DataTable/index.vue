@@ -3,6 +3,7 @@
 // 測試添加功能
 import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
+import type { ComputedRef, VNode } from 'vue'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { arrayToTree, sortTreeData } from '@/utils/array'
@@ -11,6 +12,7 @@ import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 import TableModal from './components/TableModal.vue'
 
 const props = defineProps<{
+  width?: string // 表格的寬度
   modalName: string // 模態框名稱
 
   edit?: boolean // 開啟編輯
@@ -20,6 +22,9 @@ const props = defineProps<{
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
   pagination?: boolean // 開啟分頁
+
+  filterColumnName?: string // 過濾條件的欄位名稱
+  filterColumnId?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnId.value} ）
 
   columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
@@ -126,6 +131,27 @@ function propsVerify() {
     return
   }
 
+  // 如果 filterColumnName 存在則必須提供 filterColumnId
+  if (props.filterColumnName && !props.filterColumnId) {
+    propsVerifyErrorMsg.value = '如果 filterColumnName 存在則必須提供 filterColumnId'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // 如果 filterColumnId 存在則必須提供 filterColumnName
+  if (props.filterColumnId && !props.filterColumnName) {
+    propsVerifyErrorMsg.value = '如果 filterColumnId 存在則必須提供 filterColumnName'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // 如果 filterColumnId.value 不是非空 string 則報錯
+  if (props.filterColumnId && (typeof props.filterColumnId.value !== 'string' || props.filterColumnId.value === '')) {
+    propsVerifyErrorMsg.value = 'filterColumnId.value 必須是 string 且不能為空'
+    propsVerifyPassed.value = false
+    return
+  }
+
   propsVerifyPassed.value = true
 }
 
@@ -228,6 +254,11 @@ const columns = computed(() => {
     return newColumn
   })
 
+  // 找出外部的 actions 列
+  const externalActionsColumn = props.columns.find((column): column is (typeof column & { key: 'actions', render?: (row: any) => VNode }) =>
+    'key' in column && column.key === 'actions',
+  )
+
   const operateColumn = [
     {
       title: '操作',
@@ -237,6 +268,8 @@ const columns = computed(() => {
       render: (row: TableRow) => {
         return (
           <NSpace justify="center">
+            {/* 如果存在外部的 actions 列，先渲染它的內容 */}
+            {externalActionsColumn?.render?.(row)}
             {props.view && (
               <NButton
                 size="small"
@@ -284,14 +317,17 @@ const columns = computed(() => {
   return [
     ...batchDeleteColumn,
     ...indexColumn,
-    ...actualColumns,
-    ...operateColumn,
+    ...actualColumns.filter(col => !('key' in col) || col.key !== 'actions'), // 過濾掉外部的 actions 列
+    ...operateColumn, // 總是使用合併後的操作列
   ]
 })
 async function getList() {
   try {
     startTableLoading()
-    const { data: result } = await props.getFunction(queryParams.value)
+    const { data: result } = await props.getFunction({
+      ...queryParams.value,
+      ...(props.filterColumnName && props.filterColumnId ? { [props.filterColumnName]: props.filterColumnId.value } : {}),
+    })
 
     // 將巢狀物件攤平化
     const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
@@ -705,6 +741,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
     }
     else {
       // 沒有指定父項，直接添加到最外層
+      console.log('remain', remain)
       list.value.push(remain)
     }
     emit('createSuccess', remain)
@@ -856,6 +893,7 @@ onMounted(async () => {
 
     <TableModal
       ref="modalRef"
+      :width="width"
       modal-name="使用者"
 
       :update-function="updateFunction || undefined"

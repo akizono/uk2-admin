@@ -14,13 +14,17 @@ interface TreeNode {
 }
 
 const props = defineProps<{
-  modalName?: string
+  width?: string // 表格的寬度
+  modalName?: string // 模態框名稱
+
+  filterColumnName?: string // 過濾條件的欄位名稱
+  filterColumnId?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnId.value} ）
 
   updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數
   createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數
 
-  initFormData?: InitFormData[]
-  rules?: FormRules
+  initFormData?: InitFormData[] // 初始化表單數據
+  rules?: FormRules // 表單驗證規則
 }>()
 
 const emit = defineEmits(['success'])
@@ -254,12 +258,15 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
     if (key.endsWith('Id') && key !== 'parentId') {
       // 移除屬性名稱中的 'Id' 後綴
       const keyWithoutId = key.replace('Id', '')
+      // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」，例如dictType，所以需要加這個if來判斷
+      if (optionsMap.value[key]) {
       // 在 result 中建立新的物件結構
-      result[keyWithoutId] = {
+        result[keyWithoutId] = {
         // 使用 formDataMapping 中定義的標籤映射作為鍵名
-        [formDataMapping.value[key].options!.itemMapping!.label]: optionsMap.value[key][0].label,
-        // 儲存選項的實際值（ID）
-        id: optionsMap.value[key][0].value,
+          [formDataMapping.value[key].options!.itemMapping!.label]: optionsMap.value[key][0].label,
+          // 儲存選項的實際值（ID）// 為什麼是0？因為optionsMap.value[key]的值是通過精確尋找到的，且這個值通常是唯一的，所以我們可以沒有顧慮的採用第一個元素 所以寫0
+          id: optionsMap.value[key][0].value,
+        }
       }
     }
   }
@@ -270,7 +277,10 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
 // 新增
 async function add() {
   const { id, ...remain } = formData.value
-  const { data } = await props.createFunction!(remain)
+  const { data } = await props.createFunction!({
+    ...remain,
+    ...(props.filterColumnName && props.filterColumnId ? { [props.filterColumnName]: props.filterColumnId.value } : {}),
+  })
 
   const emitData = handleIdDataMapping(
     {
@@ -280,7 +290,6 @@ async function add() {
     },
     remain,
   )
-
   emit('success', emitData)
 }
 
@@ -350,7 +359,9 @@ function closeModal() {
     :mask-closable="false"
     preset="card"
     :title="modalTitle"
-    class="w-700px"
+    :style="{
+      width: width || '700px',
+    }"
     :segmented="{
       content: true,
       action: true,

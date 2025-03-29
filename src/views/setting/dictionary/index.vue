@@ -3,9 +3,12 @@ import type { InitFormData, InitQueryParams } from '@/components/common/DataTabl
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DictTypeApi, type DictTypeVO } from '@/api/system/dict-type'
-import { NSwitch } from 'naive-ui'
+import { NButton, NSwitch } from 'naive-ui'
+
+import DictData from './components/dict-data/index.vue'
 
 const dataTableRef = ref()
+const modalRef = ref()
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -57,6 +60,13 @@ const columns: DataTableColumns<DictTypeVO> = [
       return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
+  {
+    title: '操作',
+    key: 'actions',
+    render: (row) => {
+      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>查看數據</NButton>
+    },
+  },
 ]
 
 /** 初始化表單數據 */
@@ -101,7 +111,6 @@ const initFormData: InitFormData[] = [
     label: '狀態',
     type: 'switch',
   },
-
 ]
 
 /** 表單驗證規則 */
@@ -127,7 +136,7 @@ const rules: FormRules = {
 /** 元件的配置 */
 const options = {
   /** 表格的顯示功能 */
-  view: true, // 是否顯示「查看按鈕」
+  view: false, // 是否顯示「查看按鈕」
   edit: true, // 是否顯示「編輯按鈕」
   del: true, // 是否顯示「刪除按鈕」
   search: true, // 是否顯示「頂部搜索框」
@@ -158,7 +167,11 @@ const options = {
 </script>
 
 <template>
-  <DataTable
-    v-bind="options"
-  />
+  <div>
+    <DataTable
+      v-bind="options"
+    />
+
+    <DictData ref="modalRef" />
+  </div>
 </template>

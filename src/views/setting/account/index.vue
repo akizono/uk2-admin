@@ -160,38 +160,6 @@ const columns: DataTableColumns<UserVo> = [
 
 ]
 
-const rules: FormRules = {
-  username: {
-    required: true,
-    message: '請輸入使用者名稱',
-    trigger: ['blur', 'input'],
-  },
-  nickname: {
-    message: '請輸入暱稱',
-    trigger: ['blur', 'input'],
-  },
-  age: {
-    type: 'number',
-    message: '請輸入年齡',
-    trigger: ['blur', 'input'],
-  },
-  sex: {
-    type: 'number',
-    message: '請選擇性別',
-    trigger: ['blur', 'change'],
-  },
-  email: {
-    type: 'email',
-    message: '請輸入正確的電子郵件格式',
-    trigger: ['blur', 'input'],
-  },
-  mobile: {
-    pattern: /^[\d\s+]{1,20}$/,
-    message: '請輸入正確的手機號碼格式',
-    trigger: ['blur', 'input'],
-  },
-}
-
 const initFormData: InitFormData[] = [
   {
     name: 'id',
@@ -257,6 +225,38 @@ const initFormData: InitFormData[] = [
   },
 ]
 
+const rules: FormRules = {
+  username: {
+    required: true,
+    message: '請輸入使用者名稱',
+    trigger: ['blur', 'input'],
+  },
+  nickname: {
+    message: '請輸入暱稱',
+    trigger: ['blur', 'input'],
+  },
+  age: {
+    type: 'number',
+    message: '請輸入年齡',
+    trigger: ['blur', 'input'],
+  },
+  sex: {
+    type: 'number',
+    message: '請選擇性別',
+    trigger: ['blur', 'change'],
+  },
+  email: {
+    type: 'email',
+    message: '請輸入正確的電子郵件格式',
+    trigger: ['blur', 'input'],
+  },
+  mobile: {
+    pattern: /^[\d\s+]{1,20}$/,
+    message: '請輸入正確的手機號碼格式',
+    trigger: ['blur', 'input'],
+  },
+}
+
 /** 元件的配置 */
 const options = {
   /** 表格的顯示功能 */
@@ -266,6 +266,7 @@ const options = {
   search: true, // 是否顯示「頂部搜索框」
   add: true, // 是否顯示「新增按鈕」
   index: true, // 是否顯示「索引」
+  pagination: true, // 是否開啟分頁
 
   /** 表格配置 */
   columns, // 表格欄位的定義
@@ -275,6 +276,9 @@ const options = {
   deleteFunction: UserApi.deleteUser, // 刪除表格數據的 API
   updateFunction: UserApi.updateUser, // 更新表格數據的 API
   createFunction: UserApi.createUser, // 新增表格數據的 API
+
+  blockFunction: UserApi.blockUser, // 封鎖使用者的 API
+  unblockFunction: UserApi.unblockUser, // 解封使用者的 API
 
   /** 表單配置 */
   rules, // 表單驗證規則
