@@ -17,6 +17,14 @@ const initQueryParams: InitQueryParams[] = [
     placeholder: '請填寫字典名稱',
     inputType: 'input',
   },
+  {
+    name: 'type',
+    value: undefined,
+    label: '字典類型',
+    class: '!w-64',
+    placeholder: '請填寫字典類型',
+    inputType: 'input',
+  },
 ]
 
 /** 表格列定義 */
@@ -35,6 +43,11 @@ const columns: DataTableColumns<DictTypeVO> = [
     title: '排序',
     align: 'center',
     key: 'sort',
+  },
+  {
+    title: '備註',
+    align: 'center',
+    key: 'remark',
   },
   {
     title: '狀態',
@@ -120,11 +133,11 @@ const options = {
   search: true, // 是否顯示「頂部搜索框」
   add: true, // 是否顯示「新增按鈕」
   index: true, // 是否顯示「索引」
-  pagination: false, // 是否開啟分頁
+  pagination: true, // 是否開啟分頁
 
   /** 表格配置 */
   columns, // 表格欄位的定義
-  viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
+  viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
   getFunction: DictTypeApi.getDictTypePage, // 獲取表格數據的 API
   deleteFunction: DictTypeApi.deleteDictType, // 刪除表格數據的 API
