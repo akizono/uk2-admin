@@ -5,10 +5,12 @@ import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
+import { DictDataApi } from '@/api/system/dict-data/'
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
+import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
 
 const props = defineProps<{
@@ -234,14 +236,43 @@ const columns = computed(() => {
     return null
   }
 
+  // 外部傳遞進來的 columns
   const actualColumns = props.columns.map((column) => {
-    const newColumn = { ...column }
+    const newColumn = { ...column } as any
+
+    // 將 dictValue 轉化為具體的字典值
+    // 判斷 render 是不是JSON對象
+    if (typeof newColumn.render === 'function') {
+      const originalRender = newColumn.render
+      newColumn.render = (row: TableRow) => {
+        const result = originalRender(row)
+        // console.log('render 函數返回值：', result)
+        try {
+          const data = JSON.parse(result)
+          // 判斷data是否包含dictType
+          if ('dictType' in data) {
+            return h(AsyncDictLabel, {
+              dictType: data.dictType,
+              value: data.value,
+            })
+          }
+        }
+        catch {
+          // 如果不是 JSON 字串，直接返回原始結果
+          return result
+        }
+        return result
+      }
+    }
+
+    // 返回新的 column
     if ('key' in newColumn
       && !('children' in newColumn)
       && props.viewEntranceColumns?.includes(newColumn.key as string)) {
       return {
         ...newColumn,
         render: (row: TableRow) => {
+          // 找到父項
           const parentData = findParentItem(list.value, row.parentId)
           return (
             <n-button type="primary" text onClick={() => modalRef.value.openModal('view', row, parentData)}>
@@ -254,7 +285,7 @@ const columns = computed(() => {
     return newColumn
   })
 
-  // 找出外部的 actions 列
+  // 外部的 actions 列
   const externalActionsColumn = props.columns.find((column): column is (typeof column & { key: 'actions', render?: (row: any) => VNode }) =>
     'key' in column && column.key === 'actions',
   )

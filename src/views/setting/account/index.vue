@@ -113,10 +113,10 @@ const columns: DataTableColumns<UserVo> = [
     align: 'center',
     key: 'sex',
     render: (row) => {
-      if (row.sex)
-        return row.sex === 1 ? '男' : '女'
-      else
-        return ''
+      return JSON.stringify({
+        dictType: 'system_user_sex',
+        value: row.sex,
+      })
     },
   },
   {

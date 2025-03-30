@@ -53,6 +53,7 @@ function withDictCheck(fn: (dict: any) => any) {
 
 const getDict = withDictCheck((dict) => {
   data.value = dict.data()
+  console.log(data.value)
 })
 
 const getEnum = withDictCheck((dict) => {

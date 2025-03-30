@@ -33,7 +33,7 @@ declare namespace App {
 }
 
 interface DictMap {
-  [key: string]: Entity.Dict[]
+  [key: string]: import('@/store/model/dict').DictItem[]
 }
 
 // API 回應介面
@@ -54,5 +54,5 @@ interface PageParams {
   currentPage?: number
 }
 
-// 彈窗類型
+// 彈出視窗類型
 type ModalType = 'add' | 'view' | 'edit'
