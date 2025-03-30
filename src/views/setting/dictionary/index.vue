@@ -64,7 +64,7 @@ const columns: DataTableColumns<DictTypeVO> = [
     title: '操作',
     key: 'actions',
     render: (row) => {
-      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>查看數據</NButton>
+      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>字典數據</NButton>
     },
   },
 ]

@@ -3,6 +3,7 @@ import type { InitFormData, ModalType, TableRow } from '../type'
 import type { FormRules } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
+import { useDictStore } from '@/store'
 import { useDebounceFn } from '@vueuse/core'
 
 // 樹狀結構的節點
@@ -42,6 +43,8 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 const optionsMap = ref<Record<string, any[]>>({})
 // 為每個 select 添加獨立的 loading 狀態
 const selectLoadingMap = ref<Record<string, boolean>>({})
+// 為每個 radio 添加獨立的 loading 狀態
+const radioLoadingMap = ref<Record<string, boolean>>({})
 // 設置選項的共用函數，使用 nextTick 確保 DOM 更新
 async function setOptionsWithNextTick(
   fieldName: string,
@@ -150,6 +153,7 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
   formDataMapping.value = {}
   optionsMap.value = {}
   selectLoadingMap.value = {} // 重設搜索 loading 狀態
+  radioLoadingMap.value = {} // 重設 radio loading 狀態
 
   // 初始化表單數據
   if (props.initFormData && Array.isArray(props.initFormData)) {
@@ -157,8 +161,15 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
       formData.value[item.name] = item.value
       formDataMapping.value[item.name] = item
 
+      // 如果是 radio 類型且有 dictType
+      if (item.type === 'radio' && item.dictType) {
+        radioLoadingMap.value[item.name] = true
+        await getDictOptions(item.dictType)
+        radioLoadingMap.value[item.name] = false
+      }
+
       // 如果選單類型
-      if (item.type === 'select') {
+      if (item.type === 'select' && item.options) {
         /**
          * 由於 optionsMap.value 初始化時沒有數據，n-select 或者 n-tree-select 組件會直接顯示ID
          * 如果data如果可以拿到ID的具體數據的話， 我們可以先將當前ID的lable和value塞進去
@@ -351,6 +362,15 @@ function closeModal() {
   endLoading()
   hiddenModal()
 }
+
+const { dict } = useDictStore()
+const dictOptionsMap = ref<Record<string, any>>({})
+
+// 獲取字典選項
+async function getDictOptions(dictType: string) {
+  const dictData = await dict(dictType)
+  dictOptionsMap.value[dictType] = dictData.data()
+}
 </script>
 
 <template>
@@ -384,32 +404,6 @@ function closeModal() {
 
     <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100">
       <n-grid :cols="2" :x-gap="18">
-        <!-- <n-form-item-grid-item :span="1" label="性別" path="sex">
-          <n-radio-group v-model:value="formData.sex">
-            <n-space>
-              <n-radio :value="1">
-                男
-              </n-radio>
-              <n-radio :value="2">
-                女
-              </n-radio>
-            </n-space>
-          </n-radio-group>
-        </n-form-item-grid-item> -->
-        <!-- <n-form-item-grid-item :span="1" label="使用者狀態" path="status">
-          <n-switch
-            v-model:value="formData.status"
-            :checked-value="1" :unchecked-value="0"
-          >
-            <template #checked>
-              啟用
-            </template>
-            <template #unchecked>
-              禁用
-            </template>
-          </n-switch>
-        </n-form-item-grid-item> -->
-
         <template v-for="item in formDataMapping" :key="item.name">
           <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :label="item.label" :path="item.name">
             <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
@@ -417,7 +411,7 @@ function closeModal() {
             <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
             <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
             <template v-else-if="item.type === 'select'">
-              <!-- 如果數據中包含 parentId，使用樹狀選擇器 -->
+              <!-- 如果數據中包含 children，使用樹狀選擇器 -->
               <n-tree-select
                 v-if="optionsMap[item.name]?.[0]?.children"
                 v-model:value="formData[item.name]"
@@ -449,6 +443,18 @@ function closeModal() {
                 @search="(query) => handleSearch(query, item)"
               />
             </template>
+            <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]">
+              <n-space>
+                <template v-if="radioLoadingMap[item.name]">
+                  <n-skeleton text :repeat="3" :width="60" />
+                </template>
+                <template v-else-if="item.dictType && dictOptionsMap[item.dictType]">
+                  <n-radio v-for="option in dictOptionsMap[item.dictType]" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                  </n-radio>
+                </template>
+              </n-space>
+            </n-radio-group>
           </n-form-item-grid-item>
         </template>
       </n-grid>

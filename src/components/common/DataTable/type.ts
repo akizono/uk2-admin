@@ -21,7 +21,7 @@ export interface InitQueryParams {
   /** 輸入框類型 */
   inputType: string
   /** 字典代碼（用於下拉選單等） */
-  dict?: string
+  dictType?: string
 }
 
 /** 表單數據介面 */
@@ -61,6 +61,8 @@ export interface InitFormData {
   }
   /** 編輯時是否禁用此欄位 */
   disableEdit?: boolean
+  /** 字典類型 */
+  dictType?: string
 }
 
 /** 彈出視窗類型 */

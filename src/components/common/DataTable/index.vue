@@ -5,8 +5,8 @@ import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
-import { DictDataApi } from '@/api/system/dict-data/'
 import { useBoolean, useThrottleAction } from '@/hooks'
+import { useDictStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
@@ -98,12 +98,12 @@ function propsVerify() {
     return
   }
 
-  // initQueryParams中如果inputType是select的時候，必須包含dict
-  const hasSelectCarryDict = !props.initQueryParams?.some((item: InitQueryParams) =>
-    item.inputType === 'select' && !item.dict,
+  // initQueryParams中如果inputType是select的時候，必須包含dictType
+  const hasSelectCarryDictType = !props.initQueryParams?.some((item: InitQueryParams) =>
+    item.inputType === 'select' && !item.dictType,
   )
-  if (!hasSelectCarryDict) {
-    propsVerifyErrorMsg.value = 'inputType是select的時候，必須包含dict'
+  if (!hasSelectCarryDictType) {
+    propsVerifyErrorMsg.value = 'initQueryParams中如果inputType是select的時候，必須包含dictType'
     propsVerifyPassed.value = false
     return
   }
@@ -120,7 +120,17 @@ function propsVerify() {
     ),
   )
   if (!hasSelectCarryOptions) {
-    propsVerifyErrorMsg.value = 'type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
+    propsVerifyErrorMsg.value = 'initFormData中如果type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
+    propsVerifyPassed.value = false
+    return
+  }
+
+  // initFormData中如果type是radio的時候，必須包含dictType
+  const hasRadioCarryDictType = !props.initFormData?.some((item: InitFormData) =>
+    item.type === 'radio' && !item.dictType,
+  )
+  if (!hasRadioCarryDictType) {
+    propsVerifyErrorMsg.value = 'initFormData中如果type是radio的時候，必須包含dictType'
     propsVerifyPassed.value = false
     return
   }
@@ -174,13 +184,37 @@ const formRef = ref<FormInst | null>()
 const total = ref(0)
 const queryParams = ref<Record<string, any>>({})
 const queryParamsMapping = ref<Record<string, InitQueryParams>>({})
+const dictOptionsMap = ref<Record<string, any>>({})
+// 為每個 select 添加獨立的 loading 狀態
+const selectLoadingMap = ref<Record<string, boolean>>({})
+
+// 獲取字典選項
+const { dict } = useDictStore()
+async function getDictOptions(dictType: string) {
+  try {
+    // 設置 loading 狀態為 true
+    selectLoadingMap.value[dictType] = true
+    const dictData = await dict(dictType)
+    dictOptionsMap.value[dictType] = dictData.data()
+  }
+  finally {
+    // 設置 loading 狀態為 false
+    selectLoadingMap.value[dictType] = false
+  }
+}
+
 function handleResetSearch() {
   try {
     startQueryLoading()
     if (props.initQueryParams && Array.isArray(props.initQueryParams)) {
-      props.initQueryParams.forEach((item: InitQueryParams) => {
+      props.initQueryParams.forEach(async (item: InitQueryParams) => {
         queryParams.value[item.name] = item.value
         queryParamsMapping.value[item.name] = item
+
+        // 如果是 select 類型且有 dictType，則獲取字典選項
+        if (item.inputType === 'select' && item.dictType) {
+          await getDictOptions(item.dictType)
+        }
       })
     }
   }
@@ -854,6 +888,15 @@ onMounted(async () => {
                 <n-input-number
                   v-if="item.inputType === 'input-number'" v-model:value="queryParams[item.name]"
                   :placeholder="item.placeholder || '請輸入'"
+                />
+                <n-select
+                  v-if="item.inputType === 'select' && item.dictType"
+                  v-model:value="queryParams[item.name]"
+                  :options="dictOptionsMap[item.dictType]"
+                  :placeholder="item.placeholder || '請選擇'"
+                  :loading="selectLoadingMap[item.dictType]"
+                  clearable
+                  @update:value="getList"
                 />
               </n-form-item>
             </template>

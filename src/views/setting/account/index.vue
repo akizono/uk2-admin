@@ -63,7 +63,7 @@ const initQueryParams: InitQueryParams[] = [
     class: '!w-64',
     placeholder: '請填寫性別',
     inputType: 'select',
-    dict: 'sex',
+    dictType: 'system_user_sex',
   },
   {
     name: 'email',
@@ -87,7 +87,7 @@ const initQueryParams: InitQueryParams[] = [
     label: '狀態',
     class: '!w-64',
     inputType: 'select',
-    dict: 'status',
+    dictType: 'status',
   },
 ]
 
@@ -194,6 +194,7 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '性別',
     type: 'radio',
+    dictType: 'system_user_sex',
   },
   {
     name: 'email',
