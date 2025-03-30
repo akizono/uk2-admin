@@ -8,7 +8,7 @@ import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
 const modalRef = ref()
 const dataTableRef = ref()
 const modalTitle = ref('')
-const filterColumnId = ref<string>('')
+const filterColumnValue = ref<string>('')
 
 /** 表格列定義 */
 const columns: DataTableColumns<DictDataVO> = [
@@ -47,7 +47,7 @@ const initFormData: InitFormData[] = [
     hidden: true,
   },
   {
-    name: 'dictTypeId',
+    name: 'dictType',
     value: undefined, // 在openModal時會被賦值
     hidden: true,
   },
@@ -120,8 +120,8 @@ const options = {
   pagination: true, // 是否開啟分頁
 
   /** 表格配置 */
-  filterColumnName: 'dictTypeId', // 過濾條件的欄位名稱
-  filterColumnId: computed(() => filterColumnId.value), // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnId.value} ）
+  filterColumnName: 'dictType', // 過濾條件的欄位名稱
+  filterColumnValue: computed(() => filterColumnValue.value), // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
 
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
@@ -145,10 +145,10 @@ const options = {
 defineExpose({
   openModal: (row: DictTypeVO) => {
     // 設置過濾欄位的 ID
-    filterColumnId.value = row.id
+    filterColumnValue.value = row.type
 
     // 設置字典類型的 ID（在「initFormData」中會用到）
-    initFormData.find(item => item.name === 'dictTypeId')!.value = row.id
+    initFormData.find(item => item.name === 'dictType')!.value = row.type
 
     // 設置模態框的標題
     modalTitle.value = row.name

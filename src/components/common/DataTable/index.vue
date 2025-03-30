@@ -24,7 +24,7 @@ const props = defineProps<{
   pagination?: boolean // 開啟分頁
 
   filterColumnName?: string // 過濾條件的欄位名稱
-  filterColumnId?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnId.value} ）
+  filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
 
   columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
@@ -131,23 +131,23 @@ function propsVerify() {
     return
   }
 
-  // 如果 filterColumnName 存在則必須提供 filterColumnId
-  if (props.filterColumnName && !props.filterColumnId) {
-    propsVerifyErrorMsg.value = '如果 filterColumnName 存在則必須提供 filterColumnId'
+  // 如果 filterColumnName 存在則必須提供 filterColumnValue
+  if (props.filterColumnName && !props.filterColumnValue) {
+    propsVerifyErrorMsg.value = '如果 filterColumnName 存在則必須提供 filterColumnValue'
     propsVerifyPassed.value = false
     return
   }
 
-  // 如果 filterColumnId 存在則必須提供 filterColumnName
-  if (props.filterColumnId && !props.filterColumnName) {
-    propsVerifyErrorMsg.value = '如果 filterColumnId 存在則必須提供 filterColumnName'
+  // 如果 filterColumnValue 存在則必須提供 filterColumnName
+  if (props.filterColumnValue && !props.filterColumnName) {
+    propsVerifyErrorMsg.value = '如果 filterColumnValue 存在則必須提供 filterColumnName'
     propsVerifyPassed.value = false
     return
   }
 
-  // 如果 filterColumnId.value 不是非空 string 則報錯
-  if (props.filterColumnId && (typeof props.filterColumnId.value !== 'string' || props.filterColumnId.value === '')) {
-    propsVerifyErrorMsg.value = 'filterColumnId.value 必須是 string 且不能為空'
+  // 如果 filterColumnValue.value 不是非空 string 則報錯
+  if (props.filterColumnValue && (typeof props.filterColumnValue.value !== 'string' || props.filterColumnValue.value === '')) {
+    propsVerifyErrorMsg.value = 'filterColumnValue.value 必須是 string 且不能為空'
     propsVerifyPassed.value = false
     return
   }
@@ -326,7 +326,7 @@ async function getList() {
     startTableLoading()
     const { data: result } = await props.getFunction({
       ...queryParams.value,
-      ...(props.filterColumnName && props.filterColumnId ? { [props.filterColumnName]: props.filterColumnId.value } : {}),
+      ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
     })
 
     // 將巢狀物件攤平化

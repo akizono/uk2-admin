@@ -18,7 +18,7 @@ const props = defineProps<{
   modalName?: string // 模態框名稱
 
   filterColumnName?: string // 過濾條件的欄位名稱
-  filterColumnId?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnId.value} ）
+  filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
 
   updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數
   createFunction?: (...args: any[]) => Promise<any> // 新增列表數據的函數
@@ -258,7 +258,7 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
     if (key.endsWith('Id') && key !== 'parentId') {
       // 移除屬性名稱中的 'Id' 後綴
       const keyWithoutId = key.replace('Id', '')
-      // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」，例如dictType，所以需要加這個if來判斷
+      // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」
       if (optionsMap.value[key]) {
       // 在 result 中建立新的物件結構
         result[keyWithoutId] = {
@@ -279,7 +279,7 @@ async function add() {
   const { id, ...remain } = formData.value
   const { data } = await props.createFunction!({
     ...remain,
-    ...(props.filterColumnName && props.filterColumnId ? { [props.filterColumnName]: props.filterColumnId.value } : {}),
+    ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
   })
 
   const emitData = handleIdDataMapping(
