@@ -2,9 +2,9 @@ import request from '@/utils/request'
 
 export interface DictDataVO {
   id: string
-  dictTypeId: string
+  dictType: string
   label: string
-  value: string
+  value: number
   sort: number
 
   remark: string

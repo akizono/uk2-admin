@@ -1,4 +1,4 @@
-import { fetchDictList } from '@/service'
+import { DictDataApi } from '@/api/system/dict-data'
 import { session } from '@/utils'
 
 export const useDictStore = defineStore('dict-store', {
@@ -9,13 +9,13 @@ export const useDictStore = defineStore('dict-store', {
     }
   },
   actions: {
-    async dict(code: string) {
+    async dict(type: string) {
       // 調用前初始化
       if (!this.dictMap) {
         this.initDict()
       }
 
-      const targetDict = await this.getDict(code)
+      const targetDict = await this.getDict(type)
 
       return {
         data: () => targetDict,
@@ -24,27 +24,32 @@ export const useDictStore = defineStore('dict-store', {
         labelMap: () => Object.fromEntries(targetDict.map(({ label, ...data }) => [label, data])),
       }
     },
-    async getDict(code: string) {
-      const isExist = Reflect.has(this.dictMap, code)
+    async getDict(type: string) {
+      const isExist = Reflect.has(this.dictMap, type)
 
       if (isExist) {
-        return this.dictMap[code]
+        return this.dictMap[type]
       }
       else {
-        return await this.getDictByNet(code)
+        return await this.getDictByNet(type)
       }
     },
 
-    async getDictByNet(code: string) {
-      const { data, isSuccess } = await fetchDictList(code)
-      if (isSuccess) {
-        Reflect.set(this.dictMap, code, data)
+    async getDictByNet(type: string) {
+      try {
+        const { data: result } = await DictDataApi.getDictDataPage({
+          pageSize: 0,
+          currentPage: 1,
+          // @ts-expect-error neglect
+          dictType: type,
+        })
+        Reflect.set(this.dictMap, type, result.list)
         // 同步至session
         session.set('dict', this.dictMap)
-        return data
+        return result.list
       }
-      else {
-        throw new Error(`Failed to get ${code} dictionary from network, check ${code} field or network`)
+      catch {
+        throw new Error(`Failed to get ${type} dictionary from network, check ${type} field or network`)
       }
     },
     initDict() {
