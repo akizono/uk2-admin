@@ -63,6 +63,14 @@ export interface InitFormData {
   disableEdit?: boolean
   /** 字典類型 */
   dictType?: string
+  /** 輸入框提示文字 */
+  placeholder?: string
+  /** 輸入框前綴 */
+  inputPrefix?: string
+  /** 輸入框後綴 */
+  inputSuffix?: string
+  /** 幫助提示 */
+  helpInfo?: string
 }
 
 /** 彈出視窗類型 */

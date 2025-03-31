@@ -7,7 +7,6 @@ import type { ComputedRef, VNode } from 'vue'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { useDictStore } from '@/store'
-import { delay } from '@/utils'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
@@ -15,8 +14,9 @@ import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
 
 const props = defineProps<{
-  width?: string // 表格的寬度
-  modalName: string // 模態框名稱
+  modalWidth?: string // 模態框的寬度（傳遞到 Modal）
+  modalFormLabelWidth?: string // 模態框表單label的寬度（傳遞到 Modal）
+  modalName?: string // 模態框名稱
 
   edit?: boolean // 開啟編輯
   del?: boolean // 開啟刪除
@@ -756,6 +756,17 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
   const { modalType, parentId, ...remain } = params
 
   if (modalType === 'add') {
+    // 定義根據 sort 值插入項目的函數
+    const insertItemBySortValue = (item: TableRow) => {
+      const insertIndex = list.value.findIndex(existingItem => (existingItem.sort ?? Infinity) > (item.sort ?? Infinity))
+      if (insertIndex === -1) {
+        list.value.push(item)
+      }
+      else {
+        list.value.splice(insertIndex, 0, item)
+      }
+    }
+
     // 如果有指定父項 ID，則尋找父項並將新項目添加到其 children 中
     if (parentId) {
       // 定義遞迴尋找父項的路徑
@@ -784,7 +795,21 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
             if (!items[i].children) {
               items[i].children = []
             }
-            items[i].children.push({ ...remain, parentId })
+
+            // 根據 sort 值找到合適的插入位置
+            const newItem: TableRow = { ...remain, parentId }
+            const insertIndex = items[i].children.findIndex((child: TableRow) =>
+              (Number(child.sort) || 0) > (Number(newItem.sort) || 0),
+            )
+
+            if (insertIndex === -1) {
+              // 如果沒有找到更大的 sort 值，則添加到末尾
+              items[i].children.push(newItem)
+            }
+            else {
+              // 在找到的位置插入
+              items[i].children.splice(insertIndex, 0, newItem)
+            }
             return true
           }
 
@@ -816,13 +841,12 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
 
       // 如果沒有找到父項，則添加到最外層
       if (!parentFound) {
-        list.value.push(remain)
+        insertItemBySortValue(remain)
       }
     }
     else {
-      // 沒有指定父項，直接添加到最外層
-      console.log('remain', remain)
-      list.value.push(remain)
+      // 沒有指定父項 直接添加
+      insertItemBySortValue(remain)
     }
     emit('createSuccess', remain)
   }
@@ -981,8 +1005,9 @@ onMounted(async () => {
 
     <TableModal
       ref="modalRef"
-      :width="width"
-      modal-name="使用者"
+      :modal-width="modalWidth"
+      :modal-form-label-width="modalFormLabelWidth"
+      :modal-name="modalName"
 
       :update-function="updateFunction || undefined"
       :create-function="createFunction || undefined"

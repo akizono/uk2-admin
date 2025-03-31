@@ -15,7 +15,8 @@ interface TreeNode {
 }
 
 const props = defineProps<{
-  width?: string // 表格的寬度
+  modalWidth?: string // 模態框的寬度
+  modalFormLabelWidth?: string // 模態框表單label的寬度
   modalName?: string // 模態框名稱
 
   filterColumnName?: string // 過濾條件的欄位名稱
@@ -214,7 +215,7 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
           selectLoadingMap.value[item.name] = true
 
           try {
-            const { data: result } = await item.options!.api({ pageSize: 2000, currentPage: 1 })
+            const { data: result } = await item.options!.api({ pageSize: 0, currentPage: 1 })
             if (result.list.length > 0) {
               await setOptionsWithNextTick(
                 item.name,
@@ -332,6 +333,11 @@ async function edit() {
 async function submitModal() {
   try {
     await formRef.value?.validate()
+    if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
+      window.$message.error('不能將自己設為父級')
+      return
+    }
+
     startLoading()
 
     if (modalType.value === 'add') {
@@ -380,7 +386,7 @@ async function getDictOptions(dictType: string) {
     preset="card"
     :title="modalTitle"
     :style="{
-      width: width || '700px',
+      width: modalWidth || '700px',
     }"
     :segmented="{
       content: true,
@@ -402,59 +408,74 @@ async function getDictOptions(dictType: string) {
       </n-descriptions>
     </template>
 
-    <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="100">
+    <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
       <n-grid :cols="2" :x-gap="18">
         <template v-for="item in formDataMapping" :key="item.name">
-          <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :label="item.label" :path="item.name">
-            <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
-            <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="item.disableEdit ? modalType === 'edit' : false" />
-            <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" />
-            <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
-            <template v-else-if="item.type === 'select'">
-              <!-- 如果數據中包含 children，使用樹狀選擇器 -->
-              <n-tree-select
-                v-if="optionsMap[item.name]?.[0]?.children"
-                v-model:value="formData[item.name]"
-                :options="optionsMap[item.name]"
-                :disabled="item.disableEdit ? modalType === 'edit' : false"
-                filterable
-                remote
-                :loading="selectLoadingMap[item.name]"
-                :clear-filter-after-select="false"
-                placeholder="請輸入關鍵字搜索"
-                :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
-                key-field="key"
-                label-field="label"
-                children-field="children"
-                @search="(query) => handleSearch(query, item)"
-              />
-              <!-- 否則使用普通選擇器 -->
-              <n-select
-                v-else
-                v-model:value="formData[item.name]"
-                :options="optionsMap[item.name]"
-                :disabled="item.disableEdit ? modalType === 'edit' : false"
-                filterable
-                remote
-                :loading="selectLoadingMap[item.name]"
-                :clear-filter-after-select="false"
-                placeholder="請輸入關鍵字搜索"
-                :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
-                @search="(query) => handleSearch(query, item)"
-              />
+          <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :path="item.name">
+            <template #label>
+              {{ item.label }}
+              <HelpInfo v-if="item.helpInfo" :message="item.helpInfo" />
             </template>
-            <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]">
-              <n-space>
-                <template v-if="radioLoadingMap[item.name]">
-                  <n-skeleton text :repeat="3" :width="60" />
-                </template>
-                <template v-else-if="item.dictType && dictOptionsMap[item.dictType]">
-                  <n-radio v-for="option in dictOptionsMap[item.dictType]" :key="option.value" :value="option.value">
-                    {{ option.label }}
-                  </n-radio>
-                </template>
-              </n-space>
-            </n-radio-group>
+
+            <n-input-group>
+              <n-input-group-label v-if="item.inputPrefix">
+                {{ item.inputPrefix }}
+              </n-input-group-label>
+
+              <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
+              <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
+              <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
+              <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+              <template v-else-if="item.type === 'select'">
+                <!-- 如果數據中包含 children，使用樹狀選擇器 -->
+                <n-tree-select
+                  v-if="optionsMap[item.name]?.[0]?.children"
+                  v-model:value="formData[item.name]"
+                  :options="optionsMap[item.name]"
+                  :disabled="item.disableEdit ? modalType === 'edit' : false"
+                  filterable
+                  remote
+                  :loading="selectLoadingMap[item.name]"
+                  :clear-filter-after-select="false"
+                  :placeholder="item.placeholder || '請輸入關鍵字搜索'"
+                  :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                  key-field="key"
+                  label-field="label"
+                  children-field="children"
+                  @search="(query) => handleSearch(query, item)"
+                />
+                <!-- 否則使用普通選擇器 -->
+                <n-select
+                  v-else
+                  v-model:value="formData[item.name]"
+                  :options="optionsMap[item.name]"
+                  :disabled="item.disableEdit ? modalType === 'edit' : false"
+                  filterable
+                  remote
+                  :loading="selectLoadingMap[item.name]"
+                  :clear-filter-after-select="false"
+                  :placeholder="item.placeholder"
+                  :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                  @search="(query) => handleSearch(query, item)"
+                />
+              </template>
+              <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]">
+                <n-space>
+                  <template v-if="radioLoadingMap[item.name]">
+                    <n-skeleton text :repeat="3" :width="60" />
+                  </template>
+                  <template v-else-if="item.dictType && dictOptionsMap[item.dictType]">
+                    <n-radio v-for="option in dictOptionsMap[item.dictType]" :key="option.value" :value="option.value">
+                      {{ option.label }}
+                    </n-radio>
+                  </template>
+                </n-space>
+              </n-radio-group>
+
+              <n-input-group-label v-if="item.inputSuffix">
+                {{ item.inputSuffix }}
+              </n-input-group-label>
+            </n-input-group>
           </n-form-item-grid-item>
         </template>
       </n-grid>
