@@ -7,6 +7,7 @@ import type { ComputedRef, VNode } from 'vue'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { useDictStore } from '@/store'
+import { delay } from '@/utils'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
@@ -187,6 +188,40 @@ const queryParamsMapping = ref<Record<string, InitQueryParams>>({})
 const dictOptionsMap = ref<Record<string, any>>({})
 // 為每個 select 添加獨立的 loading 狀態
 const selectLoadingMap = ref<Record<string, boolean>>({})
+function handleResetSearch() {
+  try {
+    startQueryLoading()
+
+    queryParams.value = {}
+
+    // 為 queryParams 添加初始值
+    if (props.initQueryParams && Array.isArray(props.initQueryParams)) {
+      props.initQueryParams.forEach(async (item: InitQueryParams) => {
+        queryParamsMapping.value[item.name] = item
+        queryParams.value[item.name] = item.value === undefined ? null : item.value
+
+        // 如果是 select 類型且有 dictType，則獲取字典選項
+        if (item.inputType === 'select' && item.dictType) {
+          await getDictOptions(item.dictType)
+        }
+      })
+    }
+
+    // 如果此時 queryParams.value 沒有 pageSize 和 currentPage，則添加
+    if (!queryParams.value.pageSize) {
+      queryParams.value.pageSize = Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE)
+    }
+    if (!queryParams.value.currentPage) {
+      queryParams.value.currentPage = Number(import.meta.env.VITE_DEFAULT_CURRENT_PAGE)
+    }
+
+    // 獲取列表
+    getList()
+  }
+  finally {
+    endQueryLoading()
+  }
+}
 
 // 獲取字典選項
 const { dict } = useDictStore()
@@ -200,26 +235,6 @@ async function getDictOptions(dictType: string) {
   finally {
     // 設置 loading 狀態為 false
     selectLoadingMap.value[dictType] = false
-  }
-}
-
-function handleResetSearch() {
-  try {
-    startQueryLoading()
-    if (props.initQueryParams && Array.isArray(props.initQueryParams)) {
-      props.initQueryParams.forEach(async (item: InitQueryParams) => {
-        queryParams.value[item.name] = item.value
-        queryParamsMapping.value[item.name] = item
-
-        // 如果是 select 類型且有 dictType，則獲取字典選項
-        if (item.inputType === 'select' && item.dictType) {
-          await getDictOptions(item.dictType)
-        }
-      })
-    }
-  }
-  finally {
-    endQueryLoading()
   }
 }
 
@@ -859,7 +874,6 @@ onMounted(async () => {
 
   // 排隊查詢
   await handleResetSearch()
-  await getList()
 })
 </script>
 

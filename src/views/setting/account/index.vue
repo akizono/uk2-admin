@@ -87,7 +87,7 @@ const initQueryParams: InitQueryParams[] = [
     label: '狀態',
     class: '!w-64',
     inputType: 'select',
-    dictType: 'status',
+    dictType: 'common_status',
   },
 ]
 

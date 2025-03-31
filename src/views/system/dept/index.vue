@@ -31,7 +31,7 @@ const initQueryParams: InitQueryParams[] = [
     class: '!w-64',
     placeholder: '請填寫狀態',
     inputType: 'select',
-    dict: 'status',
+    dictType: 'common_status',
   },
 ]
 

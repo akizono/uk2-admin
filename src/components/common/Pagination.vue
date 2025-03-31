@@ -6,12 +6,12 @@ interface Props {
 }
 const {
   total: propTotal = 0,
-  pageSize: propPageSize = 10,
-  currentPage: propCurrentPage = 1,
+  pageSize: propPageSize = Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE),
+  currentPage: propCurrentPage = Number(import.meta.env.VITE_DEFAULT_CURRENT_PAGE),
 } = defineProps<Props>()
 
 const emit = defineEmits<{
-  change: [page: number, pageSize: number] // 具名元组语法
+  change: [page: number, pageSize: number] // 具名元組語法
 }>()
 
 const page = ref(propCurrentPage)
