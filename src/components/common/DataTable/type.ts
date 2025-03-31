@@ -46,7 +46,7 @@ export interface InitFormData {
    */
   type?: string
   /** 選單配置 */
-  options?: {
+  selectOptions?: {
     /** 選單 API */
     api?: any
     /** 選單 API 參數 */

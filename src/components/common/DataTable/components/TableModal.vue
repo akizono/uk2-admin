@@ -41,7 +41,7 @@ const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoo
 const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
 
 // 為每個帶選項的欄位創建獨立的儲存區域
-const optionsMap = ref<Record<string, any[]>>({})
+const selectOptionsMap = ref<Record<string, any[]>>({})
 // 為每個 select 添加獨立的 loading 狀態
 const selectLoadingMap = ref<Record<string, boolean>>({})
 // 為每個 radio 添加獨立的 loading 狀態
@@ -54,7 +54,7 @@ async function setOptionsWithNextTick(
   valueKey: string,
 ) {
   // 先設置為空數組，強制更新
-  optionsMap.value[fieldName] = []
+  selectOptionsMap.value[fieldName] = []
   // 使用 nextTick 確保 DOM 已更新
   await nextTick()
 
@@ -95,11 +95,11 @@ async function setOptionsWithNextTick(
       .map(item => nodeMap.get(item[valueKey]))
       .filter((node): node is TreeNode => node !== undefined)
 
-    optionsMap.value[fieldName] = treeData
+    selectOptionsMap.value[fieldName] = treeData
   }
   else {
     // 原有的扁平結構處理
-    optionsMap.value[fieldName] = list.map((resultItem: any) => ({
+    selectOptionsMap.value[fieldName] = list.map((resultItem: any) => ({
       label: resultItem[labelKey],
       value: resultItem[valueKey],
     }))
@@ -111,26 +111,26 @@ const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => 
 
   // 如果搜索內容為空，清空選項並返回
   if (!query) {
-    optionsMap.value[fieldName] = []
+    selectOptionsMap.value[fieldName] = []
     return
   }
 
   // 設置 loading 狀態為 true
   selectLoadingMap.value[fieldName] = true
 
-  if (item.options?.api) {
+  if (item.selectOptions?.api) {
     try {
-      const { data: result } = await item.options.api({ [item.options.selectParam!]: query })
+      const { data: result } = await item.selectOptions.api({ [item.selectOptions.selectParam!]: query })
       if (result.list.length > 0) {
         await setOptionsWithNextTick(
           fieldName,
           result.list,
-          item.options.itemMapping!.label,
-          item.options.itemMapping!.value,
+          item.selectOptions.itemMapping!.label,
+          item.selectOptions.itemMapping!.value,
         )
       }
       else {
-        optionsMap.value[fieldName] = []
+        selectOptionsMap.value[fieldName] = []
       }
     }
     finally {
@@ -152,7 +152,7 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
   // 重設表單數據
   formData.value = {}
   formDataMapping.value = {}
-  optionsMap.value = {}
+  selectOptionsMap.value = {}
   selectLoadingMap.value = {} // 重設搜索 loading 狀態
   radioLoadingMap.value = {} // 重設 radio loading 狀態
 
@@ -170,9 +170,9 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
       }
 
       // 如果選單類型
-      if (item.type === 'select' && item.options) {
+      if (item.type === 'select' && item.selectOptions) {
         /**
-         * 由於 optionsMap.value 初始化時沒有數據，n-select 或者 n-tree-select 組件會直接顯示ID
+         * 由於 selectOptionsMap.value 初始化時沒有數據，n-select 或者 n-tree-select 組件會直接顯示ID
          * 如果data如果可以拿到ID的具體數據的話， 我們可以先將當前ID的lable和value塞進去
          * 這樣在網速正常的情況下，使用者可以一進來就看到label
          */
@@ -180,17 +180,17 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         // 通常「某ID」是從「某數據」查詢過來的，如果「某數據」也在介面的返回值中，則可以透過去掉「某Id」的「Id」字串來獲取
         const itemNameMinusId = item.name.replace('Id', '')
         if (data && data![itemNameMinusId] && itemNameMinusId) {
-          optionsMap.value[item.name] = [
+          selectOptionsMap.value[item.name] = [
             {
-              label: data![itemNameMinusId][item.options!.itemMapping!.label],
-              value: data![itemNameMinusId][item.options!.itemMapping!.value],
+              label: data![itemNameMinusId][item.selectOptions!.itemMapping!.label],
+              value: data![itemNameMinusId][item.selectOptions!.itemMapping!.value],
             },
           ]
         }
 
         // 如果data中存在parentId這個屬性
         else if (data && parent) {
-          optionsMap.value[item.name] = [
+          selectOptionsMap.value[item.name] = [
             {
               label: parent.name,
               value: parent.id,
@@ -200,11 +200,11 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
 
         // 如果拿不到ID的具體數據的話， 則需要初始化一個空數組
         else {
-          optionsMap.value[item.name] = []
+          selectOptionsMap.value[item.name] = []
         }
 
         // 如果懶載入已開放
-        if (item.options?.lazy) {
+        if (item.selectOptions?.lazy) {
           // 初始化為非 loading 狀態
           selectLoadingMap.value[item.name] = false
         }
@@ -215,13 +215,13 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
           selectLoadingMap.value[item.name] = true
 
           try {
-            const { data: result } = await item.options!.api({ pageSize: 0, currentPage: 1 })
+            const { data: result } = await item.selectOptions!.api({ pageSize: 0, currentPage: 1 })
             if (result.list.length > 0) {
               await setOptionsWithNextTick(
                 item.name,
                 result.list,
-                item.options!.itemMapping!.label,
-                item.options!.itemMapping!.value,
+                item.selectOptions!.itemMapping!.label,
+                item.selectOptions!.itemMapping!.value,
               )
             }
           }
@@ -271,13 +271,13 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
       // 移除屬性名稱中的 'Id' 後綴
       const keyWithoutId = key.replace('Id', '')
       // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」
-      if (optionsMap.value[key]) {
+      if (selectOptionsMap.value[key]) {
       // 在 result 中建立新的物件結構
         result[keyWithoutId] = {
         // 使用 formDataMapping 中定義的標籤映射作為鍵名
-          [formDataMapping.value[key].options!.itemMapping!.label]: optionsMap.value[key][0].label,
-          // 儲存選項的實際值（ID）// 為什麼是0？因為optionsMap.value[key]的值是通過精確尋找到的，且這個值通常是唯一的，所以我們可以沒有顧慮的採用第一個元素 所以寫0
-          id: optionsMap.value[key][0].value,
+          [formDataMapping.value[key].selectOptions!.itemMapping!.label]: selectOptionsMap.value[key][0].label,
+          // 儲存選項的實際值（ID）// 為什麼是0？因為selectOptionsMap.value[key]的值是通過精確尋找到的，且這個值通常是唯一的，所以我們可以沒有顧慮的採用第一個元素 所以寫0
+          id: selectOptionsMap.value[key][0].value,
         }
       }
     }
@@ -429,9 +429,9 @@ async function getDictOptions(dictType: string) {
               <template v-else-if="item.type === 'select'">
                 <!-- 如果數據中包含 children，使用樹狀選擇器 -->
                 <n-tree-select
-                  v-if="optionsMap[item.name]?.[0]?.children"
+                  v-if="selectOptionsMap[item.name]?.[0]?.children"
                   v-model:value="formData[item.name]"
-                  :options="optionsMap[item.name]"
+                  :options="selectOptionsMap[item.name]"
                   :disabled="item.disableEdit ? modalType === 'edit' : false"
                   filterable
                   remote
@@ -448,7 +448,7 @@ async function getDictOptions(dictType: string) {
                 <n-select
                   v-else
                   v-model:value="formData[item.name]"
-                  :options="optionsMap[item.name]"
+                  :options="selectOptionsMap[item.name]"
                   :disabled="item.disableEdit ? modalType === 'edit' : false"
                   filterable
                   remote

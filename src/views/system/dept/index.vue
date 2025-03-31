@@ -75,7 +75,7 @@ const initFormData: InitFormData[] = [
     span: 2,
     label: '父級部門',
     type: 'select',
-    options: {
+    selectOptions: {
       api: DeptApi.getDeptPage,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
@@ -94,7 +94,7 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '負責人',
     type: 'select',
-    options: {
+    selectOptions: {
       api: UserApi.getUserPage,
       selectParam: 'username',
       itemMapping: { label: 'nickname', value: 'id' },

@@ -109,19 +109,19 @@ function propsVerify() {
     return
   }
 
-  // initFormData中如果type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
+  // initFormData中如果type是select的時候，必須包含selectOptions，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
   const hasSelectCarryOptions = !props.initFormData?.some((item: InitFormData) =>
     item.type === 'select' && (
-      !item.options
-      || !item.options.api
-      || !item.options.selectParam
-      || !item.options.itemMapping
-      || !item.options.itemMapping.label
-      || !item.options.itemMapping.value
+      !item.selectOptions
+      || !item.selectOptions.api
+      || !item.selectOptions.selectParam
+      || !item.selectOptions.itemMapping
+      || !item.selectOptions.itemMapping.label
+      || !item.selectOptions.itemMapping.value
     ),
   )
   if (!hasSelectCarryOptions) {
-    propsVerifyErrorMsg.value = 'initFormData中如果type是select的時候，必須包含options，且options中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
+    propsVerifyErrorMsg.value = 'initFormData中如果type是select的時候，必須包含selectOptions，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
     propsVerifyPassed.value = false
     return
   }
