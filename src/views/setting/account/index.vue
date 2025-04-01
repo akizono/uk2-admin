@@ -172,7 +172,8 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '使用者名稱',
     type: 'input',
-    disableEdit: true, // 編輯時禁用
+    disableEditInput: true,
+    disableUpdate: true,
   },
   {
     name: 'nickname',
