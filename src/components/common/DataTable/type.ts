@@ -24,6 +24,43 @@ export interface InitQueryParams {
   dictType?: string
 }
 
+/** 條件運算符 */
+export type Operator =
+  | 'eq' // 等於
+  | 'neq' // 不等於
+  | 'gt' // 大於
+  | 'gte' // 大於等於
+  | 'lt' // 小於
+  | 'lte' // 小於等於
+  | 'in' // 在列表中
+  | 'nin' // 不在列表中
+
+/** 單一條件 */
+export interface Condition {
+  /** 欄位名稱 */
+  field: string
+  /** 運算符 */
+  operator: Operator
+  /** 比較值 */
+  value: any
+}
+
+/** 條件組合 */
+export interface ConditionGroup {
+  /** 邏輯運算符 */
+  logic: 'and' | 'or'
+  /** 條件列表 */
+  conditions: (Condition | ConditionGroup)[]
+}
+
+/** 值生成器的條件項 */
+interface ValueGeneratorCondition {
+  /** 條件判斷表達式 */
+  when?: string
+  /** 生成的值模板 */
+  then: string
+}
+
 /** 表單數據介面 */
 export interface InitFormData {
   /** 欄位名稱 */
@@ -59,8 +96,12 @@ export interface InitFormData {
     /** 是否啟用懶載入 */
     lazy?: boolean
   }
-  /** 編輯時是否禁用此欄位 */
-  disableEdit?: boolean
+  /** 禁止該欄位進行更新（請求中不會攜帶該欄位） */
+  disableUpdate?: boolean
+  /** 編輯時是否禁用此欄位的輸入框 */
+  disableEditInput?: boolean
+  /** 新增時是否禁用此欄位的輸入框 */
+  disableAddInput?: boolean
   /** 字典類型 */
   dictType?: string
   /** 輸入框提示文字 */
@@ -71,6 +112,20 @@ export interface InitFormData {
   inputSuffix?: string
   /** 幫助提示 */
   helpInfo?: string
+  /** 顯示條件 */
+  showCondition?: Condition | ConditionGroup
+  /** 值生成器配置 */
+  valueGenerator?: {
+    /** 需要監聽變化的欄位列表 */
+    watchFields: string[]
+    /** 生成規則 */
+    rule: {
+      /** 規則類型 */
+      type: 'template' | 'condition' | 'expression'
+      /** 規則值 */
+      value: string | ValueGeneratorCondition[]
+    }
+  }
 }
 
 /** 彈出視窗類型 */

@@ -89,6 +89,8 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '字典類型',
     type: 'input',
+    disableEditInput: true,
+    disableUpdate: true,
   },
   {
     name: 'sort',

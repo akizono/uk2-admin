@@ -109,21 +109,46 @@ function propsVerify() {
     return
   }
 
-  // initFormData中如果type是select的時候，必須包含selectOptions，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
-  const hasSelectCarryOptions = !props.initFormData?.some((item: InitFormData) =>
-    item.type === 'select' && (
-      !item.selectOptions
-      || !item.selectOptions.api
-      || !item.selectOptions.selectParam
-      || !item.selectOptions.itemMapping
-      || !item.selectOptions.itemMapping.label
-      || !item.selectOptions.itemMapping.value
-    ),
-  )
-  if (!hasSelectCarryOptions) {
-    propsVerifyErrorMsg.value = 'initFormData中如果type是select的時候，必須包含selectOptions，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value'
-    propsVerifyPassed.value = false
-    return
+  // initFormData中如果type是select的時候，必須包含selectOptions或者dictType，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
+  const selectFormItems = props.initFormData?.filter((item: InitFormData) => item.type === 'select') || []
+  for (const item of selectFormItems) {
+    // 檢查是否有任一選項來源
+    if (!item.selectOptions && !item.dictType) {
+      propsVerifyErrorMsg.value = 'select類型的表單項必須指定selectOptions或dictType其中之一作為選項來源'
+      propsVerifyPassed.value = false
+      return
+    }
+
+    // 檢查是否同時存在兩種選項來源
+    if (item.selectOptions && item.dictType) {
+      propsVerifyErrorMsg.value = 'select類型的表單項不能同時指定selectOptions和dictType'
+      propsVerifyPassed.value = false
+      return
+    }
+
+    // 如果使用selectOptions，檢查必要屬性
+    if (item.selectOptions) {
+      if (!item.selectOptions.api) {
+        propsVerifyErrorMsg.value = 'selectOptions必須包含api屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (!item.selectOptions.selectParam) {
+        propsVerifyErrorMsg.value = 'selectOptions必須包含selectParam屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (!item.selectOptions.itemMapping) {
+        propsVerifyErrorMsg.value = 'selectOptions必須包含itemMapping屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
+        propsVerifyErrorMsg.value = 'itemMapping必須包含label和value屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+    }
   }
 
   // initFormData中如果type是radio的時候，必須包含dictType

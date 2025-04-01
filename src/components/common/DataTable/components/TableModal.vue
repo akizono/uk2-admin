@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { InitFormData, ModalType, TableRow } from '../type'
+import type { Condition, ConditionGroup, InitFormData, ModalType, TableRow } from '../type'
 import type { FormRules } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
@@ -30,6 +30,59 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['success'])
+
+/** 評估單一條件 */
+function evaluateCondition(condition: Condition, formData: Record<string, any>): boolean {
+  const { field, operator, value } = condition
+  const fieldValue = formData[field]
+
+  switch (operator) {
+    case 'eq':
+      return fieldValue === value
+    case 'neq':
+      return fieldValue !== value
+    case 'gt':
+      return fieldValue > value
+    case 'gte':
+      return fieldValue >= value
+    case 'lt':
+      return fieldValue < value
+    case 'lte':
+      return fieldValue <= value
+    case 'in':
+      return Array.isArray(value) && value.includes(fieldValue)
+    case 'nin':
+      return Array.isArray(value) && !value.includes(fieldValue)
+    default:
+      return false
+  }
+}
+
+/** 評估條件組 */
+function evaluateConditionGroup(group: ConditionGroup, formData: Record<string, any>): boolean {
+  const results = group.conditions.map((condition) => {
+    if ('logic' in condition) {
+      return evaluateConditionGroup(condition, formData)
+    }
+    return evaluateCondition(condition, formData)
+  })
+
+  return group.logic === 'and'
+    ? results.every(result => result)
+    : results.some(result => result)
+}
+
+/** 評估顯示條件 */
+function evaluateShowCondition(condition: Condition | ConditionGroup | undefined, formData: Record<string, any>): boolean {
+  if (!condition)
+    return true
+
+  if ('logic' in condition) {
+    return evaluateConditionGroup(condition, formData)
+  }
+
+  return evaluateCondition(condition, formData)
+}
 
 defineExpose({
   openModal,
@@ -147,6 +200,84 @@ const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => 
 const formRef = ref()
 const formData = ref<Record<string, any>>({})
 const formDataMapping = ref<Record<string, InitFormData>>({})
+
+// 監聽表單數據變化，處理 valueGenerator
+watch(formData, (newVal) => {
+  // 遍歷所有表單項
+  Object.values(formDataMapping.value).forEach((item) => {
+    // 如果有 valueGenerator 配置
+    if (item.valueGenerator) {
+      // 檢查是否有被監聽的欄位發生變化
+      const hasChange = item.valueGenerator.watchFields.some(
+        field => newVal[field] !== undefined,
+      )
+
+      if (hasChange) {
+        // 根據不同的規則類型生成值
+        const rule = item.valueGenerator.rule
+        let generatedValue = ''
+
+        switch (rule.type) {
+          case 'template': {
+            // 處理模板字串
+            if (typeof rule.value === 'string') {
+              generatedValue = rule.value.replace(/\$\{(\w+)\}/g, (_: string, field: string) => {
+                return newVal[field] || ''
+              })
+            }
+            break
+          }
+
+          case 'condition': {
+            // 處理條件判斷
+            if (Array.isArray(rule.value)) {
+              for (const condition of rule.value) {
+                if (condition.when) {
+                  // 創建一個函數來評估條件
+                  // eslint-disable-next-line no-new-func
+                  const evalFn = new Function(...Object.keys(newVal), `return ${condition.when}`)
+                  if (evalFn(...Object.values(newVal))) {
+                    generatedValue = condition.then.replace(/\$\{(\w+)\}/g, (_: string, field: string) => {
+                      return newVal[field] || ''
+                    })
+                    break
+                  }
+                }
+                else {
+                  // 沒有 when 條件的就是預設值
+                  generatedValue = condition.then.replace(/\$\{(\w+)\}/g, (_: string, field: string) => {
+                    return newVal[field] || ''
+                  })
+                }
+              }
+            }
+            break
+          }
+
+          case 'expression': {
+            // 處理數學運算
+            if (typeof rule.value === 'string') {
+              try {
+                // eslint-disable-next-line no-new-func
+                const evalFn = new Function(...Object.keys(newVal), `return ${rule.value}`)
+                generatedValue = evalFn(...Object.values(newVal))
+              }
+              catch (error) {
+                console.error('Expression evaluation error:', error)
+                generatedValue = ''
+              }
+            }
+            break
+          }
+        }
+
+        // 更新生成的值
+        formData.value[item.name] = generatedValue
+      }
+    }
+  })
+}, { deep: true })
+
 // 重設表單數據
 function resetFormData(data?: TableRow, parent?: TableRow) {
   // 重設表單數據
@@ -169,8 +300,15 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         radioLoadingMap.value[item.name] = false
       }
 
-      // 如果選單類型
-      if (item.type === 'select' && item.selectOptions) {
+      // 如果是 select 類型且有 dictType
+      else if (item.type === 'select' && item.dictType) {
+        selectLoadingMap.value[item.name] = true
+        await getDictOptions(item.dictType)
+        selectLoadingMap.value[item.name] = false
+      }
+
+      // 如果選單類型 且有 selectOptions
+      else if (item.type === 'select' && item.selectOptions) {
         /**
          * 由於 selectOptionsMap.value 初始化時沒有數據，n-select 或者 n-tree-select 組件會直接顯示ID
          * 如果data如果可以拿到ID的具體數據的話， 我們可以先將當前ID的lable和value塞進去
@@ -307,11 +445,11 @@ async function add() {
 
 // 編輯
 async function edit() {
-  // 過濾掉不應該被修改的欄位
+  // 過濾掉禁止編輯的欄位
   const { isDeleted, creator, createTime, updater, updateTime, ...remain } = formData.value
   for (const key of Object.keys(formDataMapping.value)) {
     const item = formDataMapping.value[key]
-    if (item.disableEdit)
+    if (item.disableUpdate)
       delete remain[key]
   }
 
@@ -376,6 +514,7 @@ const dictOptionsMap = ref<Record<string, any>>({})
 async function getDictOptions(dictType: string) {
   const dictData = await dict(dictType)
   dictOptionsMap.value[dictType] = dictData.data()
+  console.log(dictType, dictOptionsMap.value[dictType])
 }
 </script>
 
@@ -411,9 +550,14 @@ async function getDictOptions(dictType: string) {
     <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
       <n-grid :cols="2" :x-gap="18">
         <template v-for="item in formDataMapping" :key="item.name">
-          <n-form-item-grid-item v-if="!item.hidden" :span="item.span" :path="item.name">
+          <n-form-item-grid-item
+            v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)"
+            :span="item.span"
+            :path="item.name"
+          >
             <template #label>
               {{ item.label }}
+
               <HelpInfo v-if="item.helpInfo" :message="item.helpInfo" />
             </template>
 
@@ -422,17 +566,17 @@ async function getDictOptions(dictType: string) {
                 {{ item.inputPrefix }}
               </n-input-group-label>
 
-              <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
-              <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
-              <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="item.disableEdit ? modalType === 'edit' : false" :placeholder="item.placeholder" />
-              <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="item.disableEdit ? modalType === 'edit' : false" />
+              <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+              <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+              <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+              <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
               <template v-else-if="item.type === 'select'">
                 <!-- 如果數據中包含 children，使用樹狀選擇器 -->
                 <n-tree-select
                   v-if="selectOptionsMap[item.name]?.[0]?.children"
                   v-model:value="formData[item.name]"
                   :options="selectOptionsMap[item.name]"
-                  :disabled="item.disableEdit ? modalType === 'edit' : false"
+                  :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
                   filterable
                   remote
                   :loading="selectLoadingMap[item.name]"
@@ -448,8 +592,8 @@ async function getDictOptions(dictType: string) {
                 <n-select
                   v-else
                   v-model:value="formData[item.name]"
-                  :options="selectOptionsMap[item.name]"
-                  :disabled="item.disableEdit ? modalType === 'edit' : false"
+                  :options="item.dictType ? dictOptionsMap[item.dictType] : selectOptionsMap[item.name]"
+                  :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
                   filterable
                   remote
                   :loading="selectLoadingMap[item.name]"

@@ -23,6 +23,11 @@ const columns: DataTableColumns<DictDataVO> = [
     key: 'value',
   },
   {
+    title: '數據類型',
+    align: 'center',
+    key: 'dataType',
+  },
+  {
     title: '排序',
     align: 'center',
     key: 'sort',
@@ -52,16 +57,24 @@ const initFormData: InitFormData[] = [
     hidden: true,
   },
   {
-    name: 'label',
+    name: 'dataType',
     value: undefined,
     span: 1,
+    label: '數據類型',
+    type: 'select',
+    dictType: 'system_dict_data_data_type',
+  },
+  {
+    name: 'label',
+    value: undefined,
+    span: 2,
     label: '字典標籤',
     type: 'input',
   },
   {
     name: 'value',
     value: undefined,
-    span: 1,
+    span: 2,
     label: '字典鍵值',
     type: 'input',
   },
