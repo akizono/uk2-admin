@@ -200,6 +200,8 @@ const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => 
 const formRef = ref()
 const formData = ref<Record<string, any>>({})
 const formDataMapping = ref<Record<string, InitFormData>>({})
+// 本地的驗證規則
+const localRules = ref<FormRules>({})
 
 // 監聽表單數據變化，處理 valueGenerator
 watch(formData, (newVal) => {
@@ -287,11 +289,36 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
   selectLoadingMap.value = {} // 重設搜索 loading 狀態
   radioLoadingMap.value = {} // 重設 radio loading 狀態
 
+  // 重設本地驗證規則
+  localRules.value = props.rules ? { ...props.rules } : {}
+
   // 初始化表單數據
   if (props.initFormData && Array.isArray(props.initFormData)) {
+    // 檢查重複的 name 並添加識別符
+    const nameCount = new Map<string, number>()
+    props.initFormData.forEach((item: InitFormData) => {
+      const originalName = item.name
+      if (nameCount.has(originalName)) {
+        const count = nameCount.get(originalName)! + 1
+        nameCount.set(originalName, count)
+        item.name = `${originalName}-$$repeat$$-${count}`
+      }
+      else {
+        nameCount.set(originalName, 1)
+      }
+    })
+
     props.initFormData.forEach(async (item: InitFormData) => {
       formData.value[item.name] = item.value
       formDataMapping.value[item.name] = item
+
+      // 如果有 rulesType ，添加驗證類型屬性
+      if (item.rulesType) {
+        localRules.value[item.name] = {
+          ...(localRules.value[item.name.includes('-$$repeat$$-') ? item.name.replace(/-\$\$repeat\$\$-\d+$/, '') : item.name] || {}),
+          type: item.rulesType as 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer',
+        }
+      }
 
       // 如果是 radio 類型且有 dictType
       if (item.type === 'radio' && item.dictType) {
@@ -374,7 +401,9 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
   // 如果傳入了數據，則將數據填充到表單中(通常只有新增和編輯時會傳入數據)
   if (data) {
     for (const key in formData.value) {
-      formData.value[key] = data[key]
+      // 去掉識別符來匹配原始數據
+      const originalKey = key.replace(/-\$\$repeat\$\$-\d+$/, '')
+      formData.value[key] = data[originalKey]
     }
   }
 }
@@ -426,7 +455,22 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
 
 // 新增
 async function add() {
-  const { id, ...remain } = formData.value
+  // 創建一個新的對象來儲存處理後的數據
+  const processedData: Record<string, any> = { ...formData.value }
+  const { id, ...remain } = processedData
+
+  // 處理所有欄位，去掉識別符
+  for (const key in remain) {
+    const regex = /-\$\$repeat\$\$-\d+$/
+    if (regex.test(key)) {
+      const originalKey = key.replace(regex, '')
+      if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
+        remain[originalKey] = remain[key]
+      }
+      delete remain[key]
+    }
+  }
+
   const { data } = await props.createFunction!({
     ...remain,
     ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
@@ -445,8 +489,24 @@ async function add() {
 
 // 編輯
 async function edit() {
+  // 創建一個新的對象來儲存處理後的數據
+  const processedData: Record<string, any> = { ...formData.value }
+
   // 過濾掉禁止編輯的欄位
-  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = formData.value
+  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = processedData
+
+  // 處理所有欄位，去掉識別符
+  for (const key in remain) {
+    const regex = /-\$\$repeat\$\$-\d+$/
+    if (regex.test(key)) {
+      const originalKey = key.replace(regex, '')
+      if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
+        remain[originalKey] = remain[key]
+      }
+      delete remain[key]
+    }
+  }
+
   for (const key of Object.keys(formDataMapping.value)) {
     const item = formDataMapping.value[key]
     if (item.disableUpdate)
@@ -547,7 +607,7 @@ async function getDictOptions(dictType: string) {
       </n-descriptions>
     </template>
 
-    <n-form v-else ref="formRef" :rules="rules || {}" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
+    <n-form v-else ref="formRef" :rules="localRules" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
       <n-grid :cols="2" :x-gap="18">
         <template v-for="item in formDataMapping" :key="item.name">
           <n-form-item-grid-item

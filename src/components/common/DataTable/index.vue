@@ -190,6 +190,32 @@ function propsVerify() {
     return
   }
 
+  // 如果同時出現了兩個及以上name一樣的值，那麼他們必須包含正確的showCondition屬性
+  if (props.initFormData) {
+    // 使用Map來統計每個name出現的次數
+    const nameCount = new Map<string, number>()
+    props.initFormData.forEach((item: InitFormData) => {
+      nameCount.set(item.name, (nameCount.get(item.name) || 0) + 1)
+    })
+
+    // 檢查所有出現次數大於1的name
+    for (const [name, count] of nameCount.entries()) {
+      if (count > 1) {
+        // 找出所有具有這個name的項目
+        const itemsWithSameName = props.initFormData.filter(item => item.name === name)
+
+        // 檢查這些項目是否都有showCondition屬性
+        const allHaveShowCondition = itemsWithSameName.every(item => item.showCondition !== undefined)
+
+        if (!allHaveShowCondition) {
+          propsVerifyErrorMsg.value = `存在多個name為"${name}"的表單項，但並非所有項目都包含showCondition屬性`
+          propsVerifyPassed.value = false
+          return
+        }
+      }
+    }
+  }
+
   propsVerifyPassed.value = true
 }
 

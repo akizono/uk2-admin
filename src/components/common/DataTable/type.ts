@@ -82,6 +82,8 @@ export interface InitFormData {
    * - select: 下拉選單
    */
   type?: string
+  /** rules規則中的type屬性 */
+  rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'
   /** 選單配置 */
   selectOptions?: {
     /** 選單 API */
