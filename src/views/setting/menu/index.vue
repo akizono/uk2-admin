@@ -12,6 +12,11 @@ const dataTableRef = ref()
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
   {
+    name: 'pageSize',
+    value: 0,
+    inputType: 'pagination',
+  },
+  {
     name: 'name',
     value: undefined,
     label: '部門名稱',
@@ -26,7 +31,7 @@ const initQueryParams: InitQueryParams[] = [
     class: '!w-64',
     placeholder: '請填寫狀態',
     inputType: 'select',
-    dict: 'status',
+    dictType: 'common_status',
   },
 ]
 
@@ -86,7 +91,7 @@ const initFormData: InitFormData[] = [
     span: 2,
     label: '父級菜單',
     type: 'select',
-    options: {
+    selectOptions: {
       api: MenuApi.getMenuPage,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
@@ -102,70 +107,125 @@ const initFormData: InitFormData[] = [
   {
     name: 'path',
     value: undefined,
-    span: 2,
+    span: 1,
     label: '路由路徑',
     type: 'input',
+    placeholder: 'Eg: /system/user',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'component',
     value: undefined,
-    span: 2,
-    label: '路由元件',
+    span: 1,
+    label: '元件路徑',
     type: 'input',
+    placeholder: 'Eg: /system/user/index.vue',
+    inputPrefix: '@/src/view',
+    // inputSuffix: '.vue',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'permission',
     value: undefined,
-    span: 2,
+    span: 1,
     label: '路由權限',
+    type: 'input',
+    placeholder: 'Eg: system:user:page',
+    helpInfo: `控制器中定義的權限表示，如 @HasPermission('system:user:create')`,
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1, 2],
+    },
   },
   {
     name: 'type',
-    value: undefined,
-    span: 2,
+    value: 0,
+    span: 1,
     label: '菜單類型',
-    type: 'input',
+    type: 'radio',
+    dictType: 'system_menu_type',
   },
   {
     name: 'icon',
     value: undefined,
-    span: 2,
+    span: 1,
     label: '菜單圖示',
+    type: 'icon-select',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [0, 1],
+    },
   },
   {
     name: 'link',
     value: undefined,
-    span: 2,
+    span: 1,
     label: '外鏈',
     type: 'input',
+    placeholder: 'Eg: https://google.com',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'isCache',
     value: undefined,
-    span: 2,
+    span: 1,
     label: '是否快取',
     type: 'switch',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'isShowTag',
     value: undefined,
-    span: 2,
-    label: '是否顯示標籤',
+    span: 1,
+    label: '顯示與標籤',
     type: 'switch',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'isKeepAlive',
     value: undefined,
-    span: 2,
-    label: '是否快取',
+    span: 1,
+    label: '常駐標籤欄',
     type: 'switch',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [1],
+    },
   },
   {
     name: 'isShowSide',
     value: undefined,
-    span: 2,
-    label: '是否顯示側邊欄',
+    span: 1,
+    label: '顯示與側邊欄',
     type: 'switch',
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [0, 1],
+    },
   },
   {
     name: 'sort',
@@ -198,10 +258,22 @@ const rules: FormRules = {
     message: '請填寫菜單名稱',
     trigger: ['blur', 'input'],
   },
+  permission: {
+    required: true,
+    message: '請填寫路由權限',
+    trigger: ['blur', 'input'],
+  },
+  type: {
+    required: true,
+    message: '請選擇菜單類型',
+    trigger: ['blur', 'input'],
+    type: 'number',
+  },
 }
 
 /** 元件的配置 */
 const options = {
+
   /** 表格的顯示功能 */
   view: true, // 是否顯示「查看按鈕」
   edit: true, // 是否顯示「編輯按鈕」
@@ -228,6 +300,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
+  modalWidth: '1000px',
   modalName: '菜單', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
 }

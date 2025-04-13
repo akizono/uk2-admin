@@ -57,7 +57,6 @@ function evaluateCondition(condition: Condition, formData: Record<string, any>):
       return false
   }
 }
-
 /** 評估條件組 */
 function evaluateConditionGroup(group: ConditionGroup, formData: Record<string, any>): boolean {
   const results = group.conditions.map((condition) => {
@@ -71,7 +70,6 @@ function evaluateConditionGroup(group: ConditionGroup, formData: Record<string, 
     ? results.every(result => result)
     : results.some(result => result)
 }
-
 /** 評估顯示條件 */
 function evaluateShowCondition(condition: Condition | ConditionGroup | undefined, formData: Record<string, any>): boolean {
   if (!condition)
@@ -196,6 +194,15 @@ const handleSearch = useDebounceFn(async (query: string, item: InitFormData) => 
   }
 }, 300)
 
+// 獲取字典選項
+const { dict } = useDictStore()
+const dictOptionsMap = ref<Record<string, any>>({})
+async function getDictOptions(dictType: string) {
+  const dictData = await dict(dictType)
+  dictOptionsMap.value[dictType] = dictData.data()
+  console.log(dictType, dictOptionsMap.value[dictType])
+}
+
 // 表單數據
 const formRef = ref()
 const formData = ref<Record<string, any>>({})
@@ -280,6 +287,21 @@ watch(formData, (newVal) => {
   })
 }, { deep: true })
 
+// 監聽 type 值的變化，清除不符合顯示條件的表單項目值
+watch(() => formData.value.type, (newType) => {
+  if (newType === undefined)
+    return
+
+  // 遍歷所有表單項目
+  Object.entries(formDataMapping.value).forEach(([key, item]) => {
+    // 如果有 showCondition 且條件不滿足
+    if (item.showCondition && !evaluateShowCondition(item.showCondition, formData.value)) {
+      // 清除該表單項目的值
+      formData.value[key] = undefined
+    }
+  })
+})
+
 // 重設表單數據
 function resetFormData(data?: TableRow, parent?: TableRow) {
   // 重設表單數據
@@ -325,6 +347,26 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         radioLoadingMap.value[item.name] = true
         await getDictOptions(item.dictType)
         radioLoadingMap.value[item.name] = false
+      }
+
+      // 如果是 radio 類型且有 selectOptions
+      else if (item.type === 'radio' && item.selectOptions?.api && item.selectOptions?.itemMapping?.label && item.selectOptions?.itemMapping?.value) {
+        radioLoadingMap.value[item.name] = true
+        try {
+          const { data: result } = await item.selectOptions.api({ pageSize: 0, currentPage: 1 })
+          console.log('result', result)
+          if (result.list.length > 0) {
+            await setOptionsWithNextTick(
+              item.name,
+              result.list,
+              item.selectOptions.itemMapping.label,
+              item.selectOptions.itemMapping.value,
+            )
+          }
+        }
+        finally {
+          radioLoadingMap.value[item.name] = false
+        }
       }
 
       // 如果是 select 類型且有 dictType
@@ -404,6 +446,10 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
       // 去掉識別符來匹配原始數據
       const originalKey = key.replace(/-\$\$repeat\$\$-\d+$/, '')
       formData.value[key] = data[originalKey]
+
+      if (formDataMapping.value[key].type === 'input-number') {
+        formData.value[key] = Number(formData.value[key])
+      }
     }
   }
 }
@@ -457,19 +503,19 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
 async function add() {
   // 創建一個新的對象來儲存處理後的數據
   const processedData: Record<string, any> = { ...formData.value }
-  const { id, ...remain } = processedData
-
   // 處理所有欄位，去掉識別符
-  for (const key in remain) {
+  for (const key in processedData) {
     const regex = /-\$\$repeat\$\$-\d+$/
     if (regex.test(key)) {
       const originalKey = key.replace(regex, '')
       if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
-        remain[originalKey] = remain[key]
+        processedData[originalKey] = processedData[key]
       }
-      delete remain[key]
+      delete processedData[key]
     }
   }
+
+  const { id, ...remain } = processedData
 
   const { data } = await props.createFunction!({
     ...remain,
@@ -479,7 +525,7 @@ async function add() {
   const emitData = handleIdDataMapping(
     {
       modalType: modalType.value!,
-      ...formData.value,
+      ...processedData,
       ...data,
     },
     remain,
@@ -492,20 +538,20 @@ async function edit() {
   // 創建一個新的對象來儲存處理後的數據
   const processedData: Record<string, any> = { ...formData.value }
 
-  // 過濾掉禁止編輯的欄位
-  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = processedData
-
   // 處理所有欄位，去掉識別符
-  for (const key in remain) {
+  for (const key in processedData) {
     const regex = /-\$\$repeat\$\$-\d+$/
     if (regex.test(key)) {
       const originalKey = key.replace(regex, '')
       if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
-        remain[originalKey] = remain[key]
+        processedData[originalKey] = processedData[key]
       }
-      delete remain[key]
+      delete processedData[key]
     }
   }
+
+  // 過濾掉禁止編輯的欄位
+  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = processedData
 
   for (const key of Object.keys(formDataMapping.value)) {
     const item = formDataMapping.value[key]
@@ -519,9 +565,9 @@ async function edit() {
   const emitData = handleIdDataMapping(
     {
       modalType: modalType.value!,
-      ...formData.value,
+      ...processedData,
     },
-    formData.value,
+    processedData,
   )
 
   emit('success', emitData)
@@ -566,16 +612,6 @@ function closeModal() {
   endLoading()
   hiddenModal()
 }
-
-const { dict } = useDictStore()
-const dictOptionsMap = ref<Record<string, any>>({})
-
-// 獲取字典選項
-async function getDictOptions(dictType: string) {
-  const dictData = await dict(dictType)
-  dictOptionsMap.value[dictType] = dictData.data()
-  console.log(dictType, dictOptionsMap.value[dictType])
-}
 </script>
 
 <template>
@@ -592,6 +628,7 @@ async function getDictOptions(dictType: string) {
       action: true,
     }"
   >
+    {{ formData }}
     <template v-if="modalType === 'view'">
       <n-descriptions :column="2" bordered label-placement="left">
         <template v-for="(item, key) in formDataMapping" :key="key">
@@ -646,7 +683,7 @@ async function getDictOptions(dictType: string) {
                   key-field="key"
                   label-field="label"
                   children-field="children"
-                  @search="(query) => handleSearch(query, item)"
+                  @search="(query: string) => handleSearch(query, item)"
                 />
                 <!-- 否則使用普通選擇器 -->
                 <n-select
@@ -660,10 +697,10 @@ async function getDictOptions(dictType: string) {
                   :clear-filter-after-select="false"
                   :placeholder="item.placeholder"
                   :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
-                  @search="(query) => handleSearch(query, item)"
+                  @search="(query: string) => handleSearch(query, item)"
                 />
               </template>
-              <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]">
+              <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')">
                 <n-space>
                   <template v-if="radioLoadingMap[item.name]">
                     <n-skeleton text :repeat="3" :width="60" />
@@ -673,9 +710,14 @@ async function getDictOptions(dictType: string) {
                       {{ option.label }}
                     </n-radio>
                   </template>
+                  <template v-else-if="item.selectOptions">
+                    <n-radio v-for="option in selectOptionsMap[item.name]" :key="option.value" :value="option.value">
+                      {{ option.label }}
+                    </n-radio>
+                  </template>
                 </n-space>
               </n-radio-group>
-
+              <icon-select v-else-if="item.type === 'icon-select'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
               <n-input-group-label v-if="item.inputSuffix">
                 {{ item.inputSuffix }}
               </n-input-group-label>

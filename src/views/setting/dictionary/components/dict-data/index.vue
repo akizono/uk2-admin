@@ -4,9 +4,10 @@ import type { InitFormData } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
+import { wrapOptionsToPromise } from '@/utils/initFormData'
 
 const modalRef = ref()
-const dataTableRef = ref()
+// const dataTableRef = ref()
 const modalTitle = ref('')
 const filterColumnValue = ref<string>('')
 
@@ -57,14 +58,6 @@ const initFormData: InitFormData[] = [
     hidden: true,
   },
   {
-    name: 'dataType',
-    value: undefined,
-    span: 1,
-    label: '數據類型',
-    type: 'select',
-    dictType: 'system_dict_data_data_type',
-  },
-  {
     name: 'label',
     value: undefined,
     span: 2,
@@ -72,11 +65,81 @@ const initFormData: InitFormData[] = [
     type: 'input',
   },
   {
+    name: 'dataType',
+    value: undefined,
+    span: 2,
+    label: '數據類型',
+    type: 'select',
+    dictType: 'system_dict_data_data_type',
+  },
+  {
+    name: 'value',
+    value: '',
+    span: 2,
+    label: '字典鍵值',
+    type: 'input',
+    disableAddInput: true,
+    disableEditInput: true,
+    showCondition: {
+      field: 'dataType',
+      operator: 'in',
+      value: ['undefined', 'null'],
+    },
+    valueGenerator: {
+      watchFields: ['dataType'],
+      rule: {
+        type: 'template',
+        value: '${dataType}',
+      },
+    },
+  },
+  {
+    name: 'value',
+    value: 0,
+    span: 2,
+    label: '字典鍵值',
+    type: 'input-number',
+    rulesType: 'number',
+    showCondition: {
+      field: 'dataType',
+      operator: 'in',
+      value: ['number'],
+    },
+  },
+  {
     name: 'value',
     value: undefined,
     span: 2,
     label: '字典鍵值',
     type: 'input',
+    rulesType: 'string',
+    showCondition: {
+      field: 'dataType',
+      operator: 'in',
+      value: ['string'],
+    },
+  },
+  {
+    name: 'value',
+    value: undefined,
+    span: 2,
+    label: '字典鍵值',
+    type: 'radio',
+    selectOptions: {
+      api: wrapOptionsToPromise([
+        { label: 'true', value: 'true' },
+        { label: 'false', value: 'false' },
+      ]),
+      itemMapping: {
+        label: 'label',
+        value: 'value',
+      },
+    },
+    showCondition: {
+      field: 'dataType',
+      operator: 'in',
+      value: ['boolean'],
+    },
   },
   {
     name: 'sort',

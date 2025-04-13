@@ -5,7 +5,7 @@ export interface DictDataVO {
   dictType: string
   label: string
   value: any // 資料庫中是varchar，但是在前端會根據dataType進行轉化，所以這裡是any
-  dataType: 'undefined' | 'null' | 'number' | 'string' | 'boolean' | 'object' | 'array'
+  dataType: 'undefined' | 'null' | 'number' | 'string' | 'boolean'
   sort: number
 
   remark: string

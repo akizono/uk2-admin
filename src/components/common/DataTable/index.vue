@@ -109,6 +109,38 @@ function propsVerify() {
     return
   }
 
+  // initQueryParams中如果存在name是pageSize的選項，值必須是數字且不能為負數（可以為0）；如果存在name是currentPage的選項，值必須是數字且不能為0和負數）
+  if (props.initQueryParams) {
+    const pageSizeParam = props.initQueryParams.find(item => item.name === 'pageSize')
+    const currentPageParam = props.initQueryParams.find(item => item.name === 'currentPage')
+
+    if (pageSizeParam) {
+      if (typeof pageSizeParam.value !== 'number') {
+        propsVerifyErrorMsg.value = 'pageSize 必須是數字類型'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (pageSizeParam.value < 0) {
+        propsVerifyErrorMsg.value = 'pageSize 不能為負數'
+        propsVerifyPassed.value = false
+        return
+      }
+    }
+
+    if (currentPageParam) {
+      if (typeof currentPageParam.value !== 'number') {
+        propsVerifyErrorMsg.value = 'currentPage 必須是數字類型'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (currentPageParam.value <= 0) {
+        propsVerifyErrorMsg.value = 'currentPage 必須大於 0'
+        propsVerifyPassed.value = false
+        return
+      }
+    }
+  }
+
   // initFormData中如果type是select的時候，必須包含selectOptions或者dictType，且selectOptions中必須包含api、selectParam、itemMapping，且itemMapping中必須包含label和value
   const selectFormItems = props.initFormData?.filter((item: InitFormData) => item.type === 'select') || []
   for (const item of selectFormItems) {
@@ -151,12 +183,49 @@ function propsVerify() {
     }
   }
 
-  // initFormData中如果type是radio的時候，必須包含dictType
+  // initFormData中如果type是radio的時候，必須包含selectOptions或者dictType，且selectOptions中必須包含api、itemMapping，且itemMapping中必須包含label和value
+  const radioFormItems = props.initFormData?.filter((item: InitFormData) => item.type === 'radio') || []
+  for (const item of radioFormItems) {
+    // 檢查是否有任一選項來源
+    if (!item.selectOptions && !item.dictType) {
+      propsVerifyErrorMsg.value = 'radio類型的表單項必須指定selectOptions或dictType其中之一作為選項來源'
+      propsVerifyPassed.value = false
+      return
+    }
+
+    // 檢查是否同時存在兩種選項來源
+    if (item.selectOptions && item.dictType) {
+      propsVerifyErrorMsg.value = 'radio類型的表單項不能同時指定selectOptions和dictType'
+      propsVerifyPassed.value = false
+      return
+    }
+
+    // 如果使用selectOptions，檢查必要屬性
+    if (item.selectOptions) {
+      if (!item.selectOptions.api) {
+        propsVerifyErrorMsg.value = 'selectOptions必須包含api屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (!item.selectOptions.itemMapping) {
+        propsVerifyErrorMsg.value = 'selectOptions必須包含itemMapping屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+      if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
+        propsVerifyErrorMsg.value = 'itemMapping必須包含label和value屬性'
+        propsVerifyPassed.value = false
+        return
+      }
+    }
+  }
+
+  // initFormData中如果type是radio的時候，必須包含dictType 或者 selectOptions（且selectOptions中必須包含api、itemMapping，且itemMapping中必須包含label和value）
   const hasRadioCarryDictType = !props.initFormData?.some((item: InitFormData) =>
-    item.type === 'radio' && !item.dictType,
+    item.type === 'radio' && !item.dictType && (!item.selectOptions || !item.selectOptions.api || !item.selectOptions.itemMapping || !item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value),
   )
   if (!hasRadioCarryDictType) {
-    propsVerifyErrorMsg.value = 'initFormData中如果type是radio的時候，必須包含dictType'
+    propsVerifyErrorMsg.value = 'initFormData中如果type是radio的時候，必須包含dictType 或者 selectOptions（且selectOptions中必須包含api、itemMapping，且itemMapping中必須包含label和value）'
     propsVerifyPassed.value = false
     return
   }
@@ -259,7 +328,7 @@ function handleResetSearch() {
     }
 
     // 如果此時 queryParams.value 沒有 pageSize 和 currentPage，則添加
-    if (!queryParams.value.pageSize) {
+    if (queryParams.value.pageSize === undefined || queryParams.value.pageSize === null) {
       queryParams.value.pageSize = Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE)
     }
     if (!queryParams.value.currentPage) {
@@ -490,6 +559,8 @@ async function getList() {
     // 先將數據轉換為樹狀結構，然後進行排序
     list.value = sortTreeData(arrayToTree(flattenData(result.list)))
     total.value = result.total
+
+    console.log('list.value', list.value)
   }
   finally {
     endTableLoading()
@@ -961,6 +1032,7 @@ onMounted(async () => {
   />
 
   <NSpace v-else vertical class="flex-1">
+    {{ queryParams }}
     <n-card v-if="search && initQueryParams">
       <n-spin :show="queryLoading" size="large">
         <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">

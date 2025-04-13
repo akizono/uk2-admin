@@ -116,24 +116,6 @@ export const useDictStore = defineStore('dict-store', {
             case 'boolean':
               item.value = String(value) === 'true' ? true : (String(value) === 'false' ? false : undefined)
               break
-            case 'object':
-              try {
-                const parsed = JSON.parse(value)
-                item.value = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : undefined
-              }
-              catch {
-                item.value = undefined
-              }
-              break
-            case 'array':
-              try {
-                const parsed = JSON.parse(value)
-                item.value = (Array.isArray(parsed) && parsed.every(el => typeof el !== 'object' || el === null)) ? parsed : undefined
-              }
-              catch {
-                item.value = undefined
-              }
-              break
           }
         }
 
