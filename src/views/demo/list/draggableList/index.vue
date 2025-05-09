@@ -19,7 +19,7 @@ const model = ref({ ...initialModel })
 
 const formRef = ref<FormInst | null>()
 function sendMail(id?: number) {
-  window.$message.success(`删除用户id:${id}`)
+  window.$message.success(`刪除用戶id:${id}`)
 }
 const columns: DataTableColumns<Entity.User> = [
   {
@@ -28,12 +28,12 @@ const columns: DataTableColumns<Entity.User> = [
     key: 'userName',
   },
   {
-    title: '年龄',
+    title: '年齡',
     align: 'center',
     key: 'age',
   },
   {
-    title: '性别',
+    title: '性別',
     align: 'center',
     key: 'gender',
     render: (row) => {
@@ -51,12 +51,12 @@ const columns: DataTableColumns<Entity.User> = [
     },
   },
   {
-    title: '邮箱',
+    title: '信箱',
     align: 'center',
     key: 'email',
   },
   {
-    title: '状态',
+    title: '狀態',
     align: 'center',
     key: 'status',
     render: (row) => {
@@ -68,7 +68,7 @@ const columns: DataTableColumns<Entity.User> = [
           onUpdateValue={(value: 0 | 1) =>
             handleUpdateDisabled(value, row.id!)}
         >
-          {{ checked: () => '启用', unchecked: () => '禁用' }}
+          {{ checked: () => '啟用', unchecked: () => '禁用' }}
         </NSwitch>
       )
     },
@@ -82,8 +82,8 @@ const columns: DataTableColumns<Entity.User> = [
         <NSpace justify="center">
           <NPopconfirm onPositiveClick={() => sendMail(row.id)}>
             {{
-              default: () => '确认删除',
-              trigger: () => <NButton size="small">删除</NButton>,
+              default: () => '確認刪除',
+              trigger: () => <NButton size="small">刪除</NButton>,
             }}
           </NPopconfirm>
         </NSpace>
@@ -100,17 +100,18 @@ function handleUpdateDisabled(value: 0 | 1, id: number) {
 }
 
 const tableRef = ref<InstanceType<typeof NDataTable>>()
-useTableDrag({
+const { initDrag } = useTableDrag({
   tableRef,
   data: listData,
   onRowDrag(data) {
     const target = data[data.length - 1]
-    window.$message.success(`拖拽数据 id: ${target.id} name: ${target.userName}`)
+    window.$message.success(`拖拽數據 id: ${target.id} name: ${target.userName}`)
   },
 })
 
 onMounted(() => {
   getUserList()
+  initDrag()
 })
 async function getUserList() {
   startLoading()
@@ -120,7 +121,7 @@ async function getUserList() {
   })
 }
 function changePage(page: number, size: number) {
-  window.$message.success(`分页器:${page},${size}`)
+  window.$message.success(`分頁器:${page},${size}`)
 }
 function handleResetSearch() {
   model.value = { ...initialModel }
@@ -133,16 +134,16 @@ function handleResetSearch() {
       <n-form ref="formRef" :model="model" label-placement="left" inline :show-feedback="false">
         <n-flex>
           <n-form-item label="姓名" path="condition_1">
-            <n-input v-model:value="model.condition_1" placeholder="请输入" />
+            <n-input v-model:value="model.condition_1" placeholder="請輸入" />
           </n-form-item>
-          <n-form-item label="年龄" path="condition_2">
-            <n-input v-model:value="model.condition_2" placeholder="请输入" />
+          <n-form-item label="年齡" path="condition_2">
+            <n-input v-model:value="model.condition_2" placeholder="請輸入" />
           </n-form-item>
-          <n-form-item label="性别" path="condition_3">
-            <n-input v-model:value="model.condition_3" placeholder="请输入" />
+          <n-form-item label="性別" path="condition_3">
+            <n-input v-model:value="model.condition_3" placeholder="請輸入" />
           </n-form-item>
           <n-form-item label="地址" path="condition_4">
-            <n-input v-model:value="model.condition_4" placeholder="请输入" />
+            <n-input v-model:value="model.condition_4" placeholder="請輸入" />
           </n-form-item>
           <n-flex class="ml-auto">
             <NButton type="primary" @click="getUserList">
@@ -155,7 +156,7 @@ function handleResetSearch() {
               <template #icon>
                 <icon-park-outline-redo />
               </template>
-              重置
+              重設
             </NButton>
           </n-flex>
         </n-flex>

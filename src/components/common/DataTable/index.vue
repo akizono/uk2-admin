@@ -2,10 +2,11 @@
 // TODO: 不同分類要用不同顏色區分
 // 測試添加功能
 import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
-import type { DataTableColumns, FormInst, FormRules } from 'naive-ui'
+import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
+import { useTableDrag } from '@/hooks/useTableDrag'
 import { useDictStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
@@ -25,6 +26,7 @@ const props = defineProps<{
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
   pagination?: boolean // 開啟分頁
+  drag?: boolean // 開啟拖拽
 
   filterColumnName?: string // 過濾條件的欄位名稱
   filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
@@ -285,6 +287,13 @@ function propsVerify() {
     }
   }
 
+  // 開啟分頁後，不允許開啟拖拽
+  if (props.pagination && props.drag) {
+    propsVerifyErrorMsg.value = '開啟分頁後，不允許開啟拖拽'
+    propsVerifyPassed.value = false
+    return
+  }
+
   propsVerifyPassed.value = true
 }
 
@@ -363,6 +372,7 @@ const modalRef = ref()
 const list = ref<TableRow[]>([])
 // 控制展開的行
 const expandedRowKeys = ref<string[]>([])
+// 表格列定義
 const columns = computed(() => {
   const batchDeleteColumn = props.del
     ? [
@@ -521,6 +531,41 @@ const columns = computed(() => {
     ...operateColumn, // 總是使用合併後的操作列
   ]
 })
+// 表格引用
+const tableRef = ref<InstanceType<typeof NDataTable>>()
+// 拖拽開關
+const dragSwitch = ref(false)
+// 檢查是否允許開啟拖拽
+const hasDrag = computed(() => {
+  return props.drag
+})
+// 檢查是否包含sort列
+const hasSortColumn = computed(() => {
+  return props.columns.some(column => 'key' in column && column.key === 'sort')
+})
+// 處理拖拽後的排序
+async function handleDragSort(_rows: TableRow[], newList: TableRow[], draggedRow: TableRow, newSort: number) {
+  // 更新後端數據
+  await props.updateFunction!({
+    id: draggedRow.id,
+    sort: newSort,
+  })
+
+  // 更新前端數據
+  draggedRow.sort = newSort
+}
+// 使用拖拽 hook
+async function handleDragSwitch() {
+  dragSwitch.value = !dragSwitch.value
+  const { initDrag } = useTableDrag({
+    tableRef,
+    data: list,
+    onRowDrag: handleDragSort,
+  })
+  await initDrag()
+}
+
+// 獲取列表
 async function getList() {
   try {
     startTableLoading()
@@ -556,11 +601,24 @@ async function getList() {
       })
     }
 
-    // 先將數據轉換為樹狀結構，然後進行排序
-    list.value = sortTreeData(arrayToTree(flattenData(result.list)))
-    total.value = result.total
+    // 定義遞迴排序函數
+    const sortBySort = (items: TableRow[]) => {
+      // 如果有 sort 列，則根據 sort 排序
+      if (hasSortColumn.value) {
+        items.sort((a, b) => Number(a.sort || 0) - Number(b.sort || 0))
+        // 遞迴排序子項
+        items.forEach((item) => {
+          if (item.children && item.children.length > 0) {
+            sortBySort(item.children)
+          }
+        })
+      }
+      return items
+    }
 
-    console.log('list.value', list.value)
+    // 先將數據轉換為樹狀結構，然後進行排序
+    list.value = sortBySort(sortTreeData(arrayToTree(flattenData(result.list))))
+    total.value = result.total
   }
   finally {
     endTableLoading()
@@ -1033,6 +1091,7 @@ onMounted(async () => {
 
   <NSpace v-else vertical class="flex-1">
     {{ queryParams }}
+    {{ dragSwitch }}
     <n-card v-if="search && initQueryParams">
       <n-spin :show="queryLoading" size="large">
         <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
@@ -1061,18 +1120,6 @@ onMounted(async () => {
                 />
               </n-form-item>
             </template>
-            <!-- <n-form-item label="性別" path="sex" class="!w-64">
-            <n-select
-              v-model:value="queryParams.sex"
-              :options="[
-                { label: '男', value: 1 },
-                { label: '女', value: 2 },
-              ]"
-              placeholder="請選擇"
-              clearable
-              class="max-w-40 w-100"
-            />
-          </n-form-item> -->
             <n-flex class="ml-auto">
               <NButton type="primary" @click="getList">
                 <template #icon>
@@ -1094,27 +1141,41 @@ onMounted(async () => {
 
     <n-card class="flex-1">
       <template #header>
-        <NButton v-if="add" type="primary" @click="modalRef.openModal('add')">
-          <template #icon>
-            <icon-park-outline-add-one />
-          </template>
-          新建{{ props.modalName }}
-        </NButton>
-        <NButton v-if="del" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
-          <template #icon>
-            <icon-park-outline-delete />
-          </template>
-          批次刪除
-        </NButton>
+        <n-flex justify="space-between">
+          <div>
+            <NButton v-if="add" type="primary" @click="modalRef.openModal('add')">
+              <template #icon>
+                <icon-park-outline-add-one />
+              </template>
+              新建{{ props.modalName }}
+            </NButton>
+
+            <NButton v-if="del" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+              <template #icon>
+                <icon-park-outline-delete />
+              </template>
+              批次刪除
+            </NButton>
+          </div>
+          <NButton v-if="drag" secondary class="m-l-10px" @click="handleDragSwitch">
+            <template #icon>
+              <icon-park-outline-close-one v-if="dragSwitch" />
+              <icon-park-outline-drag v-else />
+            </template>
+            {{ dragSwitch ? '關閉拖拽' : '開啟拖拽' }}
+          </NButton>
+        </n-flex>
       </template>
       <NSpace vertical>
         <n-data-table
+          ref="tableRef"
           v-model:checked-row-keys="checkedRowKeys"
           v-model:expanded-row-keys="expandedRowKeys"
           :columns="columns as DataTableColumns"
           :data="list"
           :loading="tableLoading"
           :row-key="row => row.id"
+          :row-class-name="hasDrag && dragSwitch ? 'drag-handle' : ''"
         />
         <template v-if="pagination">
           <Pagination
