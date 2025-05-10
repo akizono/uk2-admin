@@ -111,6 +111,13 @@ async function setOptionsWithNextTick(
 
   // 檢查是否包含 parentId
   const hasParentId = list.length > 0 && 'parentId' in list[0]
+  // 檢查是否包含 sort
+  const hasSort = list.length > 0 && 'sort' in list[0]
+
+  // 如果有 sort 欄位，先進行排序
+  if (hasSort) {
+    list.sort((a, b) => (a.sort || 0) - (b.sort || 0))
+  }
 
   if (hasParentId) {
     // 先建立所有節點
@@ -136,6 +143,14 @@ async function setOptionsWithNextTick(
             parentNode.children = []
           }
           parentNode.children.push(currentNode)
+          // 如果有 sort 欄位，對子節點進行排序
+          if (hasSort && parentNode.children.length > 1) {
+            parentNode.children.sort((a, b) => {
+              const aItem = list.find(i => i[valueKey] === a.value)
+              const bItem = list.find(i => i[valueKey] === b.value)
+              return (aItem?.sort || 0) - (bItem?.sort || 0)
+            })
+          }
         }
       }
     })
@@ -146,6 +161,15 @@ async function setOptionsWithNextTick(
       .map(item => nodeMap.get(item[valueKey]))
       .filter((node): node is TreeNode => node !== undefined)
 
+    // 如果有 sort 欄位，對根節點進行排序
+    if (hasSort) {
+      treeData.sort((a, b) => {
+        const aItem = list.find(i => i[valueKey] === a.value)
+        const bItem = list.find(i => i[valueKey] === b.value)
+        return (aItem?.sort || 0) - (bItem?.sort || 0)
+      })
+    }
+
     selectOptionsMap.value[fieldName] = treeData
   }
   else {
@@ -153,7 +177,13 @@ async function setOptionsWithNextTick(
     selectOptionsMap.value[fieldName] = list.map((resultItem: any) => ({
       label: resultItem[labelKey],
       value: resultItem[valueKey],
+      sort: resultItem.sort, // 保留 sort 欄位用於排序
     }))
+
+    // 如果有 sort 欄位，進行排序
+    if (hasSort) {
+      selectOptionsMap.value[fieldName].sort((a, b) => (a.sort || 0) - (b.sort || 0))
+    }
   }
 }
 // 搜索下拉框選項

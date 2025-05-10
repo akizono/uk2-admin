@@ -9,6 +9,7 @@ import { useBoolean, useThrottleAction } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'
 import { useDictStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
+import { createIcon } from '@/utils/icon'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
 import AsyncDictLabel from '../AsyncDictLabel/index.vue'
@@ -297,6 +298,7 @@ function propsVerify() {
   propsVerifyPassed.value = true
 }
 
+// 暴露給父組件的方法
 defineExpose({
   setListItemFieldValue,
   handleStatusChange,
@@ -418,6 +420,16 @@ const columns = computed(() => {
   // 外部傳遞進來的 columns
   const actualColumns = props.columns.map((column) => {
     const newColumn = { ...column } as any
+
+    // 處理 icon 欄位
+    if ('key' in newColumn && newColumn.key === 'icon') {
+      return {
+        ...newColumn,
+        render: (row: TableRow) => {
+          return row.icon && createIcon(row.icon, { size: 20 })
+        },
+      }
+    }
 
     // 將 dictValue 轉化為具體的字典值
     // 判斷 render 是不是JSON對象
@@ -1097,8 +1109,6 @@ onMounted(async () => {
   />
 
   <NSpace v-else vertical class="flex-1">
-    {{ queryParams }}
-    {{ dragSwitch }}
     <n-card v-if="search && initQueryParams">
       <n-spin :show="queryLoading" size="large">
         <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
