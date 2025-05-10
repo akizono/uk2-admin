@@ -43,6 +43,11 @@ const columns: DataTableColumns<MenuVO> = [
     key: 'name',
   },
   {
+    title: '菜單圖示',
+    align: 'center',
+    key: 'icon',
+  },
+  {
     title: '路由路徑',
     align: 'center',
     key: 'path',
@@ -62,11 +67,6 @@ const columns: DataTableColumns<MenuVO> = [
     align: 'center',
     key: 'type',
 
-  },
-  {
-    title: '菜單圖示',
-    align: 'center',
-    key: 'icon',
   },
   {
     title: '排序',
