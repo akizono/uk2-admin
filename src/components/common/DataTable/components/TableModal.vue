@@ -29,7 +29,7 @@ const props = defineProps<{
   rules?: FormRules // 表單驗證規則
 }>()
 
-const emit = defineEmits(['success'])
+const emit = defineEmits(['success', 'resort'])
 
 /** 評估單一條件 */
 function evaluateCondition(condition: Condition, formData: Record<string, any>): boolean {
@@ -531,6 +531,8 @@ async function add() {
     remain,
   )
   emit('success', emitData)
+  // 觸發重新排序
+  emit('resort')
 }
 
 // 編輯
@@ -571,6 +573,8 @@ async function edit() {
   )
 
   emit('success', emitData)
+  // 觸發重新排序
+  emit('resort')
 }
 
 // 提交

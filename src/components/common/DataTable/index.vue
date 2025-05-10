@@ -565,6 +565,21 @@ async function handleDragSwitch() {
   await initDrag()
 }
 
+// 定義遞迴排序函數
+function sortBySort(items: TableRow[]) {
+  // 如果有 sort 列，則根據 sort 排序
+  if (hasSortColumn.value) {
+    items.sort((a, b) => Number(a.sort || 0) - Number(b.sort || 0))
+    // 遞迴排序子項
+    items.forEach((item) => {
+      if (item.children && item.children.length > 0) {
+        sortBySort(item.children)
+      }
+    })
+  }
+  return items
+}
+
 // 獲取列表
 async function getList() {
   try {
@@ -599,21 +614,6 @@ async function getList() {
         // 這樣既保留了原始物件的結構，也有攤平後的屬性
         return { ...item, ...flattened }
       })
-    }
-
-    // 定義遞迴排序函數
-    const sortBySort = (items: TableRow[]) => {
-      // 如果有 sort 列，則根據 sort 排序
-      if (hasSortColumn.value) {
-        items.sort((a, b) => Number(a.sort || 0) - Number(b.sort || 0))
-        // 遞迴排序子項
-        items.forEach((item) => {
-          if (item.children && item.children.length > 0) {
-            sortBySort(item.children)
-          }
-        })
-      }
-      return items
     }
 
     // 先將數據轉換為樹狀結構，然後進行排序
@@ -1069,6 +1069,13 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
   }
 }
 
+// 處理重新排序
+function handleResort() {
+  if (list.value) {
+    list.value = sortBySort([...list.value])
+  }
+}
+
 onMounted(async () => {
   await propsVerify()
 
@@ -1200,6 +1207,7 @@ onMounted(async () => {
       :init-form-data="initFormData"
 
       @success="tableModalSuccess"
+      @resort="handleResort"
     />
 
     <!-- 批次刪除確認 Modal -->
