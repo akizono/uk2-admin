@@ -1,10 +1,8 @@
 import type { MenuOption } from 'naive-ui'
 
+import { MenuApi } from '@/api/system/menu'
 import { router } from '@/router'
-import { staticRoutes } from '@/router/routes.static'
-import { fetchUserRoutes } from '@/service'
-import { useAuthStore } from '@/store/model/auth/'
-import { $t, local } from '@/utils'
+import { $t } from '@/utils'
 
 import { createMenus, createRoutes, generateCacheRoutes } from './helper'
 
@@ -40,29 +38,42 @@ export const useRouteStore = defineStore('route-store', {
     },
 
     async initRouteInfo() {
-      if (import.meta.env.VITE_ROUTE_LOAD_MODE === 'dynamic') {
-        const userInfo = local.get('userInfo')
+      const { data } = await MenuApi.getMenuPage({
+        pageSize: 0,
+        // @ts-expect-error 忽略狀態不為1的菜單
+        status: 1,
+      })
+      console.log('data.list', data.list)
+      // [{"remark":null,"status":1,"isDeleted":0,"creator":"-1","createTime":"2025-05-10T05:34:39.000Z","updater":"-1","updateTime":"2025-05-10T06:08:39.000Z","id":"44","parentId":null,"name":"系統管理","path":null,"component":null,"permission":null,"type":0,"icon":"icon-park-outline:setting","link":null,"isCache":0,"isShowTag":0,"isPersistentTag":0,"isShowSide":1,"sort":-1},{"remark":null,"status":1,"isDeleted":0,"creator":"-1","createTime":"2025-05-10T06:20:36.000Z","updater":null,"updateTime":null,"id":"45","parentId":"44","name":"菜單設置","path":"/system/menu","component":"/system/menu/index.vue","permission":"system:menu:page","type":1,"icon":"icon-park-outline:application-menu","link":null,"isCache":1,"isShowTag":1,"isPersistentTag":0,"isShowSide":1,"sort":10}...]
 
-        if (!userInfo || !userInfo.id) {
-          const authStore = useAuthStore()
-          authStore.logout()
-          return
-        }
+      // 直接使用 API 返回的數據，過濾掉狀態不為1的菜單
+      const rowRoutes = data.list
 
-        // Get user's route
-        const { data } = await fetchUserRoutes({
-          id: userInfo.id,
-        })
+      this.rowRoutes = rowRoutes
+      return rowRoutes
 
-        if (!data)
-          return
+      // if (import.meta.env.VITE_ROUTE_LOAD_MODE === 'dynamic') {
+      //   const userInfo = local.get('userInfo')
 
-        return data
-      }
-      else {
-        this.rowRoutes = staticRoutes
-        return staticRoutes
-      }
+      //   if (!userInfo || !userInfo.id) {
+      //     const authStore = useAuthStore()
+      //     authStore.logout()
+      //     return
+      //   }
+
+      //   // Get user's route
+      //   const { data } = await fetchUserRoutes({
+      //     id: userInfo.id,
+      //   })
+
+      //   if (!data)
+      //     return
+
+      //   return data
+      // }
+
+      // this.rowRoutes = staticRoutes
+      // return staticRoutes
     },
     async initAuthRoute() {
       this.isInitAuthRoute = false

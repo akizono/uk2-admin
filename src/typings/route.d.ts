@@ -11,8 +11,10 @@ declare namespace AppRoute {
     requiresAuth?: boolean
     /* 可以访问的角色 */
     roles?: Entity.RoleType[]
+    /* 权限标识 */
+    permission?: string
     /* 是否开启页面缓存 */
-    keepAlive?: boolean
+    cache?: boolean
     /* 有些路由我们并不想在菜单中显示，比如某些编辑页面。 */
     hide?: boolean
     /* 菜单排序。 */
@@ -27,6 +29,8 @@ declare namespace AppRoute {
     pinTab?: boolean
     /** 当前路由在左侧菜单是目录还是页面,不设置默认为page */
     menuType?: MenuType
+    /** 菜单类型 0:目录 1:菜单 */
+    type?: number
   }
 
   type MetaKeys = keyof RouteMeta
@@ -43,11 +47,33 @@ declare namespace AppRoute {
     /* 路由id */
     id: number
     /* 父级路由id，顶级页面为null */
-    pid: number | null
+    parentId: number | null
   }
 
   /** 单个路由的类型结构(动态路由模式：后端返回此类型结构的路由) */
-  type RowRoute = RouteMeta & baseRoute
+  type RowRoute = RouteMeta & baseRoute | {
+    id: string
+    parentId: string | null
+    name: string
+    path: string | null
+    component: string | null
+    permission: string | null
+    type: number
+    icon: string | null
+    link: string | null
+    isCache: number
+    isShowTag: number
+    isKeepAlive: number
+    isShowSide: number
+    sort: number
+    remark: string | null
+    status: number
+    isDeleted: number
+    creator: string
+    createTime: string
+    updater: string | null
+    updateTime: string | null
+  }
 
   /**
    * 挂载到项目上的真实路由结构

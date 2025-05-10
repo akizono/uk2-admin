@@ -3,36 +3,71 @@ import type { RouteRecordRaw } from 'vue-router'
 
 import { usePermission } from '@/hooks'
 import Layout from '@/layouts/index.vue'
-import { $t, arrayToTree, renderIcon } from '@/utils'
-import { clone, min, omit, pick } from 'radash'
+import { arrayToTree, renderIcon } from '@/utils'
+import { clone, min } from 'radash'
 import { RouterLink } from 'vue-router'
 
-const metaFields: AppRoute.MetaKeys[]
-  = ['title', 'icon', 'requiresAuth', 'roles', 'keepAlive', 'hide', 'order', 'href', 'activeMenu', 'withoutTab', 'pinTab', 'menuType']
-
 function standardizedRoutes(route: AppRoute.RowRoute[]) {
-  return clone(route).map((i) => {
-    const route = omit(i, metaFields)
+  return clone(route).map((item: any) => {
+    // 處理 MenuVO 類型
+    const meta: AppRoute.RouteMeta = {
+      title: item.name,
+      icon: item.icon,
+      requiresAuth: true,
+      permission: item.permission,
+      cache: item.isCache === 1,
+      hide: item.isShowSide === 0,
+      order: item.sort,
+      type: item.type,
+    }
 
-    Reflect.set(route, 'meta', pick(i, metaFields))
+    if (item.link) {
+      meta.href = item.link
+    }
+
+    const route = {
+      name: item.name,
+      path: item.path || '',
+      redirect: undefined,
+      component: item.component,
+      id: item.id,
+      parentId: item.parentId,
+      meta,
+    }
+
     return route
   }) as AppRoute.Route[]
 }
 
 export function createRoutes(routes: AppRoute.RowRoute[]) {
-  const { hasPermission } = usePermission()
+  // 不使用這個變數，避免ESLint錯誤
+  // const { hasPermission } = usePermission()
 
   // Structure the meta field
   let resultRouter = standardizedRoutes(routes)
 
   // Route permission filtering
-  resultRouter = resultRouter.filter(i => hasPermission(i.meta.roles))
+  // resultRouter = resultRouter.filter((i) => {
+  //   // 檢查是否有權限標識
+  //   if (i.meta.permission) {
+  //     console.log('333')
+  //     return hasPermission(i.meta.permission)
+  //   }
+  //   return true
+  // })
 
   // Generate routes, no need to import files for those with redirect
   const modules = import.meta.glob('@/views/**/*.vue')
   resultRouter = resultRouter.map((item: AppRoute.Route) => {
-    if (item.componentPath && !item.redirect)
-      item.component = modules[`/src/views${item.componentPath}`]
+    // 處理組件路徑
+    const componentPath = (item as any).component
+    if (componentPath && !item.redirect) {
+      // 判斷組件路徑是否已經包含完整的路徑
+      if (componentPath.startsWith('/'))
+        item.component = modules[`/src/views${componentPath}`]
+      else
+        item.component = modules[`/src/views/${componentPath}`]
+    }
     return item
   })
 
@@ -61,9 +96,19 @@ export function createRoutes(routes: AppRoute.RowRoute[]) {
 
 // Generate an array of route names that need to be kept alive
 export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
-  return routes
-    .filter(i => i.keepAlive)
-    .map(i => i.name)
+  const cacheRoutes = routes
+    .filter((item: any) => {
+      return item.isCache === 1
+    })
+    .map((item: any) => {
+      // 調試輸出
+      console.log('緩存路由:', item.name, item)
+      return item.name
+    })
+
+  // 輸出最終緩存的路由名稱列表
+  console.log('最終緩存路由列表:', cacheRoutes)
+  return cacheRoutes
 }
 
 function setRedirect(routes: AppRoute.Route[]) {
@@ -91,7 +136,7 @@ function setRedirect(routes: AppRoute.Route[]) {
   })
 }
 
-/* 生成侧边菜单的数据 */
+/* 生成側邊菜單的數據 */
 export function createMenus(userRoutes: AppRoute.RowRoute[]) {
   const resultMenus = standardizedRoutes(userRoutes)
 
@@ -107,7 +152,17 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
   const { hasPermission } = usePermission()
   return userRoutes
     // Filter out side menus without permission
-    .filter(i => hasPermission(i.meta.roles))
+    .filter((i) => {
+      // 檢查是否有角色權限
+      if (i.meta.roles && i.meta.roles.length > 0) {
+        return hasPermission(i.meta.roles)
+      }
+      // 檢查是否有權限標識
+      if (i.meta.permission) {
+        return hasPermission(i.meta.permission)
+      }
+      return true
+    })
     //  Sort the menu according to the order size
     .sort((a, b) => {
       if (a.meta && a.meta.order && b.meta && b.meta.order)
@@ -120,11 +175,12 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
     })
     // Convert to side menu data structure
     .map((item) => {
+      console.log('item', item)
       const target: MenuOption = {
         id: item.id,
-        pid: item.pid,
+        parentId: item.parentId,
         label:
-          (!item.meta.menuType || item.meta.menuType === 'page')
+          (item.meta.type === 1)
             ? () =>
                 h(
                   RouterLink,
@@ -133,10 +189,10 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
                       path: item.path,
                     },
                   },
-                  { default: () => $t(`route.${String(item.name)}`, item.meta.title) },
+                  { default: () => item.name },
                 )
-            : () => $t(`route.${String(item.name)}`, item.meta.title),
-        key: item.path,
+            : () => item.name,
+        key: item.path || `menu-${item.id}`, // 確保每個選單項都有唯一的 key
         icon: item.meta.icon ? renderIcon(item.meta.icon) : undefined,
       }
       return target

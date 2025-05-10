@@ -7,6 +7,10 @@ import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
+defineOptions({
+  name: '菜單設置',
+})
+
 const dataTableRef = ref()
 
 /** 初始化查詢參數 */
@@ -209,7 +213,7 @@ const initFormData: InitFormData[] = [
     },
   },
   {
-    name: 'isKeepAlive',
+    name: 'isPersistentTag',
     value: undefined,
     span: 1,
     label: '常駐標籤欄',
@@ -313,7 +317,5 @@ const options = {
 </script>
 
 <template>
-  <DataTable
-    v-bind="options"
-  />
+  <DataTable v-bind="options" />
 </template>
