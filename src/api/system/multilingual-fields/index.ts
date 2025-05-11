@@ -1,0 +1,53 @@
+import request from '@/utils/request'
+
+export interface MultilingualFieldsVO {
+  id: string
+  fieldId: string
+  language: string
+  value: number
+
+  remark: string
+  status: number
+  isDeleted: number
+  creator: string
+  createTime: string
+  updater: string
+  updateTime: string
+}
+
+export const MultilingualFieldsApi = {
+  /** 獲取多語言欄位分頁列表 */
+  getMultilingualFieldsPage: async (params: PageParams): PageRes<MultilingualFieldsVO> => {
+    return await request.get({ url: '/system/multilingual-fields/page', params })
+  },
+
+  /** 新增多語言欄位 */
+  createMultilingualFields: async (data: MultilingualFieldsVO) => {
+    return await request.post({ url: '/system/multilingual-fields/create', data })
+  },
+
+  /** 批次新增多語言欄位 */
+  createMultilingualFieldsBatch: async (data: MultilingualFieldsVO[]) => {
+    return await request.post({ url: '/system/multilingual-fields/create-batch', data })
+  },
+
+  /** 修改多語言欄位 */
+  updateMultilingualFields: async (data: MultilingualFieldsVO) => {
+    return await request.put({ url: '/system/multilingual-fields/update', data })
+  },
+
+  /** 刪除多語言欄位 */
+  deleteMultilingualFields: async (id: string) => {
+    return await request.delete({ url: `/system/multilingual-fields/delete/${id}` })
+  },
+
+  /** 封鎖多語言欄位 */
+  blockMultilingualFields: async (id: string) => {
+    return await request.put({ url: `/system/multilingual-fields/block/${id}` })
+  },
+
+  /** 解封多語言欄位 */
+  unblockMultilingualFields: async (id: string) => {
+    return await request.put({ url: `/system/multilingual-fields/unblock/${id}` })
+  },
+}

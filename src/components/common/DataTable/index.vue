@@ -16,9 +16,10 @@ import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
 
 const props = defineProps<{
-  modalWidth?: string // 模態框的寬度（傳遞到 Modal）
   modalFormLabelWidth?: string // 模態框表單label的寬度（傳遞到 Modal）
   modalName?: string // 模態框名稱
+  modalWidth?: string // 模態框的寬度（傳遞到 Modal）
+  multilingualFieldsModalWidth?: string // 多語言欄位彈出視窗的寬度（傳遞到 Modal）
 
   edit?: boolean // 開啟編輯
   del?: boolean // 開啟刪除
@@ -1209,7 +1210,7 @@ onMounted(async () => {
       :modal-width="modalWidth"
       :modal-form-label-width="modalFormLabelWidth"
       :modal-name="modalName"
-
+      :multilingual-fields-modal-width="multilingualFieldsModalWidth"
       :update-function="updateFunction || undefined"
       :create-function="createFunction || undefined"
 

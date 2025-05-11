@@ -128,6 +128,8 @@ export interface InitFormData {
       value: string | ValueGeneratorCondition[]
     }
   }
+  /** 是否多語言 */
+  multilingual?: boolean
 }
 
 /** 彈出視窗類型 */

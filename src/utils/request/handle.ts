@@ -41,6 +41,15 @@ export function handlePostRequest(config: InternalAxiosRequestConfig) {
   }
 }
 
+/**
+ * 處理語言請求頭
+ * @param config axios 請求設定
+ * @description 加入當前語言到請求標頭
+ */
+export function handleLanguageHeader(config: InternalAxiosRequestConfig) {
+  config.headers['Language-Current'] = local.get('languageCurrent')
+}
+
 // ------------------------------response 攔截器--------------------------------
 
 /**

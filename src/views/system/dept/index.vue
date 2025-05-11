@@ -25,6 +25,14 @@ const initQueryParams: InitQueryParams[] = [
     inputType: 'input',
   },
   {
+    name: 'code',
+    value: undefined,
+    label: '部門編碼',
+    class: '!w-64',
+    placeholder: '請填寫部門編碼',
+    inputType: 'input',
+  },
+  {
     name: 'status',
     value: undefined,
     label: '狀態',
@@ -41,6 +49,12 @@ const columns: DataTableColumns<DeptVO> = [
     title: '部門名稱',
     align: 'center',
     key: 'name',
+    multilingual: true,
+  },
+  {
+    title: '部門編碼',
+    align: 'center',
+    key: 'code',
   },
   {
     title: '負責人',
@@ -56,7 +70,7 @@ const columns: DataTableColumns<DeptVO> = [
     title: '狀態',
     align: 'center',
     key: 'status',
-    render: (row) => {
+    render: (row: DeptVO) => {
       return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
@@ -86,6 +100,14 @@ const initFormData: InitFormData[] = [
     value: undefined,
     span: 1,
     label: '部門名稱',
+    type: 'input',
+    multilingual: true,
+  },
+  {
+    name: 'code',
+    value: undefined,
+    span: 1,
+    label: '部門編碼',
     type: 'input',
   },
   {
@@ -131,6 +153,11 @@ const rules: FormRules = {
     message: '請填寫部門名稱',
     trigger: ['blur', 'input'],
   },
+  code: {
+    required: true,
+    message: '請填寫部門編碼',
+    trigger: ['blur', 'input'],
+  },
   leaderUserId: {
     required: true,
     message: '請選擇負責人',
@@ -174,7 +201,9 @@ const options = {
 
   /** 其他配置 */
   modalName: '部門', // 表格中的數據名稱
+  modalWidth: '800px', // 表格的寬度
   ref: 'dataTableRef', // 表格的 ref
+  multilingualFieldsModalWidth: '800px', // 多語言欄位彈出視窗的寬度
 }
 </script>
 

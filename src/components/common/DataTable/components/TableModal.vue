@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import type { Condition, ConditionGroup, InitFormData, ModalType, TableRow } from '../type'
+import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
+import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
 import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
+import { useLanguageStore } from '@/store/model/language'
 import { useDebounceFn } from '@vueuse/core'
-
-// 樹狀結構的節點
-interface TreeNode {
-  label: string
-  value: string | number
-  key: string | number
-  children?: TreeNode[]
-}
 
 const props = defineProps<{
   modalWidth?: string // 模態框的寬度
   modalFormLabelWidth?: string // 模態框表單label的寬度
   modalName?: string // 模態框名稱
+  multilingualFieldsModalWidth?: string // 多語言欄位彈出視窗的寬度
 
   filterColumnName?: string // 過濾條件的欄位名稱
   filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
@@ -30,6 +26,16 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['success', 'resort'])
+
+const languageStore = useLanguageStore()
+
+// 樹狀結構的節點
+interface TreeNode {
+  label: string
+  value: string | number
+  key: string | number
+  children?: TreeNode[]
+}
 
 defineExpose({
   openModal,
@@ -529,10 +535,20 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
   return result
 }
 
-// 打開設置多語言字段的彈出視窗
+// 打開設置多語言欄位的彈出視窗
 const multilingualFieldsRef = ref()
 function showMultilingualModal(item: InitFormData) {
   multilingualFieldsRef.value.openModal('edit', item)
+}
+
+// 接收多語言的提交
+const multilingualFields = ref<Record<string, any>>({})
+function handleMultilingualSubmit(data: { field: string, params: MultilingualFieldsVO[] }) {
+  multilingualFields.value[data.field] = data.params
+  // 獲取當前選中的語言
+  const currentLanguage = languageStore.current
+  // 將當前語言數據更新到表單中
+  formData.value[data.field] = multilingualFields.value[data.field].find(item => item.language === currentLanguage)?.value
 }
 
 // 新增
@@ -551,8 +567,26 @@ async function add() {
     }
   }
 
-  const { id, ...remain } = processedData
+  // 處理多語言欄位
+  const newMFData: Record<string, MultilingualFieldsVO[]> = {}
+  for (const key in formDataMapping.value) {
+    const item = formDataMapping.value[key]
+    if (item.multilingual) {
+      // 只儲存需要提交的多語言欄位
+      newMFData[item.name] = multilingualFields.value[item.name]
+      // 將是「多語言欄位」的欄位的值修改為「多語言欄位」的fieldId
+      processedData[item.name] = multilingualFields.value[item.name][0].fieldId
+    }
+  }
+  multilingualFields.value = newMFData
 
+  // 提交多語言欄位
+  for (const key in multilingualFields.value) {
+    const itemArray = multilingualFields.value[key]
+    await MultilingualFieldsApi.createMultilingualFieldsBatch(itemArray)
+  }
+
+  const { id, ...remain } = processedData
   const { data } = await props.createFunction!({
     ...remain,
     ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
@@ -616,10 +650,24 @@ async function edit() {
 // 提交
 async function submitModal() {
   try {
+    // 驗證表單
     await formRef.value?.validate()
+
+    // 如果id和parentId相同，則提示不能將自己設為父級
     if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
       window.$message.error('不能將自己設為父級')
       return
+    }
+
+    // 如果某個欄位需要設置多語言，則檢查是否完成全部語言的設置
+    for (const key in formDataMapping.value) {
+      const item = formDataMapping.value[key]
+      if (item.multilingual) {
+        if (!multilingualFields.value[item.name]) {
+          window.$message.error(`請填寫「${item.label}」的多語言欄位`)
+          return
+        }
+      }
     }
 
     startLoading()
@@ -669,11 +717,12 @@ function closeModal() {
         action: true,
       }"
     >
-      {{ formData }}
+      <div>{{ formData }}</div>
+      <div>{{ multilingualFields }}</div>
       <template v-if="modalType === 'view'">
         <n-descriptions :column="2" bordered label-placement="left">
           <template v-for="(item, key) in formDataMapping" :key="key">
-            <n-descriptions-item v-if="!item.hidden" :label="item.label" :span="item.span || 1">
+            <n-descriptions-item v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)" :label="item.label" :span="item.span || 1">
               <template v-if="item.type === 'switch'">
                 {{ formData[item.name] === 1 ? '啟用' : '停用' }}
               </template>
@@ -703,7 +752,8 @@ function closeModal() {
                   {{ item.inputPrefix }}
                 </n-input-group-label>
 
-                <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+                <n-input v-if="item.type === 'input' && item.multilingual" v-model:value="formData[item.name]" readonly class="multilingual-input" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" @click="showMultilingualModal(item)" />
+                <n-input v-else-if="item.type === 'input' && !item.multilingual" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
                 <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
                 <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
                 <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
@@ -761,10 +811,6 @@ function closeModal() {
                 <n-input-group-label v-if="item.inputSuffix">
                   {{ item.inputSuffix }}
                 </n-input-group-label>
-
-                <n-button v-if="item.multilingual" type="primary" ghost @click="showMultilingualModal(item)">
-                  多語言
-                </n-button>
               </n-input-group>
             </n-form-item-grid-item>
           </template>
@@ -782,6 +828,16 @@ function closeModal() {
       </template>
     </n-modal>
 
-    <MultilingualFields ref="multilingualFieldsRef" />
+    <MultilingualFields ref="multilingualFieldsRef" :multilingual-fields-modal-width="multilingualFieldsModalWidth" @submit="handleMultilingualSubmit" />
   </div>
 </template>
+
+<style scoped>
+:deep(.multilingual-input) {
+  cursor: pointer;
+}
+
+:deep(.multilingual-input .n-input__input-el) {
+  cursor: pointer !important;
+}
+</style>

@@ -8,8 +8,12 @@ function request(option: any) {
   if (option.params)
     option.params = filterObjEmptyValues(option.params)
 
-  if (option.data)
-    option.data = filterObjEmptyValues(option.data)
+  if (option.data) {
+    // 如果 data 是陣列，直接使用，不進行 filterObjEmptyValues
+    option.data = Array.isArray(option.data)
+      ? option.data
+      : filterObjEmptyValues(option.data)
+  }
 
   const { headersType, headers, ...otherOption } = option
   return service({

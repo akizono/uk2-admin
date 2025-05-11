@@ -31,6 +31,7 @@ const service: AxiosInstance = axios.create({
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     handle.handleAuthHeader(config)
+    handle.handleLanguageHeader(config)
 
     const method = config.method?.toUpperCase()
     if (method === 'GET')
