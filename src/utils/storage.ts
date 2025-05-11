@@ -1,8 +1,8 @@
 import type { UserVo } from '@/api/system/user'
-
 /** 設定sessionStorage的類型 */
 interface Session {
   dict: DictMap
+  languageList: App.SelectOption[]
 }
 
 /** 設定localStorage的類型 */
@@ -16,7 +16,7 @@ interface Local {
   /* 儲存登入帳號 */
   loginAccount: any
   /* 儲存當前語言 */
-  lang: App.lang
+  languageCurrent: string
 }
 
 /** 設定storage的前綴 */

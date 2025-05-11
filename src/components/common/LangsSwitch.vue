@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import { useAppStore } from '@/store'
+import { useLanguageStore } from '@/store/model/language'
 
-const appStore = useAppStore()
-const options = [
-  {
-    label: 'English',
-    value: 'enUS',
-  },
-  {
-    label: '中文',
-    value: 'zhCN',
-  },
-]
+const languageStore = useLanguageStore()
 </script>
 
 <template>
-  <n-popselect :value="appStore.lang" :options="options" trigger="click" @update:value="appStore.setAppLang">
+  <n-popselect :value="languageStore.current" :options="languageStore.list" trigger="click" @update:value="languageStore.setAppLang">
     <CommonWrapper>
       <icon-park-outline-translate />
     </CommonWrapper>

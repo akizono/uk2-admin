@@ -8,6 +8,7 @@ export * from './router'
 export * from './model/auth/'
 export * from './model/dict/'
 export * from './model/tab/'
+export * from './model/language/'
 
 export function installPinia(app: App) {
   const pinia = createPinia()

@@ -3,11 +3,17 @@ import { naiveI18nOptions } from '@/utils'
 import { darkTheme } from 'naive-ui'
 
 import { useAppStore } from './store'
+import { useLanguageStore } from './store/model/language'
 
 const appStore = useAppStore()
+const languageStore = useLanguageStore()
+
 const naiveLocale = computed(() => {
-  return naiveI18nOptions[appStore.lang] ? naiveI18nOptions[appStore.lang] : naiveI18nOptions.enUS
+  return naiveI18nOptions[languageStore.current] ? naiveI18nOptions[languageStore.current] : naiveI18nOptions.enUS
 })
+
+// 初始化語言列表
+languageStore.getLanguageList()
 </script>
 
 <template>

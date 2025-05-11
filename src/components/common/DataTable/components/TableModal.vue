@@ -31,6 +31,10 @@ const props = defineProps<{
 
 const emit = defineEmits(['success', 'resort'])
 
+defineExpose({
+  openModal,
+})
+
 /** 評估單一條件 */
 function evaluateCondition(condition: Condition, formData: Record<string, any>): boolean {
   const { field, operator, value } = condition
@@ -81,10 +85,6 @@ function evaluateShowCondition(condition: Condition | ConditionGroup | undefined
 
   return evaluateCondition(condition, formData)
 }
-
-defineExpose({
-  openModal,
-})
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
@@ -529,6 +529,12 @@ function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<s
   return result
 }
 
+// 打開設置多語言字段的彈出視窗
+const multilingualFieldsRef = ref()
+function showMultilingualModal(item: InitFormData) {
+  multilingualFieldsRef.value.openModal('edit', item)
+}
+
 // 新增
 async function add() {
   // 創建一個新的對象來儲存處理後的數據
@@ -649,126 +655,133 @@ function closeModal() {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="modalVisible"
-    :mask-closable="false"
-    preset="card"
-    :title="modalTitle"
-    :style="{
-      width: modalWidth || '700px',
-    }"
-    :segmented="{
-      content: true,
-      action: true,
-    }"
-  >
-    {{ formData }}
-    <template v-if="modalType === 'view'">
-      <n-descriptions :column="2" bordered label-placement="left">
-        <template v-for="(item, key) in formDataMapping" :key="key">
-          <n-descriptions-item v-if="!item.hidden" :label="item.label" :span="item.span || 1">
-            <template v-if="item.type === 'switch'">
-              {{ formData[item.name] === 1 ? '啟用' : '停用' }}
-            </template>
-            <template v-else>
-              {{ formData[item.name] }}
-            </template>
-          </n-descriptions-item>
-        </template>
-      </n-descriptions>
-    </template>
-
-    <n-form v-else ref="formRef" :rules="localRules" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
-      <n-grid :cols="2" :x-gap="18">
-        <template v-for="item in formDataMapping" :key="item.name">
-          <n-form-item-grid-item
-            v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)"
-            :span="item.span"
-            :path="item.name"
-          >
-            <template #label>
-              {{ item.label }}
-
-              <HelpInfo v-if="item.helpInfo" :message="item.helpInfo" />
-            </template>
-
-            <n-input-group>
-              <n-input-group-label v-if="item.inputPrefix">
-                {{ item.inputPrefix }}
-              </n-input-group-label>
-
-              <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
-              <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
-              <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
-              <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
-              <template v-else-if="item.type === 'select'">
-                <!-- 如果數據中包含 children，使用樹狀選擇器 -->
-                <n-tree-select
-                  v-if="selectOptionsMap[item.name]?.[0]?.children"
-                  v-model:value="formData[item.name]"
-                  :options="selectOptionsMap[item.name]"
-                  :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
-                  filterable
-                  remote
-                  :loading="selectLoadingMap[item.name]"
-                  :clear-filter-after-select="false"
-                  :placeholder="item.placeholder || '請輸入關鍵字搜索'"
-                  :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
-                  key-field="key"
-                  label-field="label"
-                  children-field="children"
-                  @search="(query: string) => handleSearch(query, item)"
-                />
-                <!-- 否則使用普通選擇器 -->
-                <n-select
-                  v-else
-                  v-model:value="formData[item.name]"
-                  :options="item.dictType ? dictOptionsMap[item.dictType] : selectOptionsMap[item.name]"
-                  :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
-                  filterable
-                  remote
-                  :loading="selectLoadingMap[item.name]"
-                  :clear-filter-after-select="false"
-                  :placeholder="item.placeholder"
-                  :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
-                  @search="(query: string) => handleSearch(query, item)"
-                />
+  <div>
+    <n-modal
+      v-model:show="modalVisible"
+      :mask-closable="false"
+      preset="card"
+      :title="modalTitle"
+      :style="{
+        width: modalWidth || '700px',
+      }"
+      :segmented="{
+        content: true,
+        action: true,
+      }"
+    >
+      {{ formData }}
+      <template v-if="modalType === 'view'">
+        <n-descriptions :column="2" bordered label-placement="left">
+          <template v-for="(item, key) in formDataMapping" :key="key">
+            <n-descriptions-item v-if="!item.hidden" :label="item.label" :span="item.span || 1">
+              <template v-if="item.type === 'switch'">
+                {{ formData[item.name] === 1 ? '啟用' : '停用' }}
               </template>
-              <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')">
-                <n-space>
-                  <template v-if="radioLoadingMap[item.name]">
-                    <n-skeleton text :repeat="3" :width="60" />
-                  </template>
-                  <template v-else-if="item.dictType && dictOptionsMap[item.dictType]">
-                    <n-radio v-for="option in dictOptionsMap[item.dictType]" :key="option.value" :value="option.value">
-                      {{ option.label }}
-                    </n-radio>
-                  </template>
-                  <template v-else-if="item.selectOptions">
-                    <n-radio v-for="option in selectOptionsMap[item.name]" :key="option.value" :value="option.value">
-                      {{ option.label }}
-                    </n-radio>
-                  </template>
-                </n-space>
-              </n-radio-group>
-              <icon-select v-else-if="item.type === 'icon-select'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
-              <n-input-group-label v-if="item.inputSuffix">
-                {{ item.inputSuffix }}
-              </n-input-group-label>
-            </n-input-group>
-          </n-form-item-grid-item>
-        </template>
-      </n-grid>
-    </n-form>
-    <template #action>
-      <n-space justify="center">
-        <n-button type="primary" :loading="submitLoading" @click="submitModal">
-          提交
-        </n-button>
-        <n-button @click="closeModal">
-          取消
-        </n-button>
-      </n-space>
-    </template>
-  </n-modal>
+              <template v-else>
+                {{ formData[item.name] }}
+              </template>
+            </n-descriptions-item>
+          </template>
+        </n-descriptions>
+      </template>
+
+      <n-form v-else ref="formRef" :rules="localRules" label-placement="left" :model="formData" :label-width="modalFormLabelWidth || 100">
+        <n-grid :cols="2" :x-gap="18">
+          <template v-for="item in formDataMapping" :key="item.name">
+            <n-form-item-grid-item
+              v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)"
+              :span="item.span"
+              :path="item.name"
+            >
+              <template #label>
+                {{ item.label }}
+                <HelpInfo v-if="item.helpInfo" :message="item.helpInfo" />
+              </template>
+
+              <n-input-group>
+                <n-input-group-label v-if="item.inputPrefix">
+                  {{ item.inputPrefix }}
+                </n-input-group-label>
+
+                <n-input v-if="item.type === 'input'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+                <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+                <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+                <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
+                <template v-else-if="item.type === 'select'">
+                  <!-- 如果數據中包含 children，使用樹狀選擇器 -->
+                  <n-tree-select
+                    v-if="selectOptionsMap[item.name]?.[0]?.children"
+                    v-model:value="formData[item.name]"
+                    :options="selectOptionsMap[item.name]"
+                    :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
+                    filterable
+                    remote
+                    :loading="selectLoadingMap[item.name]"
+                    :clear-filter-after-select="false"
+                    :placeholder="item.placeholder || '請輸入關鍵字搜索'"
+                    :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                    key-field="key"
+                    label-field="label"
+                    children-field="children"
+                    @search="(query: string) => handleSearch(query, item)"
+                  />
+                  <!-- 否則使用普通選擇器 -->
+                  <n-select
+                    v-else
+                    v-model:value="formData[item.name]"
+                    :options="item.dictType ? dictOptionsMap[item.dictType] : selectOptionsMap[item.name]"
+                    :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
+                    filterable
+                    remote
+                    :loading="selectLoadingMap[item.name]"
+                    :clear-filter-after-select="false"
+                    :placeholder="item.placeholder"
+                    :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                    @search="(query: string) => handleSearch(query, item)"
+                  />
+                </template>
+                <n-radio-group v-else-if="item.type === 'radio'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')">
+                  <n-space>
+                    <template v-if="radioLoadingMap[item.name]">
+                      <n-skeleton text :repeat="3" :width="60" />
+                    </template>
+                    <template v-else-if="item.dictType && dictOptionsMap[item.dictType]">
+                      <n-radio v-for="option in dictOptionsMap[item.dictType]" :key="option.value" :value="option.value">
+                        {{ option.label }}
+                      </n-radio>
+                    </template>
+                    <template v-else-if="item.selectOptions">
+                      <n-radio v-for="option in selectOptionsMap[item.name]" :key="option.value" :value="option.value">
+                        {{ option.label }}
+                      </n-radio>
+                    </template>
+                  </n-space>
+                </n-radio-group>
+                <icon-select v-else-if="item.type === 'icon-select'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
+                <n-input-group-label v-if="item.inputSuffix">
+                  {{ item.inputSuffix }}
+                </n-input-group-label>
+
+                <n-button v-if="item.multilingual" type="primary" ghost @click="showMultilingualModal(item)">
+                  多語言
+                </n-button>
+              </n-input-group>
+            </n-form-item-grid-item>
+          </template>
+        </n-grid>
+      </n-form>
+      <template #action>
+        <n-space justify="center">
+          <n-button type="primary" :loading="submitLoading" @click="submitModal">
+            提交
+          </n-button>
+          <n-button @click="closeModal">
+            取消
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
+
+    <MultilingualFields ref="multilingualFieldsRef" />
+  </div>
 </template>

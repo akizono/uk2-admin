@@ -1,6 +1,5 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 
-import { local, setLocale } from '@/utils'
 import { colord } from 'colord'
 import { set } from 'radash'
 
@@ -9,7 +8,7 @@ import themeConfig from './theme.json'
 export type TransitionAnimation = '' | 'fade-slide' | 'fade-bottom' | 'fade-scale' | 'zoom-fade' | 'zoom-out'
 export type LayoutMode = 'leftMenu' | 'topMenu' | 'mixMenu'
 
-const { VITE_DEFAULT_LANG, VITE_COPYRIGHT_INFO } = import.meta.env
+const { VITE_COPYRIGHT_INFO } = import.meta.env
 
 const docEle = ref(document.documentElement)
 
@@ -23,7 +22,6 @@ export const useAppStore = defineStore('app-store', {
   state: () => {
     return {
       footerText: VITE_COPYRIGHT_INFO,
-      lang: VITE_DEFAULT_LANG,
       theme: themeConfig as GlobalThemeOverrides,
       primaryColor: themeConfig.common.primaryColor,
       collapsed: false,
@@ -76,11 +74,7 @@ export const useAppStore = defineStore('app-store', {
       // 重置所有配色
       this.setPrimaryColor(this.primaryColor)
     },
-    setAppLang(lang: App.lang) {
-      setLocale(lang)
-      local.set('lang', lang)
-      this.lang = lang
-    },
+
     /* 设置主题色 */
     setPrimaryColor(color: string) {
       const brightenColor = colord(color).lighten(0.05).toHex()
@@ -128,6 +122,7 @@ export const useAppStore = defineStore('app-store', {
       docEle.value.classList.toggle('gray-mode')
       this.grayMode = docEle.value.classList.contains('gray-mode')
     },
+
   },
   persist: {
     storage: localStorage,

@@ -29,7 +29,11 @@ declare namespace NaiveUI {
 }
 
 declare namespace App {
-  type lang = 'zhCN' | 'enUS'
+  // 選項的通用型別
+  interface SelectOption {
+    value: string
+    label: string
+  }
 }
 
 interface DictMap {
