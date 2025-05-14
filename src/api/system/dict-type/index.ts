@@ -1,18 +1,12 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
-export interface DictTypeVO {
+export interface DictTypeVO extends BaseVO {
   id: string
   name: string
   type: string
   sort: number
-
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
 }
 
 export const DictTypeApi = {

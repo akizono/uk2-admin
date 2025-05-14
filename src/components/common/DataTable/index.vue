@@ -2,12 +2,13 @@
 // TODO: 不同分類要用不同顏色區分
 // 測試添加功能
 import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
+import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'
-import { useDictStore } from '@/store'
+import { useDictStore, useLanguageStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { createIcon } from '@/utils/icon'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
@@ -48,6 +49,7 @@ const props = defineProps<{
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
+const languageStore = useLanguageStore()
 
 const propsVerifyPassed = ref(false)
 const propsVerifyErrorMsg = ref('')
@@ -600,6 +602,24 @@ async function getList() {
     const { data: result } = await props.getFunction({
       ...queryParams.value,
       ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
+    })
+
+    // 將多語言欄位轉換為當前語言的值
+    result.list.forEach((item: any) => {
+      if (!item.multilingualFields)
+        return
+
+      // 使用當前語言作為查詢條件
+      const languageCurrent = languageStore.current
+
+      // 直接處理有多語言欄位的屬性
+      Object.entries(item.multilingualFields).forEach(([field, translations]) => {
+        if (item[field]) {
+          // 使用型別斷言確保型別安全
+          const multilangFields = translations as MultilingualFieldsVO[]
+          item[field] = multilangFields.find(t => t.language === languageCurrent)?.value
+        }
+      })
     })
 
     // 將巢狀物件攤平化

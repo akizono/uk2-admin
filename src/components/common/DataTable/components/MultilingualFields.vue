@@ -25,7 +25,12 @@ const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = use
 // 表單數據
 const formRef = ref()
 const formData = ref<Record<string, any>>({})
-const parentData = ref<TableRow | null>(null)
+// 傳進來的column的設定
+const columnData = ref<TableRow | null>(null)
+// 傳進來的行數據
+// const rowData = ref<TableRow | null>(null)
+// 進行編輯時，TableModal會傳入multilingualFields以便進行更新
+const multilingualFields = ref<Record<string, any>>({})
 
 // 多語言列表
 const languageList = computed(() => {
@@ -57,6 +62,22 @@ const formRules = computed(() => {
   return rules
 })
 
+// 重設表單數據
+function resetFormData() {
+  formData.value = {}
+  if (modalType.value !== 'add') {
+    // 回填表單數據
+    if (multilingualFields.value) {
+      const multilingualField = multilingualFields.value[columnData.value?.name]
+      if (multilingualField) {
+        multilingualField.forEach((item: any) => {
+          formData.value[item.language] = item.value
+        })
+      }
+    }
+  }
+}
+
 // 提交
 async function handleSubmit() {
   try {
@@ -65,13 +86,31 @@ async function handleSubmit() {
 
     // 格式化數據為後端介面需要的格式
     const uuid = generateUUID()
-    const params = Object.entries(formData.value).map(([key, value]) => ({
-      language: key,
-      fieldId: uuid,
-      value,
-    }))
+    const params = Object.entries(formData.value).map(([key, value]) => {
+      if (modalType.value === 'add') {
+        return {
+          language: key,
+          fieldId: uuid,
+          value,
+        }
+      }
+      else {
+        const mf = multilingualFields.value[columnData.value?.name]
+        const mfItem = mf.find((item: any) => item.language === key)
 
-    emit('submit', { field: parentData.value?.name, params })
+        return {
+          language: key,
+          fieldId: mf[0].fieldId,
+          value,
+
+          ifNewLanguage: !mfItem, // 是否為新增語言
+          id: mfItem?.id || undefined,
+          remark: mfItem?.remark || undefined,
+        }
+      }
+    })
+
+    emit('submit', { field: columnData.value?.name, params })
     endLoading()
     hiddenModal()
   }
@@ -82,12 +121,17 @@ async function handleSubmit() {
 }
 
 // 打開彈出視窗
-async function openModal(type: ModalType, data: TableRow) {
+async function openModal(type: ModalType, data: TableRow, /* _rowData?: TableRow, */ _multilingualFields?: Record<string, any>) {
   modalType.value = type // 設置模態框類型
   modalName.value = data?.label // 設置模態框名稱
-  parentData.value = data // 設置父級數據
+  columnData.value = data // 設置父級數據
+  // rowData.value = _rowData ?? null // 設置行數據
+  multilingualFields.value = _multilingualFields ?? {} // TableModal傳入的multilingualFields
+  resetFormData()
   showModal()
-  // resetFormData()
+
+  // console.log('rowData.value', rowData.value)
+  console.log('columnData.value', columnData.value)
 }
 
 // 關閉彈出視窗
@@ -111,7 +155,7 @@ function closeModal() {
       action: true,
     }"
   >
-    {{ formData }}
+    <div>formData: {{ formData }}</div>
     <n-form ref="formRef" label-placement="left" :model="formData" :rules="formRules">
       <n-grid :cols="2" :x-gap="18">
         <template v-for="item in languageList" :key="item.code">

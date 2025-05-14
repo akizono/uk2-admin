@@ -1,20 +1,14 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
-export interface DictDataVO {
+export interface DictDataVO extends BaseVO {
   id: string
   dictType: string
   label: string
   value: any // 資料庫中是varchar，但是在前端會根據dataType進行轉化，所以這裡是any
   dataType: 'undefined' | 'null' | 'number' | 'string' | 'boolean'
   sort: number
-
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
 }
 
 export const DictDataApi = {

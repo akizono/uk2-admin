@@ -1,22 +1,15 @@
 import type { UserVo } from '../user'
+import type { BaseVO } from '@/typings/base'
 
 import request from '@/utils/request'
 
-export interface DeptVO {
+export interface DeptVO extends BaseVO {
   id: string
   parentId: string
   name: string
   sort: number
   leaderUserId: string
   leaderUser: UserVo
-
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
 }
 
 export const DeptApi = {

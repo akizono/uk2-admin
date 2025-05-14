@@ -1,18 +1,13 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
-export interface LanguageVO {
+export interface LanguageVO extends BaseVO {
   id: string
   name: string
   code: string
   sort: number
 
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
 }
 
 export const LanguageApi = {

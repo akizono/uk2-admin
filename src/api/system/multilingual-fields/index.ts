@@ -1,18 +1,14 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
-export interface MultilingualFieldsVO {
+export interface MultilingualFieldsVO extends BaseVO {
   id: string
   fieldId: string
   language: string
   value: number
 
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
+  ifNewLanguage?: boolean
 }
 
 export const MultilingualFieldsApi = {
@@ -34,6 +30,11 @@ export const MultilingualFieldsApi = {
   /** 修改多語言欄位 */
   updateMultilingualFields: async (data: MultilingualFieldsVO) => {
     return await request.put({ url: '/system/multilingual-fields/update', data })
+  },
+
+  /** 批次修改多語言欄位 */
+  updateMultilingualFieldsBatch: async (data: MultilingualFieldsVO[]) => {
+    return await request.put({ url: '/system/multilingual-fields/update-batch', data })
   },
 
   /** 刪除多語言欄位 */

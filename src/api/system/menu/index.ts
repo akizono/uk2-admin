@@ -1,6 +1,8 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
-export interface MenuVO {
+export interface MenuVO extends BaseVO {
   id: string
   parentId: string
   name: string
@@ -15,14 +17,6 @@ export interface MenuVO {
   isKeepAlive: number
   isShowSide: number
   sort: number
-
-  remark: string
-  status: number
-  isDeleted: number
-  creator: string
-  createTime: string
-  updater: string
-  updateTime: string
 }
 
 export const MenuApi = {

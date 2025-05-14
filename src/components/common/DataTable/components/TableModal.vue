@@ -245,6 +245,8 @@ const formData = ref<Record<string, any>>({})
 const formDataMapping = ref<Record<string, InitFormData>>({})
 // 本地的驗證規則
 const localRules = ref<FormRules>({})
+// 傳進來的行數據(用於傳輸到「MultilingualFields.vue」中使用)
+const rowData = ref<TableRow | null>(null)
 
 // 監聽表單數據變化，處理 valueGenerator
 watch(formData, (newVal) => {
@@ -338,6 +340,225 @@ watch(() => formData.value.type, (newType) => {
   })
 })
 
+// 表單類型與標題
+const modalType = shallowRef<ModalType | null>(null)
+const modalTitle = computed(() => {
+  if (!modalType.value)
+    return ''
+  return {
+    add: '新增',
+    view: '檢視',
+    edit: '編輯',
+  }[modalType.value] + (props.modalName ?? '')
+})
+
+/**
+ * 處理ID相關的資料映射
+ * 為什麼這麼做？
+ * 例如，當我們從父組件打開TableModal時 ，leaderUserId在選項未載入出來，這時候需要拿從後端返回的leaderUser的數據來進行映射
+ * 但是我們新建和編輯後的數據是沒有leaderUser的，這時候我們需要手動填充返回父組件
+ * @param baseData - 基礎資料物件
+ * @param sourceData - 來源資料物件（用於映射）
+ * @returns 處理後的資料物件
+ */
+function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<string, any>): Record<string, any> {
+  const result = { ...baseData }
+
+  //  遍歷 sourceData 物件中的所有屬性
+  for (const key in sourceData) {
+    // 檢查屬性名稱是否以 'Id' 結尾，且不是 'parentId'
+    if (key.endsWith('Id') && key !== 'parentId') {
+      // 移除屬性名稱中的 'Id' 後綴
+      const keyWithoutId = key.replace('Id', '')
+      // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」
+      if (selectOptionsMap.value[key]) {
+      // 在 result 中建立新的物件結構
+        result[keyWithoutId] = {
+        // 使用 formDataMapping 中定義的標籤映射作為鍵名
+          [formDataMapping.value[key].selectOptions!.itemMapping!.label]: selectOptionsMap.value[key][0].label,
+          // 儲存選項的實際值（ID）// 為什麼是0？因為selectOptionsMap.value[key]的值是通過精確尋找到的，且這個值通常是唯一的，所以我們可以沒有顧慮的採用第一個元素 所以寫0
+          id: selectOptionsMap.value[key][0].value,
+        }
+      }
+    }
+  }
+
+  return result
+}
+
+// 打開設置多語言欄位的彈出視窗
+const multilingualFieldsRef = ref()
+function showMultilingualModal(item: InitFormData) {
+  // eslint-disable-next-line ts/no-use-before-define
+  multilingualFieldsRef.value.openModal(modalType.value, item, multilingualFields.value)
+}
+
+// 接收多語言的提交
+const multilingualFields = ref<Record<string, any>>({})
+function handleMultilingualSubmit(data: { field: string, params: MultilingualFieldsVO[] }) {
+  multilingualFields.value[data.field] = data.params
+  // 獲取當前選中的語言
+  const currentLanguage = languageStore.current
+  // 將當前語言數據更新到表單中
+  formData.value[data.field] = multilingualFields.value[data.field].find((item: MultilingualFieldsVO) => item.language === currentLanguage)?.value
+}
+
+// 處理表單數據
+function processFormData() {
+  // 創建一個新的對象來儲存處理後的數據
+  const processedData: Record<string, any> = { ...formData.value }
+
+  // 處理所有欄位，去掉識別符
+  for (const key in processedData) {
+    const regex = /-\$\$repeat\$\$-\d+$/
+    if (regex.test(key)) {
+      const originalKey = key.replace(regex, '')
+      if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
+        processedData[originalKey] = processedData[key]
+      }
+      delete processedData[key]
+    }
+  }
+
+  // 處理多語言欄位
+  const newMFData: Record<string, MultilingualFieldsVO[]> = {}
+  for (const key in formDataMapping.value) {
+    const item = formDataMapping.value[key]
+    if (item.multilingual) {
+      // 只儲存需要提交的多語言欄位
+      newMFData[item.name] = multilingualFields.value[item.name]
+      // 將是「多語言欄位」的欄位的值修改為「多語言欄位」的fieldId
+      processedData[item.name] = multilingualFields.value[item.name][0].fieldId
+    }
+  }
+  multilingualFields.value = newMFData
+
+  return processedData
+}
+
+// 新增
+async function add() {
+  const processedData = processFormData()
+  const { id, ...remain } = processedData
+
+  // 建立多語言欄位
+  for (const key in multilingualFields.value) {
+    const itemArray = multilingualFields.value[key]
+    await MultilingualFieldsApi.createMultilingualFieldsBatch(itemArray)
+
+    // 將 processedData 中的多語言欄位還原為「當前選擇語言」的值，用於 DataTable 中表格的回顯
+    processedData[key] = itemArray.find((item: MultilingualFieldsVO) => item.language === languageStore.current)?.value
+  }
+
+  const { data } = await props.createFunction!({
+    ...remain,
+    ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
+  })
+
+  const emitData = handleIdDataMapping(
+    {
+      modalType: modalType.value!,
+      ...processedData,
+      ...data,
+    },
+    remain,
+  )
+  emit('success', emitData)
+  // 觸發重新排序
+  emit('resort')
+}
+
+// 編輯
+async function edit() {
+  const processedData = processFormData()
+
+  // 過濾掉禁止編輯的欄位
+  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = processedData
+  for (const key of Object.keys(formDataMapping.value)) {
+    const item = formDataMapping.value[key]
+    if (item.disableUpdate)
+      delete remain[key]
+  }
+
+  // 更新多語言欄位
+  for (const key in multilingualFields.value) {
+    const itemArray = multilingualFields.value[key]
+
+    const updateItemArray: MultilingualFieldsVO[] = [] // 待更新
+    const addItemArray: MultilingualFieldsVO[] = [] // 待新增
+    itemArray.forEach(async (item: MultilingualFieldsVO) => {
+      if (item.ifNewLanguage) {
+        delete item.ifNewLanguage
+        addItemArray.push(item)
+      }
+      else {
+        delete item.ifNewLanguage
+        updateItemArray.push(item)
+      }
+    })
+    await MultilingualFieldsApi.createMultilingualFieldsBatch(addItemArray)
+    await MultilingualFieldsApi.updateMultilingualFieldsBatch(updateItemArray)
+
+    // 將 processedData 中的多語言欄位還原為「當前選擇語言」的值，用於 DataTable 中表格的回顯
+    processedData[key] = itemArray.find((item: MultilingualFieldsVO) => item.language === languageStore.current)?.value
+  }
+
+  const { message } = await props.updateFunction!({ ...remain })
+  window.$message.success(message)
+
+  const emitData = handleIdDataMapping(
+    {
+      modalType: modalType.value!,
+      ...processedData,
+    },
+    processedData,
+  )
+
+  emit('success', emitData)
+  // 觸發重新排序
+  emit('resort')
+}
+
+// 提交
+async function submitModal() {
+  try {
+    // 驗證表單
+    await formRef.value?.validate()
+
+    // 如果id和parentId相同，則提示不能將自己設為父級
+    if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
+      window.$message.error('不能將自己設為父級')
+      return
+    }
+
+    // 如果某個欄位需要設置多語言，則檢查是否完成全部語言的設置
+    for (const key in formDataMapping.value) {
+      const item = formDataMapping.value[key]
+      if (item.multilingual) {
+        if (!multilingualFields.value[item.name]) {
+          window.$message.error(`請填寫「${item.label}」的多語言欄位`)
+          return
+        }
+      }
+    }
+
+    startLoading()
+
+    if (modalType.value === 'add') {
+      await add()
+      closeModal()
+    }
+
+    else if (modalType.value === 'edit') {
+      await edit()
+      closeModal()
+    }
+  }
+  catch {
+    endLoading()
+  }
+}
+
 // 重設表單數據
 function resetFormData(data?: TableRow, parent?: TableRow) {
   // 重設表單數據
@@ -346,6 +567,10 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
   selectOptionsMap.value = {}
   selectLoadingMap.value = {} // 重設搜索 loading 狀態
   radioLoadingMap.value = {} // 重設 radio loading 狀態
+  multilingualFields.value = {} // 重設多語言欄位
+
+  if (data)
+    rowData.value = data // 行數據
 
   // 重設本地驗證規則
   localRules.value = props.rules ? { ...props.rules } : {}
@@ -378,13 +603,23 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         }
       }
 
+      // 如果是多語言欄位，則添加多語言欄位
+      // 這裡的language、fieldId、value三個屬性需要和「MultilingualFields.vue - handleSubmit()」的params的屬性保持一致
+      if (item.multilingual) {
+        multilingualFields.value[item.name] = rowData.value?.multilingualFields[item.name]
+        // multilingualFields.value[item.name] = rowData.value?.multilingualFields[item.name].map((item: MultilingualFieldsVO) => ({
+        //   language: item.language,
+        //   fieldId: item.fieldId,
+        //   value: item.value,
+        // }))
+      }
+
       // 如果是 radio 類型且有 dictType
       if (item.type === 'radio' && item.dictType) {
         radioLoadingMap.value[item.name] = true
         await getDictOptions(item.dictType)
         radioLoadingMap.value[item.name] = false
       }
-
       // 如果是 radio 類型且有 selectOptions
       else if (item.type === 'radio' && item.selectOptions?.api && item.selectOptions?.itemMapping?.label && item.selectOptions?.itemMapping?.value) {
         radioLoadingMap.value[item.name] = true
@@ -404,14 +639,12 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
           radioLoadingMap.value[item.name] = false
         }
       }
-
       // 如果是 select 類型且有 dictType
       else if (item.type === 'select' && item.dictType) {
         selectLoadingMap.value[item.name] = true
         await getDictOptions(item.dictType)
         selectLoadingMap.value[item.name] = false
       }
-
       // 如果選單類型 且有 selectOptions
       else if (item.type === 'select' && item.selectOptions) {
         /**
@@ -476,214 +709,28 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
     })
   }
 
-  // 如果傳入了數據，則將數據填充到表單中(通常只有新增和編輯時會傳入數據)
+  // 如果傳入了數據
   if (data) {
+    // 將數據填充到表單中(通常只有新增和編輯時會傳入數據)
     for (const key in formData.value) {
       // 去掉識別符來匹配原始數據
       const originalKey = key.replace(/-\$\$repeat\$\$-\d+$/, '')
       formData.value[key] = data[originalKey]
 
+      // 如果數據是數字，則將數據轉換為數字
       if (formDataMapping.value[key].type === 'input-number') {
         formData.value[key] = Number(formData.value[key])
       }
     }
-  }
-}
-// 表單類型與標題
-const modalType = shallowRef<ModalType | null>(null)
-const modalTitle = computed(() => {
-  if (!modalType.value)
-    return ''
-  return {
-    add: '新增',
-    view: '檢視',
-    edit: '編輯',
-  }[modalType.value] + (props.modalName ?? '')
-})
 
-/**
- * 處理ID相關的資料映射
- * 為什麼這麼做？
- * 例如，當我們從父組件打開TableModal時 ，leaderUserId在選項未載入出來，這時候需要拿從後端返回的leaderUser的數據來進行映射
- * 但是我們新建和編輯後的數據是沒有leaderUser的，這時候我們需要手動填充返回父組件
- * @param baseData - 基礎資料物件
- * @param sourceData - 來源資料物件（用於映射）
- * @returns 處理後的資料物件
- */
-function handleIdDataMapping(baseData: Record<string, any>, sourceData: Record<string, any>): Record<string, any> {
-  const result = { ...baseData }
-
-  //  遍歷 sourceData 物件中的所有屬性
-  for (const key in sourceData) {
-    // 檢查屬性名稱是否以 'Id' 結尾，且不是 'parentId'
-    if (key.endsWith('Id') && key !== 'parentId') {
-      // 移除屬性名稱中的 'Id' 後綴
-      const keyWithoutId = key.replace('Id', '')
-      // 為什麼要加這個if？因為keyWithoutId篩選到的屬性不一定每個都是「選項」
-      if (selectOptionsMap.value[key]) {
-      // 在 result 中建立新的物件結構
-        result[keyWithoutId] = {
-        // 使用 formDataMapping 中定義的標籤映射作為鍵名
-          [formDataMapping.value[key].selectOptions!.itemMapping!.label]: selectOptionsMap.value[key][0].label,
-          // 儲存選項的實際值（ID）// 為什麼是0？因為selectOptionsMap.value[key]的值是通過精確尋找到的，且這個值通常是唯一的，所以我們可以沒有顧慮的採用第一個元素 所以寫0
-          id: selectOptionsMap.value[key][0].value,
-        }
-      }
-    }
-  }
-
-  return result
-}
-
-// 打開設置多語言欄位的彈出視窗
-const multilingualFieldsRef = ref()
-function showMultilingualModal(item: InitFormData) {
-  multilingualFieldsRef.value.openModal('edit', item)
-}
-
-// 接收多語言的提交
-const multilingualFields = ref<Record<string, any>>({})
-function handleMultilingualSubmit(data: { field: string, params: MultilingualFieldsVO[] }) {
-  multilingualFields.value[data.field] = data.params
-  // 獲取當前選中的語言
-  const currentLanguage = languageStore.current
-  // 將當前語言數據更新到表單中
-  formData.value[data.field] = multilingualFields.value[data.field].find(item => item.language === currentLanguage)?.value
-}
-
-// 新增
-async function add() {
-  // 創建一個新的對象來儲存處理後的數據
-  const processedData: Record<string, any> = { ...formData.value }
-  // 處理所有欄位，去掉識別符
-  for (const key in processedData) {
-    const regex = /-\$\$repeat\$\$-\d+$/
-    if (regex.test(key)) {
-      const originalKey = key.replace(regex, '')
-      if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
-        processedData[originalKey] = processedData[key]
-      }
-      delete processedData[key]
-    }
-  }
-
-  // 處理多語言欄位
-  const newMFData: Record<string, MultilingualFieldsVO[]> = {}
-  for (const key in formDataMapping.value) {
-    const item = formDataMapping.value[key]
-    if (item.multilingual) {
-      // 只儲存需要提交的多語言欄位
-      newMFData[item.name] = multilingualFields.value[item.name]
-      // 將是「多語言欄位」的欄位的值修改為「多語言欄位」的fieldId
-      processedData[item.name] = multilingualFields.value[item.name][0].fieldId
-    }
-  }
-  multilingualFields.value = newMFData
-
-  // 提交多語言欄位
-  for (const key in multilingualFields.value) {
-    const itemArray = multilingualFields.value[key]
-    await MultilingualFieldsApi.createMultilingualFieldsBatch(itemArray)
-  }
-
-  const { id, ...remain } = processedData
-  const { data } = await props.createFunction!({
-    ...remain,
-    ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
-  })
-
-  const emitData = handleIdDataMapping(
-    {
-      modalType: modalType.value!,
-      ...processedData,
-      ...data,
-    },
-    remain,
-  )
-  emit('success', emitData)
-  // 觸發重新排序
-  emit('resort')
-}
-
-// 編輯
-async function edit() {
-  // 創建一個新的對象來儲存處理後的數據
-  const processedData: Record<string, any> = { ...formData.value }
-
-  // 處理所有欄位，去掉識別符
-  for (const key in processedData) {
-    const regex = /-\$\$repeat\$\$-\d+$/
-    if (regex.test(key)) {
-      const originalKey = key.replace(regex, '')
-      if (!formDataMapping.value[key]?.showCondition || evaluateShowCondition(formDataMapping.value[key].showCondition, formData.value)) {
-        processedData[originalKey] = processedData[key]
-      }
-      delete processedData[key]
-    }
-  }
-
-  // 過濾掉禁止編輯的欄位
-  const { isDeleted, creator, createTime, updater, updateTime, ...remain } = processedData
-
-  for (const key of Object.keys(formDataMapping.value)) {
-    const item = formDataMapping.value[key]
-    if (item.disableUpdate)
-      delete remain[key]
-  }
-
-  const { message } = await props.updateFunction!({ ...remain })
-  window.$message.success(message)
-
-  const emitData = handleIdDataMapping(
-    {
-      modalType: modalType.value!,
-      ...processedData,
-    },
-    processedData,
-  )
-
-  emit('success', emitData)
-  // 觸發重新排序
-  emit('resort')
-}
-
-// 提交
-async function submitModal() {
-  try {
-    // 驗證表單
-    await formRef.value?.validate()
-
-    // 如果id和parentId相同，則提示不能將自己設為父級
-    if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
-      window.$message.error('不能將自己設為父級')
-      return
-    }
-
-    // 如果某個欄位需要設置多語言，則檢查是否完成全部語言的設置
-    for (const key in formDataMapping.value) {
-      const item = formDataMapping.value[key]
-      if (item.multilingual) {
-        if (!multilingualFields.value[item.name]) {
-          window.$message.error(`請填寫「${item.label}」的多語言欄位`)
-          return
-        }
-      }
-    }
-
-    startLoading()
-
-    if (modalType.value === 'add') {
-      await add()
-      closeModal()
-    }
-
-    else if (modalType.value === 'edit') {
-      await edit()
-      closeModal()
-    }
-  }
-  catch {
-    endLoading()
+    // 回填多語言欄位
+    // for (const key in formDataMapping.value) {
+    //   const item = formDataMapping.value[key]
+    //   if (item.multilingual) {
+    //     console.log('item', item)
+    //     console.log()
+    //   }
+    // }
   }
 }
 

@@ -1,3 +1,5 @@
+import type { BaseVO } from '@/typings/base'
+
 import request from '@/utils/request'
 
 export interface Token {
@@ -5,7 +7,7 @@ export interface Token {
   refreshToken: string
 }
 
-export interface UserVo {
+export interface UserVo extends BaseVO {
   id?: string
   username?: string
   nickname?: string
@@ -17,14 +19,6 @@ export interface UserVo {
 
   role?: string[]
   token?: Token
-
-  remark?: string
-  status?: number
-  isDeleted?: number
-  creator?: string
-  createTime?: string
-  updater?: string
-  updateTime?: string
 }
 
 export const UserApi = {
