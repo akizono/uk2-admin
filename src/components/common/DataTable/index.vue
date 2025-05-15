@@ -612,14 +612,21 @@ async function getList() {
       // 使用當前語言作為查詢條件
       const languageCurrent = languageStore.current
 
+      // 先找出所有多語言欄位
+      const multilingualColumns = props.columns
+        .filter(column => 'key' in column && column.multilingual)
+        .map(column => (column as { key: string }).key)
+
       // 直接處理有多語言欄位的屬性
-      Object.entries(item.multilingualFields).forEach(([field, translations]) => {
-        if (item[field]) {
-          // 使用型別斷言確保型別安全
-          const multilangFields = translations as MultilingualFieldsVO[]
-          item[field] = multilangFields.find(t => t.language === languageCurrent)?.value
-        }
-      })
+      Object.entries(item.multilingualFields)
+        .filter(([field]) => multilingualColumns.includes(field))
+        .forEach(([field, translations]) => {
+          if (item[field]) {
+            // 使用型別斷言確保型別安全
+            const multilangFields = translations as MultilingualFieldsVO[]
+            item[field] = multilangFields.find(t => t.language === languageCurrent)?.value
+          }
+        })
     })
 
     // 將巢狀物件攤平化
