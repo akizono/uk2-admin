@@ -99,16 +99,31 @@ async function handleSubmit() {
       }
       else {
         const mf = multilingualFields.value[columnData.value?.name]
-        const mfItem = mf.find((item: any) => item.language === key)
+        // 通常情況下，我們正在操作multilingualFields.value中的某個欄位，如果這個欄位一直以來都是「多語言欄位」，那麼mf就能正常獲取
+        if (mf) {
+          const mfItem = mf.find((item: any) => item.language === key)
 
-        return {
-          language: key,
-          fieldId: mf[0].fieldId,
-          value,
+          return {
+            language: key,
+            fieldId: mf[0].fieldId,
+            value,
 
-          ifNewLanguage: !mfItem, // 是否為新增語言
-          id: mfItem?.id || undefined,
-          remark: mfItem?.remark || undefined,
+            ifNewLanguage: !mfItem, // 是否為新增語言
+            id: mfItem?.id || undefined,
+            // remark: mfItem?.remark || undefined,
+          }
+        }
+
+        // 但是，如果這個欄位是從「非多語言欄位」轉換為「多語言欄位」，那麼mf就為undefined，因為multilingualFields.value中沒有這個欄位
+        else {
+          return {
+            language: key,
+            fieldId: uuid,
+            value,
+
+            ifNewLanguage: true, // 因為是新增語言，所以ifNewLanguage始終為true
+            id: undefined, // 新增語言還未儲存到資料庫，所以現在id為undefined
+          }
         }
       }
     })
@@ -120,6 +135,7 @@ async function handleSubmit() {
   catch (errors) {
     endSubmitLoading()
     console.error('表單驗證失敗：', errors)
+    window.$message.error('表單驗證失敗')
   }
 }
 

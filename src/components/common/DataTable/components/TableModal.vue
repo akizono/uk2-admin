@@ -463,7 +463,7 @@ async function add() {
     },
     remain,
   )
-  emit('success', emitData)
+  emit('success', { ...emitData, multilingualFields: multilingualFields.value })
   // 觸發重新排序
   emit('resort')
 }
@@ -514,7 +514,7 @@ async function edit() {
     processedData,
   )
 
-  emit('success', emitData)
+  emit('success', { ...emitData, multilingualFields: multilingualFields.value })
   // 觸發重新排序
   emit('resort')
 }

@@ -398,6 +398,7 @@ const columns = computed(() => {
           key: 'index',
           align: 'center',
           fixed: 'left',
+          minWidth: 80,
           render: (_: unknown, index: number) => getRowIndex(index),
         },
       ]
@@ -982,12 +983,12 @@ async function handleStatusChange(row: TableRow, value: boolean) {
 
 /**
  * 處理表單提交成功後的操作
- * 如果是新增使用者，則顯示帳號密碼提示框並將使用者加入列表
- * 如果是編輯使用者，則更新列表中對應使用者的資料
+ * - 如果是新增使用者，則顯示帳號密碼提示框並將使用者加入列表
+ *   如果是編輯使用者，則更新列表中對應使用者的資料
+ * - 不管新增還是編輯，只要「multilingualFields」存在，則都將「list.value」中的「multilingualFields」進行更新
  */
-async function tableModalSuccess(params: { modalType: ModalType, password?: string, parentId?: string } & TableRow) {
-  const { modalType, parentId, ...remain } = params
-
+async function tableModalSuccess(params: { modalType: ModalType, password?: string, parentId?: string, multilingualFields?: { [key: string]: MultilingualFieldsVO } } & TableRow) {
+  const { modalType, parentId, multilingualFields, ...remain } = params
   if (modalType === 'add') {
     // 定義根據 sort 值插入項目的函數
     const insertItemBySortValue = (item: TableRow) => {
@@ -1030,7 +1031,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
             }
 
             // 根據 sort 值找到合適的插入位置
-            const newItem: TableRow = { ...remain, parentId }
+            const newItem: TableRow = { ...remain, parentId, multilingualFields }
             const insertIndex = items[i].children.findIndex((child: TableRow) =>
               (Number(child.sort) || 0) > (Number(newItem.sort) || 0),
             )
@@ -1074,14 +1075,14 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
 
       // 如果沒有找到父項，則添加到最外層
       if (!parentFound) {
-        insertItemBySortValue(remain)
+        insertItemBySortValue({ ...remain, multilingualFields })
       }
     }
     else {
       // 沒有指定父項 直接添加
-      insertItemBySortValue(remain)
+      insertItemBySortValue({ ...remain, multilingualFields })
     }
-    emit('createSuccess', remain)
+    emit('createSuccess', { ...remain, multilingualFields })
   }
 
   if (modalType === 'edit') {
@@ -1090,7 +1091,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
       for (let i = 0; i < items.length; i++) {
         if (items[i].id === remain.id) {
           // 找到匹配項，進行更新
-          items[i] = { ...items[i], ...remain }
+          items[i] = { ...items[i], ...remain, multilingualFields }
           return true
         }
 
@@ -1106,7 +1107,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
     // 先在最外層尋找
     const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
     if (index > -1) {
-      list.value[index] = { ...list.value[index], ...remain }
+      list.value[index] = { ...list.value[index], ...remain, multilingualFields }
     }
     else {
       // 如果外層沒找到，則遞迴搜尋子項
@@ -1118,7 +1119,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
       await updateChildrenStatus(remain)
     }
 
-    emit('editSuccess', remain)
+    emit('editSuccess', { ...remain, multilingualFields })
   }
 }
 
