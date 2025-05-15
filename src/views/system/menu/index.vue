@@ -45,6 +45,7 @@ const columns: DataTableColumns<MenuVO> = [
     title: '菜單名稱',
     align: 'center',
     key: 'name',
+    multilingual: true,
   },
   {
     title: '菜單圖示',
@@ -112,6 +113,7 @@ const initFormData: InitFormData[] = [
     span: 2,
     label: '菜單名稱',
     type: 'input',
+    multilingual: true,
   },
   {
     name: 'path',

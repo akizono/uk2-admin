@@ -603,17 +603,6 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         }
       }
 
-      // 如果是多語言欄位，則添加多語言欄位
-      // 這裡的language、fieldId、value三個屬性需要和「MultilingualFields.vue - handleSubmit()」的params的屬性保持一致
-      if (item.multilingual) {
-        multilingualFields.value[item.name] = rowData.value?.multilingualFields[item.name]
-        // multilingualFields.value[item.name] = rowData.value?.multilingualFields[item.name].map((item: MultilingualFieldsVO) => ({
-        //   language: item.language,
-        //   fieldId: item.fieldId,
-        //   value: item.value,
-        // }))
-      }
-
       // 如果是 radio 類型且有 dictType
       if (item.type === 'radio' && item.dictType) {
         radioLoadingMap.value[item.name] = true
@@ -724,13 +713,18 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
     }
 
     // 回填多語言欄位
-    // for (const key in formDataMapping.value) {
-    //   const item = formDataMapping.value[key]
-    //   if (item.multilingual) {
-    //     console.log('item', item)
-    //     console.log()
-    //   }
-    // }
+    if (props.initFormData) {
+      props.initFormData.forEach(async (item: InitFormData) => {
+        if (item.multilingual) {
+          multilingualFields.value[item.name] = rowData.value?.multilingualFields?.[item.name]
+
+          // 找不到對應的多語言，則將formData.value的值也設置為空
+          if (!multilingualFields.value[item.name]) {
+            formData.value[item.name] = undefined
+          }
+        }
+      })
+    }
   }
 }
 
@@ -764,8 +758,8 @@ function closeModal() {
         action: true,
       }"
     >
-      <div>{{ formData }}</div>
-      <div>{{ multilingualFields }}</div>
+      <!-- <div>{{ formData }}</div> -->
+      <!-- <div>{{ multilingualFields }}</div> -->
       <template v-if="modalType === 'view'">
         <n-descriptions :column="2" bordered label-placement="left">
           <template v-for="(item, key) in formDataMapping" :key="key">
