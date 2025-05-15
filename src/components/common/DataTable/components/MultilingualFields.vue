@@ -1,6 +1,7 @@
 <script setup lang="tsx">
 import type { TableRow } from '../type'
 
+import { MultilingualFieldsApi } from '@/api/system/multilingual-fields'
 import { useBoolean } from '@/hooks'
 import { useLanguageStore } from '@/store/model/language'
 import { generateUUID } from '@/utils/tools/generateUUID'
@@ -20,7 +21,9 @@ defineExpose({
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
 // 控制提交的loading
-const { bool: submitLoading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
+const { bool: submitLoading, setTrue: startSubmitLoading, setFalse: endSubmitLoading } = useBoolean(false)
+// 控制表單的loading
+const { bool: formLoading, setTrue: startFormLoading, setFalse: endFormLoading } = useBoolean(false)
 
 // 表單數據
 const formRef = ref()
@@ -81,7 +84,7 @@ function resetFormData() {
 // 提交
 async function handleSubmit() {
   try {
-    startLoading()
+    startSubmitLoading()
     await formRef.value?.validate()
 
     // 格式化數據為後端介面需要的格式
@@ -111,12 +114,30 @@ async function handleSubmit() {
     })
 
     emit('submit', { field: columnData.value?.name, params })
-    endLoading()
+    endSubmitLoading()
     hiddenModal()
   }
   catch (errors) {
-    endLoading()
+    endSubmitLoading()
     console.error('表單驗證失敗：', errors)
+  }
+}
+
+// 自動生成其他語言
+async function handleConvertLanguage() {
+  try {
+    if (!formData.value[languageStore.current]) {
+      return window.$message.error(`請先填寫「${languageStore.currentName}」`)
+    }
+    startFormLoading()
+    const { data: result } = await MultilingualFieldsApi.convertLanguage({ text: formData.value[languageStore.current] })
+    for (const item of languageList.value) {
+      formData.value[item.value] = result[item.value]
+    }
+    window.$message.success('轉換成功')
+  }
+  finally {
+    endFormLoading()
   }
 }
 
@@ -136,7 +157,7 @@ async function openModal(type: ModalType, data: TableRow, /* _rowData?: TableRow
 
 // 關閉彈出視窗
 function closeModal() {
-  endLoading()
+  endSubmitLoading()
   hiddenModal()
 }
 </script>
@@ -155,18 +176,36 @@ function closeModal() {
       action: true,
     }"
   >
-    <div>formData: {{ formData }}</div>
-    <n-form ref="formRef" label-placement="left" :model="formData" :rules="formRules">
-      <n-grid :cols="2" :x-gap="18">
-        <template v-for="item in languageList" :key="item.code">
-          <n-grid-item>
-            <n-form-item :label="item.label" :path="item.value">
-              <n-input v-model:value="formData[item.value]" />
-            </n-form-item>
-          </n-grid-item>
+    <!-- <div>formData: {{ formData }}</div> -->
+    <n-flex vertical :size="24">
+      <n-button
+        dashed
+        type="primary"
+        size="small"
+        class="mb-4"
+        @click="handleConvertLanguage"
+      >
+        <template #icon>
+          <icon-park-outline-magic-wand />
         </template>
-      </n-grid>
-    </n-form>
+        根據「{{ languageStore.currentName }}」自動生成其他語言
+      </n-button>
+    </n-flex>
+
+    <n-spin :show="formLoading">
+      <n-form ref="formRef" label-placement="left" :model="formData" :rules="formRules">
+        <n-grid :cols="2" :x-gap="18">
+          <template v-for="item in languageList" :key="item.code">
+            <n-grid-item>
+              <n-form-item :label="item.label" :path="item.value">
+                <n-input v-model:value="formData[item.value]" />
+              </n-form-item>
+            </n-grid-item>
+          </template>
+        </n-grid>
+      </n-form>
+    </n-spin>
+
     <template #action>
       <n-space justify="center">
         <n-button type="primary" :loading="submitLoading" @click="handleSubmit">

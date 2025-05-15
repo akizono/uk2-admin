@@ -14,6 +14,17 @@ export const useLanguageStore = defineStore('language-store', {
       list: [] as App.SelectOption[], // 語言列表
     }
   },
+  getters: {
+    // 當前語言名稱
+    currentName: (state) => {
+      return state.list.find(item => item.value === state.current)?.label || ''
+    },
+
+    // 語言code 的列表
+    languageCodeList: (state) => {
+      return state.list.map(item => item.value)
+    },
+  },
   actions: {
     /** 設置語言 */
     setAppLang(lang: string) {
@@ -22,7 +33,7 @@ export const useLanguageStore = defineStore('language-store', {
       this.current = lang
     },
 
-    /** 初始化語言設置 */
+    /** 初始化語言設定 */
     initLanguage() {
       const current = local.get('languageCurrent') || VITE_DEFAULT_LANG
       this.setAppLang(current)

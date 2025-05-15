@@ -1,6 +1,9 @@
 import type { BaseVO } from '@/typings/base'
 
+import { useLanguageStore } from '@/store/model/language'
 import request from '@/utils/request'
+
+const languageStore = useLanguageStore()
 
 export interface MultilingualFieldsVO extends BaseVO {
   id: string
@@ -50,5 +53,11 @@ export const MultilingualFieldsApi = {
   /** 解封多語言欄位 */
   unblockMultilingualFields: async (id: string) => {
     return await request.put({ url: `/system/multilingual-fields/unblock/${id}` })
+  },
+
+  /** 將「字串」轉換為其他語言 */
+  convertLanguage: async (data: { text: string }) => {
+    const targetLanguages = languageStore.languageCodeList
+    return await request.post({ url: '/system/multilingual-fields/ai/convert-language', data: { ...data, targetLanguages } })
   },
 }
