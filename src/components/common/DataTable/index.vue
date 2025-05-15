@@ -6,6 +6,7 @@ import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
+import CopyText from '@/components/custom/CopyText.vue'
 import { useBoolean, useThrottleAction } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'
 import { useDictStore, useLanguageStore } from '@/store'
@@ -430,6 +431,18 @@ const columns = computed(() => {
         ...newColumn,
         render: (row: TableRow) => {
           return row.icon && createIcon(row.icon, { size: 20 })
+        },
+      }
+    }
+
+    // 處理可複製的欄位
+    if ('key' in newColumn && newColumn.copy) {
+      return {
+        ...newColumn,
+        render: (row: TableRow) => {
+          return h(CopyText, {
+            value: row[newColumn.key],
+          })
         },
       }
     }

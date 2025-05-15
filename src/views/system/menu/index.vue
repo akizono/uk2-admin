@@ -46,6 +46,7 @@ const columns: DataTableColumns<MenuVO> = [
     align: 'center',
     key: 'name',
     multilingual: true,
+    copy: true,
   },
   {
     title: '菜單圖示',
@@ -66,6 +67,7 @@ const columns: DataTableColumns<MenuVO> = [
     title: '路由權限',
     align: 'center',
     key: 'permission',
+    copy: true,
   },
   {
     title: '菜單類型',
