@@ -125,6 +125,13 @@ async function setOptionsWithNextTick(
     list.sort((a, b) => (a.sort || 0) - (b.sort || 0))
   }
 
+  // 如果list的某些數據存在「multilingualFields」屬性，則將該條數據的「labelKey」屬性值進行替換
+  list.forEach((item) => {
+    if (item.multilingualFields) {
+      item[labelKey] = item.multilingualFields[labelKey].find((field: MultilingualFieldsVO) => field.language === languageStore.current)?.value
+    }
+  })
+
   if (hasParentId) {
     // 先建立所有節點
     const nodeMap = new Map<string | number, TreeNode>()
