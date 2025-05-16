@@ -1,4 +1,5 @@
 import { LanguageApi } from '@/api/system/language'
+import { router } from '@/router'
 import { local, session, setLocale } from '@/utils'
 
 const { VITE_DEFAULT_LANG } = import.meta.env
@@ -47,11 +48,31 @@ export const useLanguageStore = defineStore('language-store', {
         status: 1,
       })
 
-      this.list = result.list.map(item => ({
-        value: item.code,
-        label: item.name,
-      }))
-      session.set('languageList', this.list)
+      // 檢查列表中是否包含系統預設語言
+      const isDefaultLang = result.list.find(item => item.code === VITE_DEFAULT_LANG)
+      if (!isDefaultLang) {
+        local.remove('languageCurrent')
+
+        // 路由跳轉到404頁面
+        const tipText = `
+          <div>語言列表介面缺失系統預設語言，您有兩個處理方法</div>
+          <div>1、修改「 .env -> VITE_DEFAULT_LANG 」</div>
+          <div>2、調整語言列表介面，將系統預設語言添加到列表中</div>
+        `
+        router.push({
+          path: '/error',
+          query: {
+            tipText: encodeURIComponent(tipText),
+          },
+        })
+      }
+      else {
+        this.list = result.list.map(item => ({
+          value: item.code,
+          label: item.name,
+        }))
+        session.set('languageList', this.list)
+      }
     },
   },
 })

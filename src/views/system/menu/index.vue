@@ -317,6 +317,7 @@ const options = {
   modalWidth: '1000px',
   modalName: '菜單', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
+  multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
 }
 </script>
 
