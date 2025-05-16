@@ -42,7 +42,7 @@ export const useRouteStore = defineStore('route-store', {
     async initRouteInfo() {
       const { data } = await MenuApi.getMenuPage({
         pageSize: 0,
-        // @ts-expect-error 忽略狀態不為1的菜單
+        // @ts-expect-error 忽略狀態不為1的選單
         status: 1,
       })
 
@@ -62,7 +62,7 @@ export const useRouteStore = defineStore('route-store', {
           }
         }
 
-        // 只保留type為0或1的菜單(目錄和頁面)
+        // 只保留type為0或1的選單(目錄和頁面)
         if (item.type === 0 || item.type === 1) {
           newRowRoutes.push(item)
         }

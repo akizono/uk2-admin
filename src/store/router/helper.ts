@@ -137,18 +137,18 @@ function setRedirect(routes: AppRoute.Route[]) {
   })
 }
 
-/* 生成側邊菜單的數據 */
+/* 生成側邊選單的數據 */
 export function createMenus(userRoutes: AppRoute.RowRoute[]) {
   const resultMenus = standardizedRoutes(userRoutes)
 
   // 過濾不需要顯示的選單
   const visibleMenus = resultMenus.filter(route => !route.meta.hide)
 
-  // 生成側邊菜單
+  // 生成側邊選單
   return arrayToTree(transformAuthRoutesToMenus(visibleMenus))
 }
 
-// 將返回的路由表渲染為側邊菜單
+// 將返回的路由表渲染為側邊選單
 function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
   const { hasPermission } = usePermission()
   return userRoutes

@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-// TODO：隱藏顯示左側菜單、適配彈出視窗
+// TODO：隱藏顯示左側選單、適配彈出視窗
 import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'

@@ -8,7 +8,7 @@ import DataTable from '@/components/common/DataTable/index.vue'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
-  name: '菜單設置',
+  name: '選單設置',
 })
 
 const dataTableRef = ref()
@@ -42,7 +42,7 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<MenuVO> = [
   {
-    title: '菜單名稱',
+    title: '選單名稱',
     align: 'left',
     key: 'name',
     multilingual: true,
@@ -50,7 +50,7 @@ const columns: DataTableColumns<MenuVO> = [
     fixed: 'left',
   },
   {
-    title: '菜單圖示',
+    title: '選單圖示',
     align: 'center',
     key: 'icon',
   },
@@ -66,7 +66,7 @@ const columns: DataTableColumns<MenuVO> = [
     copy: true,
   },
   {
-    title: '菜單類型',
+    title: '選單類型',
     align: 'center',
     key: 'type',
 
@@ -97,7 +97,7 @@ const initFormData: InitFormData[] = [
     name: 'parentId',
     value: undefined,
     span: 2,
-    label: '父級菜單',
+    label: '父級選單',
     type: 'select',
     selectOptions: {
       api: MenuApi.getMenuPage,
@@ -109,7 +109,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 2,
-    label: '菜單名稱',
+    label: '選單名稱',
     type: 'input',
     multilingual: true,
   },
@@ -159,15 +159,17 @@ const initFormData: InitFormData[] = [
     name: 'type',
     value: 0,
     span: 1,
-    label: '菜單類型',
+    label: '選單類型',
     type: 'radio',
     dictType: 'system_menu_type',
+    disableEditInput: true,
+    disableUpdate: true,
   },
   {
     name: 'icon',
     value: undefined,
     span: 1,
-    label: '菜單圖示',
+    label: '選單圖示',
     type: 'icon-select',
     showCondition: {
       field: 'type',
@@ -226,9 +228,9 @@ const initFormData: InitFormData[] = [
   },
   {
     name: 'isShowSide',
-    value: undefined,
+    value: 1,
     span: 1,
-    label: '顯示與側邊欄',
+    label: '顯示與側邊目錄',
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -264,12 +266,18 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   name: {
     required: true,
-    message: '請填寫菜單名稱',
+    message: '請填寫選單名稱',
     trigger: ['blur', 'input'],
   },
   type: {
     required: true,
-    message: '請選擇菜單類型',
+    message: '請選擇選單類型',
+    trigger: ['blur', 'input'],
+    type: 'number',
+  },
+  sort: {
+    required: true,
+    message: '請填寫排序',
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -303,10 +311,11 @@ const options = {
   /** 表單配置 */
   initFormData, // 初始化表單數據
   rules, // 表單驗證規則
+  modalFormLabelWidth: '120px', // 表單的 label 寬度
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '菜單', // 表格中的數據名稱
+  modalName: '選單', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
 }
