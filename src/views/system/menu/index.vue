@@ -43,10 +43,11 @@ const initQueryParams: InitQueryParams[] = [
 const columns: DataTableColumns<MenuVO> = [
   {
     title: '菜單名稱',
-    align: 'center',
+    align: 'left',
     key: 'name',
     multilingual: true,
     copy: true,
+    fixed: 'left',
   },
   {
     title: '菜單圖示',
@@ -55,17 +56,12 @@ const columns: DataTableColumns<MenuVO> = [
   },
   {
     title: '路由路徑',
-    align: 'center',
+    align: 'left',
     key: 'path',
   },
   {
-    title: '路由元件',
-    align: 'center',
-    key: 'component',
-  },
-  {
     title: '路由權限',
-    align: 'center',
+    align: 'left',
     key: 'permission',
     copy: true,
   },
@@ -271,11 +267,6 @@ const rules: FormRules = {
     message: '請填寫菜單名稱',
     trigger: ['blur', 'input'],
   },
-  permission: {
-    required: true,
-    message: '請填寫路由權限',
-    trigger: ['blur', 'input'],
-  },
   type: {
     required: true,
     message: '請選擇菜單類型',
@@ -293,7 +284,7 @@ const options = {
   del: true, // 是否顯示「刪除按鈕」
   search: true, // 是否顯示「頂部搜索框」
   add: true, // 是否顯示「新增按鈕」
-  index: true, // 是否顯示「索引」
+  index: false, // 是否顯示「索引」
   pagination: false, // 是否開啟分頁
   drag: true, // 是否開啟拖拽
 

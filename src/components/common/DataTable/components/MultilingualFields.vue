@@ -68,7 +68,7 @@ const formRules = computed(() => {
 // 重設表單數據
 function resetFormData() {
   formData.value = {}
-  if (modalType.value !== 'add') {
+  if (modalType.value !== 'view') {
     // 回填表單數據
     if (multilingualFields.value) {
       const multilingualField = multilingualFields.value[columnData.value?.name]

@@ -825,7 +825,7 @@ function closeModal() {
                 <template v-else-if="item.type === 'select'">
                   <!-- 如果數據中包含 children，使用樹狀選擇器 -->
                   <n-tree-select
-                    v-if="selectOptionsMap[item.name]?.[0]?.children"
+                    v-if="selectOptionsMap[item.name]?.some(option => option.children)"
                     v-model:value="formData[item.name]"
                     :options="selectOptionsMap[item.name]"
                     :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')"
