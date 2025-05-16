@@ -11,18 +11,18 @@ const { VITE_DEFAULT_LANG } = import.meta.env
 
 export const i18n = createI18n({
   legacy: false,
-  locale: local.get('languageCurrent') || VITE_DEFAULT_LANG, // 默认显示语言
+  locale: local.get('languageCurrent') || VITE_DEFAULT_LANG, // 默認顯示語言
   fallbackLocale: VITE_DEFAULT_LANG,
   messages: {
     zhCN,
     enUS,
     zhTW,
   },
-  // 缺失国际化键警告
-  // missingWarn: false,
+  // 缺失國際化鍵警告
+  missingWarn: true,
 
-  // 缺失回退内容警告
-  fallbackWarn: false,
+  // 缺失回退內容警告
+  fallbackWarn: true,
 })
 
 export function install(app: App) {

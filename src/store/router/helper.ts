@@ -94,20 +94,20 @@ export function createRoutes(routes: AppRoute.RowRoute[]) {
   return appRootRoute
 }
 
-// Generate an array of route names that need to be kept alive
+// 生成需要保持活躍的路由名稱列表
 export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
   const cacheRoutes = routes
     .filter((item: any) => {
       return item.isCache === 1
     })
     .map((item: any) => {
-      // 調試輸出
-      console.log('緩存路由:', item.name, item)
+      // 除錯輸出
+      console.log('快取路由:', item.name, item)
       return item.name
     })
 
-  // 輸出最終緩存的路由名稱列表
-  console.log('最終緩存路由列表:', cacheRoutes)
+  // 輸出最終快取的路由名稱列表
+  console.log('最終快取路由列表:', cacheRoutes)
   return cacheRoutes
 }
 
@@ -115,13 +115,13 @@ function setRedirect(routes: AppRoute.Route[]) {
   routes.forEach((route) => {
     if (route.children) {
       if (!route.redirect) {
-        // Filter out a collection of child elements that are not hidden
+        // 過濾掉不需要顯示的子元素
         const visibleChilds = route.children.filter(child => !child.meta.hide)
 
-        // Redirect page to the path of the first child element by default
+        // 默認重定向到第一個子元素的路徑
         let target = visibleChilds[0]
 
-        // Filter out pages with the order attribute
+        // 過濾掉沒有 order 屬性的子元素
         const orderChilds = visibleChilds.filter(child => child.meta.order)
 
         if (orderChilds.length > 0)
@@ -140,14 +140,14 @@ function setRedirect(routes: AppRoute.Route[]) {
 export function createMenus(userRoutes: AppRoute.RowRoute[]) {
   const resultMenus = standardizedRoutes(userRoutes)
 
-  // filter menus that do not need to be displayed
+  // 過濾不需要顯示的選單
   const visibleMenus = resultMenus.filter(route => !route.meta.hide)
 
-  // generate side menu
+  // 生成側邊菜單
   return arrayToTree(transformAuthRoutesToMenus(visibleMenus))
 }
 
-// render the returned routing table as a sidebar
+// 將返回的路由表渲染為側邊菜單
 function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
   const { hasPermission } = usePermission()
   return userRoutes

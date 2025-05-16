@@ -23,8 +23,6 @@ interface ImportMetaEnv {
     | 'deflateRaw'
   /** 路由模式 */
   readonly VITE_ROUTE_MODE?: 'hash' | 'web'
-  /** 路由載入模式 */
-  readonly VITE_ROUTE_LOAD_MODE: 'static' | 'dynamic'
   /** 首次載入頁面 */
   readonly VITE_HOME_PATH: string
   /** 版權資訊 */
