@@ -496,11 +496,16 @@ async function edit() {
     itemArray.forEach(async (item: MultilingualFieldsVO) => {
       if (item.ifNewLanguage) {
         delete item.ifNewLanguage
+        delete item.isUpdated
         addItemArray.push(item)
       }
       else {
-        delete item.ifNewLanguage
-        updateItemArray.push(item)
+        // 只將有更改的欄位加入更新列表
+        if (item.isUpdated) {
+          delete item.ifNewLanguage
+          delete item.isUpdated
+          updateItemArray.push(item)
+        }
       }
     })
 

@@ -12,6 +12,7 @@ export interface MultilingualFieldsVO extends BaseVO {
   value: number
 
   ifNewLanguage?: boolean
+  isUpdated?: boolean
 }
 
 export const MultilingualFieldsApi = {

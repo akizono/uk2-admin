@@ -103,6 +103,9 @@ async function handleSubmit() {
         if (mf && mf.length) {
           const mfItem = mf.find((item: any) => item.language === key)
 
+          // 判斷值是否有更新
+          const isUpdated = !mfItem || mfItem.value !== value
+
           return {
             language: key,
             fieldId: mf[0].fieldId,
@@ -110,7 +113,7 @@ async function handleSubmit() {
 
             ifNewLanguage: !mfItem, // 是否為新增語言
             id: mfItem?.id || undefined,
-            // remark: mfItem?.remark || undefined,
+            isUpdated, // 標記此欄位是否有變更
           }
         }
 
@@ -123,6 +126,7 @@ async function handleSubmit() {
 
             ifNewLanguage: true, // 因為是新增語言，所以ifNewLanguage始終為true
             id: undefined, // 新增語言還未儲存到資料庫，所以現在id為undefined
+            isUpdated: true, // 新語言一定是更新的
           }
         }
       }
