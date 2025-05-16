@@ -23,7 +23,7 @@ export const LanguageApi = {
 
   /** 修改語言 */
   updateLanguage: async (data: LanguageVO) => {
-    return await request.put({ url: '/system/language/update', data })
+    return await request.put({ url: '/system/language/update', data, isFilterEmpty: false })
   },
 
   /** 刪除語言 */

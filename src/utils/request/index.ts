@@ -1,18 +1,33 @@
-import { filterObjEmptyValues } from '../tools/object'
+import { convertUndefinedToNull, filterObjEmptyValues as filterEmpty } from '../tools/object'
 import { config } from './config'
 import { service } from './service'
 
 const { defaultHeaders } = config
 
 function request(option: any) {
-  if (option.params)
-    option.params = filterObjEmptyValues(option.params)
+  // 默認將物件中所有的空值移除
+  const isFilterEmpty = option.isFilterEmpty === undefined ? true : option.isFilterEmpty
+  console.log('isFilterEmpty', isFilterEmpty)
+  if (isFilterEmpty) {
+    if (option.params)
+      option.params = filterEmpty(option.params)
 
-  if (option.data) {
-    // 如果 data 是陣列，直接使用，不進行 filterObjEmptyValues
-    option.data = Array.isArray(option.data)
-      ? option.data
-      : filterObjEmptyValues(option.data)
+    if (option.data) {
+      // 如果 data 是陣列，直接使用，不進行 filterEmpty
+      option.data = Array.isArray(option.data)
+        ? option.data
+        : filterEmpty(option.data)
+    }
+  }
+
+  // 將所有 undefined 值轉換為 null
+  else {
+    if (option.params)
+      option.params = convertUndefinedToNull(option.params)
+
+    if (option.data) {
+      option.data = convertUndefinedToNull(option.data)
+    }
   }
 
   const { headersType, headers, ...otherOption } = option

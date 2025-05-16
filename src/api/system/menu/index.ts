@@ -32,7 +32,7 @@ export const MenuApi = {
 
   /** 修改菜單 */
   updateMenu: async (data: MenuVO) => {
-    return await request.put({ url: '/system/menu/update', data })
+    return await request.put({ url: '/system/menu/update', data, isFilterEmpty: false })
   },
 
   /** 刪除菜單 */

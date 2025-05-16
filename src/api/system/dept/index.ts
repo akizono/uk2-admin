@@ -25,7 +25,7 @@ export const DeptApi = {
 
   /** 修改部門 */
   updateDept: async (data: DeptVO) => {
-    return await request.put({ url: '/system/dept/update', data })
+    return await request.put({ url: '/system/dept/update', data, isFilterEmpty: false })
   },
 
   /** 刪除部門 */

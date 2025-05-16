@@ -24,7 +24,7 @@ export const DictDataApi = {
 
   /** 修改字典數據 */
   updateDictData: async (data: DictDataVO) => {
-    return await request.put({ url: '/system/dict-data/update', data })
+    return await request.put({ url: '/system/dict-data/update', data, isFilterEmpty: false })
   },
 
   /** 刪除字典數據 */

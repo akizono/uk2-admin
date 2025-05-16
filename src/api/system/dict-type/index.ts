@@ -22,7 +22,7 @@ export const DictTypeApi = {
 
   /** 修改字典類型 */
   updateDictType: async (data: DictTypeVO) => {
-    return await request.put({ url: '/system/dict-type/update', data })
+    return await request.put({ url: '/system/dict-type/update', data, isFilterEmpty: false })
   },
 
   /** 刪除字典類型 */

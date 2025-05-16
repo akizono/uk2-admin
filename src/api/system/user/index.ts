@@ -34,7 +34,7 @@ export const UserApi = {
 
   /** 修改使用者個人資訊 */
   updateUser: async (data: UserVo) => {
-    return await request.put({ url: '/system/user/update', data })
+    return await request.put({ url: '/system/user/update', data, isFilterEmpty: false })
   },
 
   /** 刪除使用者 */

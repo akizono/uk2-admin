@@ -503,8 +503,13 @@ async function edit() {
         updateItemArray.push(item)
       }
     })
-    await MultilingualFieldsApi.createMultilingualFieldsBatch(addItemArray)
-    await MultilingualFieldsApi.updateMultilingualFieldsBatch(updateItemArray)
+
+    if (addItemArray.length > 0) {
+      await MultilingualFieldsApi.createMultilingualFieldsBatch(addItemArray)
+    }
+    if (updateItemArray.length > 0) {
+      await MultilingualFieldsApi.updateMultilingualFieldsBatch(updateItemArray)
+    }
 
     // 將 processedData 中的多語言欄位還原為「當前選擇語言」的值，用於 DataTable 中表格的回顯
     processedData[key] = itemArray.find((item: MultilingualFieldsVO) => item.language === languageStore.current)?.value
@@ -807,10 +812,10 @@ function closeModal() {
                   {{ item.inputPrefix }}
                 </n-input-group-label>
 
-                <n-input v-if="item.type === 'input' && item.multilingual" v-model:value="formData[item.name]" readonly class="multilingual-input" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" @click="showMultilingualModal(item)" />
-                <n-input v-else-if="item.type === 'input' && !item.multilingual" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
-                <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
-                <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" />
+                <n-input v-if="item.type === 'input' && item.multilingual" v-model:value="formData[item.name]" readonly class="multilingual-input" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable @click="showMultilingualModal(item)" />
+                <n-input v-else-if="item.type === 'input' && !item.multilingual" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable />
+                <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable />
+                <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable />
                 <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
                 <template v-else-if="item.type === 'select'">
                   <!-- 如果數據中包含 children，使用樹狀選擇器 -->
@@ -828,6 +833,7 @@ function closeModal() {
                     key-field="key"
                     label-field="label"
                     children-field="children"
+                    clearable
                     @search="(query: string) => handleSearch(query, item)"
                   />
                   <!-- 否則使用普通選擇器 -->
@@ -842,6 +848,7 @@ function closeModal() {
                     :clear-filter-after-select="false"
                     :placeholder="item.placeholder"
                     :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                    clearable
                     @search="(query: string) => handleSearch(query, item)"
                   />
                 </template>
