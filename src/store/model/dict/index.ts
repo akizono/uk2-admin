@@ -119,8 +119,6 @@ export const useDictStore = defineStore('dict-store', {
           }
         }
 
-        console.log(result.list)
-
         Reflect.set(this.dictMap, type, result.list)
         // 同步至session
         session.set('dict', this.dictMap)

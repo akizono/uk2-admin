@@ -45,11 +45,11 @@ export const useRouteStore = defineStore('route-store', {
         // @ts-expect-error 忽略狀態不為1的菜單
         status: 1,
       })
-      console.log('data.list', data.list)
-      const rowRoutes = data.list
-      const languageCurrent = local.get('languageCurrent') || VITE_DEFAULT_LANG
 
+      const newRowRoutes: AppRoute.RowRoute[] = []
+      const languageCurrent = local.get('languageCurrent') || VITE_DEFAULT_LANG
       data.list.forEach((item) => {
+        // 處理多語言
         if (item.multilingualFields) {
           for (const field in item.multilingualFields) {
             if (item.multilingualFields[field] && item.multilingualFields[field].length > 0) {
@@ -61,10 +61,15 @@ export const useRouteStore = defineStore('route-store', {
             }
           }
         }
+
+        // 只保留type為0或1的菜單(目錄和頁面)
+        if (item.type === 0 || item.type === 1) {
+          newRowRoutes.push(item)
+        }
       })
 
-      this.rowRoutes = rowRoutes
-      return rowRoutes
+      this.rowRoutes = newRowRoutes
+      return newRowRoutes
 
       // if (import.meta.env.VITE_ROUTE_LOAD_MODE === 'dynamic') {
       //   const userInfo = local.get('userInfo')

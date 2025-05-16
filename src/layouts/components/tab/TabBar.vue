@@ -118,7 +118,8 @@ function onClickoutside() {
         @click="router.push(item.fullPath)"
       >
         <div class="flex-x-center gap-2">
-          <nova-icon :icon="item.meta.icon" /> {{ $t(`route.${String(item.name)}`, item.meta.title) }}
+          <!-- <nova-icon :icon="item.meta.icon" /> {{ $t(`route.${String(item.name)}`, item.meta.title) }} -->
+          <nova-icon :icon="item.meta.icon" /> {{ item.meta.title }}
         </div>
       </n-tab>
       <n-tab
@@ -130,7 +131,8 @@ function onClickoutside() {
         @contextmenu="handleContextMenu($event, item)"
       >
         <div class="flex-x-center gap-2">
-          <nova-icon :icon="item.meta.icon" /> {{ $t(`route.${String(item.name)}`, item.meta.title) }}
+          <!-- <nova-icon :icon="item.meta.icon" /> {{ $t(`route.${String(item.name)}`, item.meta.title) }} -->
+          <nova-icon :icon="item.meta.icon" /> {{ item.meta.title }}
         </div>
       </n-tab>
       <template #suffix>

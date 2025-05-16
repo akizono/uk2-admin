@@ -111,6 +111,7 @@ export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
   return cacheRoutes
 }
 
+// 設置重定向
 function setRedirect(routes: AppRoute.Route[]) {
   routes.forEach((route) => {
     if (route.children) {
