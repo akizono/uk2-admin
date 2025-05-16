@@ -1105,32 +1105,229 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
   }
 
   if (modalType === 'edit') {
-    /** 遞迴更新資料表項目 */
-    const updateRecursively = (items: TableRow[]): boolean => {
+    // 檢查是否需要重新定位項目（如果 parentId 有變化或者變為 null/undefined）
+    let needReposition = false
+
+    // 遞迴尋找項目的當前 parentId
+    const findCurrentParentId = (items: TableRow[]): string | null | undefined => {
       for (let i = 0; i < items.length; i++) {
         if (items[i].id === remain.id) {
-          // 找到匹配項，進行更新
-          items[i] = { ...items[i], ...remain, multilingualFields }
-          return true
+          return items[i].parentId
         }
 
-        // 如果當前項有子項，則遞迴搜尋
         if (items[i].children && items[i].children.length > 0) {
-          const found = updateRecursively(items[i].children)
-          if (found)
-            return true
+          const result = findCurrentParentId(items[i].children)
+          if (result !== null && result !== undefined) {
+            return result
+          }
         }
       }
-      return false
+      return null
     }
-    // 先在最外層尋找
-    const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
-    if (index > -1) {
-      list.value[index] = { ...list.value[index], ...remain, multilingualFields }
+
+    // 先檢查項目是否在列表的最外層
+    const isInRootLevel = list.value.some(item => item.id === remain.id)
+    let currentParentId: string | null | undefined = null
+
+    if (!isInRootLevel) {
+      // 如果不在最外層，獲取當前的 parentId
+      currentParentId = findCurrentParentId(list.value)
+    }
+
+    // 如果 parentId 與當前項的 parentId 不同，或者 parentId 變為 null/undefined，需要重新定位
+    if (currentParentId !== parentId) {
+      needReposition = true
+    }
+
+    if (needReposition) {
+      // 先找到並移除當前項
+      let removedItem: TableRow | null = null
+      let removed = false
+
+      // 遞迴尋找並移除項目的函數
+      const findAndRemoveRecursively = (items: TableRow[]): boolean => {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].id === remain.id) {
+            // 找到匹配項，保存它並從當前位置移除
+            removedItem = { ...items[i], ...remain, multilingualFields }
+            if (parentId) {
+              removedItem.parentId = parentId
+            }
+            else {
+              // 如果 parentId 為 null 或 undefined，確保從對象中移除
+              delete removedItem.parentId
+            }
+            items.splice(i, 1)
+            return true
+          }
+
+          // 如果當前項有子項，則遞迴搜尋
+          if (items[i].children && items[i].children.length > 0) {
+            const found = findAndRemoveRecursively(items[i].children)
+            if (found) {
+              // 如果子項列表為空，清理它
+              if (items[i].children.length === 0) {
+                items[i].children = undefined
+              }
+              return true
+            }
+          }
+        }
+        return false
+      }
+
+      // 從最外層尋找並移除
+      const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
+      if (index > -1) {
+        removedItem = { ...list.value[index], ...remain, multilingualFields }
+        if (parentId) {
+          removedItem.parentId = parentId
+        }
+        else {
+          // 如果 parentId 為 null 或 undefined，確保從對象中移除
+          delete removedItem.parentId
+        }
+        list.value.splice(index, 1)
+        removed = true
+      }
+      else {
+        // 如果外層沒找到，則遞迴搜尋子項
+        removed = findAndRemoveRecursively(list.value)
+      }
+
+      // 如果成功移除了項目，則根據 parentId 放置到正確位置
+      if (removed && removedItem) {
+        if (parentId) {
+          // 如果有指定新的父項，添加到新的父項下
+          // 定義遞迴尋找父項的路徑
+          const findParentPath = (items: TableRow[], path: string[] = []): string[] | null => {
+            for (let i = 0; i < items.length; i++) {
+              if (items[i].id === parentId) {
+                // 找到父項，返回路徑（包含父項自身的ID）
+                return [...path, items[i].id]
+              }
+
+              // 如果當前項有子項，則遞迴搜尋
+              if (items[i].children && items[i].children.length > 0) {
+                const result = findParentPath(items[i].children, [...path, items[i].id])
+                if (result)
+                  return result
+              }
+            }
+            return null
+          }
+
+          // 定義遞迴尋找父項並添加子項的函數
+          const addToParentRecursively = (items: TableRow[]): boolean => {
+            for (let i = 0; i < items.length; i++) {
+              if (items[i].id === parentId) {
+                // 找到父項，添加到其 children 中
+                if (!items[i].children) {
+                  items[i].children = []
+                }
+
+                // 根據 sort 值找到合適的插入位置
+                const insertIndex = items[i].children.findIndex((child: TableRow) =>
+                  (Number(child.sort) || 0) > (Number(removedItem!.sort) || 0),
+                )
+
+                if (insertIndex === -1) {
+                  // 如果沒有找到更大的 sort 值，則添加到末尾
+                  items[i].children.push(removedItem!)
+                }
+                else {
+                  // 在找到的位置插入
+                  items[i].children.splice(insertIndex, 0, removedItem!)
+                }
+                return true
+              }
+
+              // 如果當前項有子項，則遞迴搜尋
+              if (items[i].children && items[i].children.length > 0) {
+                const found = addToParentRecursively(items[i].children)
+                if (found)
+                  return true
+              }
+            }
+            return false
+          }
+
+          // 尋找父項的路徑，用於自動展開
+          const parentPath = findParentPath(list.value)
+
+          // 嘗試在樹中尋找父項
+          const parentFound = addToParentRecursively(list.value)
+
+          // 如果找到了父項路徑，則自動展開
+          if (parentPath) {
+            // 將路徑上的所有節點ID添加到 expandedRowKeys
+            parentPath.forEach((id) => {
+              if (!expandedRowKeys.value.includes(id)) {
+                expandedRowKeys.value.push(id)
+              }
+            })
+          }
+
+          // 如果沒有找到父項，則添加到最外層
+          if (!parentFound) {
+            // 定義根據 sort 值插入項目的函數
+            const insertItemBySortValue = (item: TableRow) => {
+              const insertIndex = list.value.findIndex(existingItem => (existingItem.sort ?? Infinity) > (item.sort ?? Infinity))
+              if (insertIndex === -1) {
+                list.value.push(item)
+              }
+              else {
+                list.value.splice(insertIndex, 0, item)
+              }
+            }
+
+            insertItemBySortValue(removedItem)
+          }
+        }
+        else {
+          // 如果沒有指定父項（parentId 為 null 或 undefined），則添加到最外層
+          const insertItemBySortValue = (item: TableRow) => {
+            const insertIndex = list.value.findIndex(existingItem => (existingItem.sort ?? Infinity) > (item.sort ?? Infinity))
+            if (insertIndex === -1) {
+              list.value.push(item)
+            }
+            else {
+              list.value.splice(insertIndex, 0, item)
+            }
+          }
+
+          insertItemBySortValue(removedItem)
+        }
+      }
     }
     else {
-      // 如果外層沒找到，則遞迴搜尋子項
-      updateRecursively(list.value)
+      /** 遞迴更新資料表項目 */
+      const updateRecursively = (items: TableRow[]): boolean => {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].id === remain.id) {
+            // 找到匹配項，進行更新
+            items[i] = { ...items[i], ...remain, multilingualFields }
+            return true
+          }
+
+          // 如果當前項有子項，則遞迴搜尋
+          if (items[i].children && items[i].children.length > 0) {
+            const found = updateRecursively(items[i].children)
+            if (found)
+              return true
+          }
+        }
+        return false
+      }
+      // 先在最外層尋找
+      const index = list.value.findIndex((item: TableRow) => item.id === remain.id)
+      if (index > -1) {
+        list.value[index] = { ...list.value[index], ...remain, multilingualFields }
+      }
+      else {
+        // 如果外層沒找到，則遞迴搜尋子項
+        updateRecursively(list.value)
+      }
     }
 
     /** status 是0的話同時 block 子項 */
@@ -1138,7 +1335,7 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
       await updateChildrenStatus(remain)
     }
 
-    emit('editSuccess', { ...remain, multilingualFields })
+    emit('editSuccess', { ...remain, parentId, multilingualFields })
   }
 }
 
