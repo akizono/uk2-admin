@@ -725,9 +725,16 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         if (item.multilingual) {
           multilingualFields.value[item.name] = rowData.value?.multilingualFields?.[item.name]
 
-          // 找不到對應的多語言，則將formData.value的值也設置為空
-          if (!multilingualFields.value[item.name]) {
-            formData.value[item.name] = undefined
+          // 找不到對應的多語言，
+          if (!multilingualFields.value[item.name] || !multilingualFields.value[item.name].length) {
+            // 使用原本的值
+            if (data[item.name]) {
+              formData.value[item.name] = data[item.name]
+            }
+            // 則將formData.value的值也設置為空
+            else {
+              formData.value[item.name] = undefined
+            }
           }
         }
       })

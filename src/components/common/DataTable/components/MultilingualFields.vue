@@ -100,7 +100,7 @@ async function handleSubmit() {
       else {
         const mf = multilingualFields.value[columnData.value?.name]
         // 通常情況下，我們正在操作multilingualFields.value中的某個欄位，如果這個欄位一直以來都是「多語言欄位」，那麼mf就能正常獲取
-        if (mf) {
+        if (mf && mf.length) {
           const mfItem = mf.find((item: any) => item.language === key)
 
           return {

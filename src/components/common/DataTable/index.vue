@@ -12,7 +12,8 @@ import { useTableDrag } from '@/hooks/useTableDrag'
 import { useDictStore, useLanguageStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { createIcon } from '@/utils/icon'
-import { NButton, NPopconfirm, NSpace } from 'naive-ui'
+import { NButton, NPopconfirm, NPopover, NSpace, useThemeVars } from 'naive-ui'
+import IconAttention from '~icons/icon-park-outline/attention'
 
 import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
@@ -441,6 +442,21 @@ const columns = computed(() => {
       return {
         ...newColumn,
         render: (row: TableRow) => {
+          const themeVars = useThemeVars()
+          if (newColumn.multilingual && !(row.multilingualFields?.[newColumn.key].length)) {
+            return h('div', [
+              h(CopyText, {
+                value: row[newColumn.key],
+              }),
+              h(NPopover, {
+                trigger: 'hover',
+              }, {
+                trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
+                default: () => h('span', '未設置多語言'),
+              }),
+            ])
+          }
+
           return h(CopyText, {
             value: row[newColumn.key],
           })
@@ -638,7 +654,10 @@ async function getList() {
           if (item[field]) {
             // 使用型別斷言確保型別安全
             const multilangFields = translations as MultilingualFieldsVO[]
-            item[field] = multilangFields.find(t => t.language === languageCurrent)?.value
+            const languageText = multilangFields.find(t => t.language === languageCurrent)?.value
+            if (languageText) {
+              item[field] = languageText
+            }
           }
         })
     })
