@@ -112,12 +112,7 @@ const columns: DataTableColumns<UserVo> = [
     title: '性別',
     align: 'center',
     key: 'sex',
-    render: (row) => {
-      return JSON.stringify({
-        dictType: 'system_user_sex',
-        value: row.sex,
-      })
-    },
+    dictType: 'system_user_sex',
   },
   {
     title: '電子郵件',

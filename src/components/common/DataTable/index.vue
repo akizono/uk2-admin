@@ -455,28 +455,16 @@ const columns = computed(() => {
       }
     }
 
-    // 將 dictValue 轉化為具體的字典值
-    // 判斷 render 是不是JSON對象
-    if (typeof newColumn.render === 'function') {
-      const originalRender = newColumn.render
-      newColumn.render = (row: TableRow) => {
-        const result = originalRender(row)
-        // console.log('render 函數返回值：', result)
-        try {
-          const data = JSON.parse(result)
-          // 判斷data是否包含dictType
-          if ('dictType' in data) {
-            return h(AsyncDictLabel, {
-              dictType: data.dictType,
-              value: data.value,
-            })
-          }
-        }
-        catch {
-          // 如果不是 JSON 字串，直接返回原始結果
-          return result
-        }
-        return result
+    // 處理字典值欄位
+    if ('key' in newColumn && newColumn.dictType) {
+      return {
+        ...newColumn,
+        render: (row: TableRow) => {
+          return h(AsyncDictLabel, {
+            dictType: newColumn.dictType,
+            value: row[newColumn.key],
+          })
+        },
       }
     }
 

@@ -8,7 +8,7 @@ import DataTable from '@/components/common/DataTable/index.vue'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
-  name: '選單設置',
+  name: 'Menu Settings',
 })
 
 const dataTableRef = ref()
@@ -23,9 +23,9 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: '部門名稱',
+    label: '選單標題',
     class: '!w-64',
-    placeholder: '請填寫部門名稱',
+    placeholder: '請填寫選單標題',
     inputType: 'input',
   },
   {
@@ -42,9 +42,9 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<MenuVO> = [
   {
-    title: '選單名稱',
+    title: '選單標題',
     align: 'left',
-    key: 'name',
+    key: 'title',
     multilingual: true,
     copy: true,
     fixed: 'left',
@@ -55,21 +55,10 @@ const columns: DataTableColumns<MenuVO> = [
     key: 'icon',
   },
   {
-    title: '路由路徑',
-    align: 'left',
-    key: 'path',
-  },
-  {
-    title: '路由權限',
-    align: 'left',
-    key: 'permission',
-    copy: true,
-  },
-  {
     title: '選單類型',
     align: 'center',
     key: 'type',
-
+    dictType: 'system_menu_type',
   },
   {
     title: '排序',
@@ -106,12 +95,24 @@ const initFormData: InitFormData[] = [
     },
   },
   {
+    name: 'title',
+    value: undefined,
+    span: 2,
+    label: '選單標題',
+    type: 'input',
+    multilingual: true,
+  },
+  {
     name: 'name',
     value: undefined,
     span: 2,
-    label: '選單名稱',
+    label: '選單標識',
     type: 'input',
-    multilingual: true,
+    showCondition: {
+      field: 'type',
+      operator: 'in',
+      value: [0, 1],
+    },
   },
   {
     name: 'path',
@@ -206,7 +207,7 @@ const initFormData: InitFormData[] = [
     name: 'isShowTag',
     value: undefined,
     span: 1,
-    label: '顯示與標籤',
+    label: '顯示與TAB欄',
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -218,7 +219,7 @@ const initFormData: InitFormData[] = [
     name: 'isPersistentTag',
     value: undefined,
     span: 1,
-    label: '常駐標籤欄',
+    label: '常駐TAB欄',
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -264,9 +265,21 @@ const initFormData: InitFormData[] = [
 
 /** 表單驗證規則 */
 const rules: FormRules = {
-  name: {
+  name: [
+    {
+      required: true,
+      message: '選單標識不能為空',
+      trigger: ['blur', 'input'],
+    },
+    {
+      pattern: /^[\s\w-]+$/, // 正則表達式：允許空格(\s)、橫槓(-)、下劃線(\w包含_)、英文和數字
+      message: '選單標識只能包含空格、橫槓(-)、下劃線(_)、英文和數字',
+      trigger: ['blur', 'input'],
+    },
+  ],
+  title: {
     required: true,
-    message: '請填寫選單名稱',
+    message: '請填寫選單標題',
     trigger: ['blur', 'input'],
   },
   type: {

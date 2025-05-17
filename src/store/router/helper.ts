@@ -11,7 +11,7 @@ function standardizedRoutes(route: AppRoute.RowRoute[]) {
   return clone(route).map((item: any) => {
     // 處理 MenuVO 類型
     const meta: AppRoute.RouteMeta = {
-      title: item.name,
+      title: item.title,
       icon: item.icon,
       requiresAuth: true,
       permission: item.permission,
@@ -190,9 +190,9 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
                       path: item.path,
                     },
                   },
-                  { default: () => item.name },
+                  { default: () => item.meta.title },
                 )
-            : () => item.name,
+            : () => item.meta.title,
         key: item.path || `menu-${item.id}`, // 確保每個選單項都有唯一的 key
         icon: item.meta.icon ? renderIcon(item.meta.icon) : undefined,
       }

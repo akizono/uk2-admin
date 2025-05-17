@@ -128,7 +128,9 @@ async function setOptionsWithNextTick(
   // 如果list的某些數據存在「multilingualFields」屬性，則將該條數據的「labelKey」屬性值進行替換
   list.forEach((item) => {
     if (item.multilingualFields) {
-      item[labelKey] = item.multilingualFields[labelKey].find((field: MultilingualFieldsVO) => field.language === languageStore.current)?.value
+      if (item.multilingualFields[labelKey]) {
+        item[labelKey] = item.multilingualFields[labelKey].find((field: MultilingualFieldsVO) => field.language === languageStore.current)?.value
+      }
     }
   })
 

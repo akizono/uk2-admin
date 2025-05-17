@@ -6,6 +6,7 @@ export interface MenuVO extends BaseVO {
   id: string
   parentId: string
   name: string
+  title: string
   path: string
   component: string
   permission: string
