@@ -3,34 +3,34 @@ import type { RouteLocationNormalized } from 'vue-router'
 import { router } from '@/router'
 
 interface TabState {
-  pinTabs: RouteLocationNormalized[]
-  tabs: RouteLocationNormalized[]
-  currentTabPath: string
+  persistentTabs: RouteLocationNormalized[] // 常駐TAB欄
+  tabs: RouteLocationNormalized[] // 動態TAB欄
+  currentTabPath: string // 當前TAB欄路徑
 }
 export const useTabStore = defineStore('tab-store', {
   state: (): TabState => {
     return {
-      pinTabs: [],
+      persistentTabs: [],
       tabs: [],
       currentTabPath: '',
     }
   },
   getters: {
-    allTabs: state => [...state.pinTabs, ...state.tabs],
+    allTabs: state => [...state.persistentTabs, ...state.tabs],
   },
   actions: {
     addTab(route: RouteLocationNormalized) {
       // 根據 meta 確定是否不添加，可用於錯誤頁,登入頁等
-      if (route.meta.withoutTab)
+      if (route.meta.isShowTab !== 1)
         return
 
       // 如果標籤名稱已存在則不添加
       if (this.hasExistTab(route.fullPath as string))
         return
 
-      // 根據 meta.pinTab 傳遞到不同的分組中
-      if (route.meta.pinTab)
-        this.pinTabs.push(route)
+      // 根據 meta.isPersistentTab 傳遞到不同的分組中
+      if (route.meta.isPersistentTab)
+        this.persistentTabs.push(route)
       else
         this.tabs.push(route)
     },
@@ -74,7 +74,7 @@ export const useTabStore = defineStore('tab-store', {
     },
     clearAllTabs() {
       this.tabs.length = 0
-      this.pinTabs.length = 0
+      this.persistentTabs.length = 0
     },
     closeAllTabs() {
       this.tabs.length = 0
@@ -82,7 +82,7 @@ export const useTabStore = defineStore('tab-store', {
     },
 
     hasExistTab(fullPath: string) {
-      const _tabs = [...this.tabs, ...this.pinTabs]
+      const _tabs = [...this.tabs, ...this.persistentTabs]
       return _tabs.some((item) => {
         return item.fullPath === fullPath
       })

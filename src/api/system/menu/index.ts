@@ -14,8 +14,8 @@ export interface MenuVO extends BaseVO {
   icon: string
   link: string
   isCache: number
-  isShowTag: number
-  isKeepAlive: number
+  isShowTab: number
+  isPersistentTab: number
   isShowSide: number
   sort: number
 }

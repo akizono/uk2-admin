@@ -112,7 +112,7 @@ function onClickoutside() {
       @close="tabStore.closeTab"
     >
       <n-tab
-        v-for="item in tabStore.pinTabs"
+        v-for="item in tabStore.persistentTabs"
         :key="item.fullPath"
         :name="item.fullPath"
         @click="router.push(item.fullPath)"

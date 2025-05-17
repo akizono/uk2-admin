@@ -204,7 +204,7 @@ const initFormData: InitFormData[] = [
     },
   },
   {
-    name: 'isShowTag',
+    name: 'isShowTab',
     value: undefined,
     span: 1,
     label: '顯示與TAB欄',
@@ -212,11 +212,11 @@ const initFormData: InitFormData[] = [
     showCondition: {
       field: 'type',
       operator: 'in',
-      value: [1],
+      value: [0, 1],
     },
   },
   {
-    name: 'isPersistentTag',
+    name: 'isPersistentTab',
     value: undefined,
     span: 1,
     label: '常駐TAB欄',

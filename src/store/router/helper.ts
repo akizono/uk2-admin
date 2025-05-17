@@ -15,9 +15,11 @@ function standardizedRoutes(route: AppRoute.RowRoute[]) {
       icon: item.icon,
       requiresAuth: true,
       permission: item.permission,
-      cache: item.isCache === 1,
-      hide: item.isShowSide === 0,
-      order: item.sort,
+      isCache: item.isCache,
+      isShowSide: item.isShowSide,
+      isShowTab: item.isShowTab,
+      isPersistentTab: item.isPersistentTab,
+      sort: item.sort,
       type: item.type,
     }
 
@@ -105,7 +107,7 @@ export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
     })
 
   // 輸出最終快取的路由名稱列表
-  console.log('最終快取路由列表:', cacheRoutes)
+  console.log('需要快取的路由列表:', cacheRoutes)
   return cacheRoutes
 }
 
@@ -115,16 +117,16 @@ function setRedirect(routes: AppRoute.Route[]) {
     if (route.children) {
       if (!route.redirect) {
         // 過濾掉不需要顯示的子元素
-        const visibleChilds = route.children.filter(child => !child.meta.hide)
+        const visibleChilds = route.children.filter(child => child.meta.isShowSide === 0)
 
         // 默認重定向到第一個子元素的路徑
         let target = visibleChilds[0]
 
-        // 過濾掉沒有 order 屬性的子元素
-        const orderChilds = visibleChilds.filter(child => child.meta.order)
+        // 過濾掉沒有 sort 屬性的子元素
+        const sortChilds = visibleChilds.filter(child => child.meta.sort)
 
-        if (orderChilds.length > 0)
-          target = min(orderChilds, i => i.meta.order!) as AppRoute.Route
+        if (sortChilds.length > 0)
+          target = min(sortChilds, i => i.meta.sort!) as AppRoute.Route
 
         if (target)
           route.redirect = target.path
@@ -139,10 +141,30 @@ function setRedirect(routes: AppRoute.Route[]) {
 export function createMenus(userRoutes: AppRoute.RowRoute[]) {
   const resultMenus = standardizedRoutes(userRoutes)
 
-  // 過濾不需要顯示的選單
-  const visibleMenus = resultMenus.filter(route => !route.meta.hide)
+  // 先找出所有被過濾掉的選單的 ID
+  const filteredIds = new Set<number | string>()
 
-  // 生成側邊選單
+  // 遞迴收集所有需要被過濾的 ID
+  function collectFilteredIds(routes: any[]) {
+    routes.forEach((route) => {
+      // 如果當前項目不顯示，或者其父項已經被過濾，則過濾掉當前項目及其所有子項
+      if (route.meta.isShowSide !== 1 || (route.parentId && filteredIds.has(route.parentId))) {
+        filteredIds.add(route.id)
+      }
+
+      // 如果有子項，繼續遞迴
+      if (route.children?.length) {
+        collectFilteredIds(route.children)
+      }
+    })
+  }
+
+  // 第一次遍歷：收集所有需要被過濾的 ID
+  collectFilteredIds(resultMenus)
+
+  // 過濾不需要顯示的選單
+  const visibleMenus = resultMenus.filter(route => !filteredIds.has(route.id))
+
   return arrayToTree(transformAuthRoutesToMenus(visibleMenus))
 }
 
@@ -162,13 +184,13 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
       }
       return true
     })
-    //  Sort the menu according to the order size
+    //  Sort the menu according to the sort size
     .sort((a, b) => {
-      if (a.meta && a.meta.order && b.meta && b.meta.order)
-        return a.meta.order - b.meta.order
-      else if (a.meta && a.meta.order)
+      if (a.meta && a.meta.sort && b.meta && b.meta.sort)
+        return a.meta.sort - b.meta.sort
+      else if (a.meta && a.meta.sort)
         return -1
-      else if (b.meta && b.meta.order)
+      else if (b.meta && b.meta.sort)
         return 1
       else return 0
     })

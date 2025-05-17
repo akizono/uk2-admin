@@ -40,12 +40,14 @@ export const useRouteStore = defineStore('route-store', {
     },
 
     async initRouteInfo() {
+      // 獲取選單列表
       const { data } = await MenuApi.getMenuPage({
         pageSize: 0,
         // @ts-expect-error 忽略狀態不為1的選單
         status: 1,
       })
 
+      // 處理路由
       const newRowRoutes: AppRoute.RowRoute[] = []
       const languageCurrent = local.get('languageCurrent') || VITE_DEFAULT_LANG
       data.list.forEach((item) => {
@@ -70,29 +72,6 @@ export const useRouteStore = defineStore('route-store', {
 
       this.rowRoutes = newRowRoutes
       return newRowRoutes
-
-      // if (import.meta.env.VITE_ROUTE_LOAD_MODE === 'dynamic') {
-      //   const userInfo = local.get('userInfo')
-
-      //   if (!userInfo || !userInfo.id) {
-      //     const authStore = useAuthStore()
-      //     authStore.logout()
-      //     return
-      //   }
-
-      //   // Get user's route
-      //   const { data } = await fetchUserRoutes({
-      //     id: userInfo.id,
-      //   })
-
-      //   if (!data)
-      //     return
-
-      //   return data
-      // }
-
-      // this.rowRoutes = staticRoutes
-      // return staticRoutes
     },
     async initAuthRoute() {
       this.isInitAuthRoute = false

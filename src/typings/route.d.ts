@@ -1,56 +1,58 @@
 declare namespace AppRoute {
 
   type MenuType = 'dir' | 'page'
-  /** 单个路由所携带的meta标识 */
+  /** 單個路由所攜帶的meta標識 */
   interface RouteMeta {
-    /* 页面标题，通常必选。 */
+    /* 頁面標題，通常必選。 */
     title: string
-    /* 图标，一般配合菜单使用 */
+    /* 圖示，一般配合菜單使用 */
     icon?: string
-    /* 是否需要登录权限。 */
+    /* 是否需要登錄權限。 */
     requiresAuth?: boolean
-    /* 可以访问的角色 */
+    /* 可以訪問的角色 */
     roles?: Entity.RoleType[]
-    /* 权限标识 */
+    /* 權限標識 */
     permission?: string
-    /* 是否开启页面缓存 */
-    cache?: boolean
-    /* 有些路由我们并不想在菜单中显示，比如某些编辑页面。 */
-    hide?: boolean
-    /* 菜单排序。 */
-    order?: number
-    /* 嵌套外链  */
+    /* 是否開啟頁面快取 */
+    isCache?: 0 | 1
+    /* 有些路由我們並不想在菜單中顯示，比如某些編輯頁面。 */
+    isShowSide?: 0 | 1
+    /* 是否顯示與TAB欄 */
+    isShowTab?: 0 | 1
+    /* 菜單排序。 */
+    sort?: number
+    /* 嵌套外鏈  */
     href?: string
-    /** 当前路由不在左侧菜单显示，但需要高亮某个菜单的情况 */
+    /** 當前路由不在左側菜單顯示，但需要高亮某個菜單的情況 */
     activeMenu?: string
-    /** 当前路由是否会被添加到Tab中 */
+    /** 當前路由是否會被添加到Tab中 */
     withoutTab?: boolean
-    /** 当前路由是否会被固定在Tab中,用于一些常驻页面 */
-    pinTab?: boolean
-    /** 当前路由在左侧菜单是目录还是页面,不设置默认为page */
+    /** 當前路由是否會被固定在Tab中,用於一些常駐頁面 */
+    isPersistentTab?: boolean
+    /** 當前路由在左側菜單是目錄還是頁面,不設置預設為page */
     menuType?: MenuType
-    /** 菜单类型 0:目录 1:菜单 */
+    /** 菜單類型 0:目錄 1:菜單 */
     type?: number
   }
 
   type MetaKeys = keyof RouteMeta
 
   interface baseRoute {
-    /** 路由名称(路由唯一标识) */
+    /** 路由名稱(路由唯一標識) */
     name: string
-    /** 路由路径 */
+    /** 路由路徑 */
     path: string
     /** 路由重定向 */
     redirect?: string
-    /* 页面组件地址 */
+    /* 頁面組件地址 */
     componentPath?: string | null
     /* 路由id */
     id: number
-    /* 父级路由id，顶级页面为null */
+    /* 父級路由id，頂級頁面為null */
     parentId: number | null
   }
 
-  /** 单个路由的类型结构(动态路由模式：后端返回此类型结构的路由) */
+  /** 單個路由的類型結構(動態路由模式：後端返回此類型結構的路由) */
   type RowRoute = RouteMeta & baseRoute | {
     id: string
     parentId: string | null
@@ -62,8 +64,8 @@ declare namespace AppRoute {
     icon: string | null
     link: string | null
     isCache: number
-    isShowTag: number
-    isKeepAlive: number
+    isShowTab: number
+    isPersistentTab: number
     isShowSide: number
     sort: number
     remark: string | null
@@ -76,12 +78,12 @@ declare namespace AppRoute {
   }
 
   /**
-   * 挂载到项目上的真实路由结构
+   * 掛載到項目上的真實路由結構
    */
   interface Route extends baseRoute {
     /** 子路由 */
     children?: Route[]
-    /* 页面组件 */
+    /* 頁面組件 */
     component: any
     /** 路由描述 */
     meta: RouteMeta
