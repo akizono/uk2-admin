@@ -86,7 +86,37 @@ export const useRouteStore = defineStore('route-store', {
 
       // Generate actual route and insert
       const routes = createRoutes(rowRoutes)
-      router.addRoute(routes)
+
+      // 修復路由中path為空的問題（通常目錄的path為空）
+      const fixRoutes = (item: any) => {
+        // 深度優先遍歷函數
+        const traverse = (node: any) => {
+          if (node.path === '') {
+            node.path = `/${Date.now()}` // 使用當前時間戳作為路徑
+          }
+
+          if (node.children && node.children.length > 0) {
+            node.children.forEach((child: any) => traverse(child))
+          }
+
+          return node
+        }
+
+        // 處理根節點
+        if (routes.path === '') {
+          routes.path = `/${Date.now()}`
+        }
+
+        // 處理子節點
+        if (routes.children && routes.children.length > 0) {
+          routes.children.forEach(child => traverse(child))
+        }
+
+        return item
+      }
+      const fixedRoutes = fixRoutes(routes)
+
+      router.addRoute(fixedRoutes)
 
       // Generate side menu
       this.menus = createMenus(rowRoutes)

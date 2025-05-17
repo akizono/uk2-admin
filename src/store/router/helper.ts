@@ -1,7 +1,6 @@
 import type { MenuOption } from 'naive-ui'
 import type { RouteRecordRaw } from 'vue-router'
 
-import { usePermission } from '@/hooks'
 import Layout from '@/layouts/index.vue'
 import { arrayToTree, renderIcon } from '@/utils'
 import { clone, min } from 'radash'
@@ -42,21 +41,8 @@ function standardizedRoutes(route: AppRoute.RowRoute[]) {
 }
 
 export function createRoutes(routes: AppRoute.RowRoute[]) {
-  // 不使用這個變數，避免ESLint錯誤
-  // const { hasPermission } = usePermission()
-
   // Structure the meta field
   let resultRouter = standardizedRoutes(routes)
-
-  // Route permission filtering
-  // resultRouter = resultRouter.filter((i) => {
-  //   // 檢查是否有權限標識
-  //   if (i.meta.permission) {
-  //     console.log('333')
-  //     return hasPermission(i.meta.permission)
-  //   }
-  //   return true
-  // })
 
   // Generate routes, no need to import files for those with redirect
   const modules = import.meta.glob('@/views/**/*.vue')
@@ -96,7 +82,7 @@ export function createRoutes(routes: AppRoute.RowRoute[]) {
   return appRootRoute
 }
 
-// 生成需要保持活躍的路由名稱列表
+// 生成需要快取的路由名稱列表
 export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
   const cacheRoutes = routes
     .filter((item: any) => {
@@ -170,21 +156,8 @@ export function createMenus(userRoutes: AppRoute.RowRoute[]) {
 
 // 將返回的路由表渲染為側邊選單
 function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
-  const { hasPermission } = usePermission()
   return userRoutes
-    // Filter out side menus without permission
-    .filter((i) => {
-      // 檢查是否有角色權限
-      if (i.meta.roles && i.meta.roles.length > 0) {
-        return hasPermission(i.meta.roles)
-      }
-      // 檢查是否有權限標識
-      if (i.meta.permission) {
-        return hasPermission(i.meta.permission)
-      }
-      return true
-    })
-    //  Sort the menu according to the sort size
+    // 根據排序大小對選單進行排序
     .sort((a, b) => {
       if (a.meta && a.meta.sort && b.meta && b.meta.sort)
         return a.meta.sort - b.meta.sort
@@ -194,7 +167,7 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
         return 1
       else return 0
     })
-    // Convert to side menu data structure
+    // 轉換為側邊選單的數據結構
     .map((item) => {
       const target: MenuOption = {
         id: item.id,
