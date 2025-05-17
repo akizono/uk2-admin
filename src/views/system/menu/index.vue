@@ -294,7 +294,6 @@ const options = {
   add: true, // 是否顯示「新增按鈕」
   index: false, // 是否顯示「索引」
   pagination: false, // 是否開啟分頁
-  drag: true, // 是否開啟拖拽
 
   /** 表格配置 */
   columns, // 表格欄位的定義

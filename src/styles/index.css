@@ -15,6 +15,3 @@ body,
   filter: grayscale(100%);
 }
 
-.drag-handle {
-  cursor: move;
-}

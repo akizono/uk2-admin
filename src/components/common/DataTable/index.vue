@@ -8,7 +8,6 @@ import type { ComputedRef, VNode } from 'vue'
 
 import CopyText from '@/components/custom/CopyText.vue'
 import { useBoolean, useThrottleAction } from '@/hooks'
-import { useTableDrag } from '@/hooks/useTableDrag'
 import { useDictStore, useLanguageStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { createIcon } from '@/utils/icon'
@@ -31,7 +30,6 @@ const props = defineProps<{
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
   pagination?: boolean // 開啟分頁
-  drag?: boolean // 開啟拖拽
 
   filterColumnName?: string // 過濾條件的欄位名稱
   filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
@@ -291,13 +289,6 @@ function propsVerify() {
         }
       }
     }
-  }
-
-  // 開啟分頁後，不允許開啟拖拽
-  if (props.pagination && props.drag) {
-    propsVerifyErrorMsg.value = '開啟分頁後，不允許開啟拖拽'
-    propsVerifyPassed.value = false
-    return
   }
 
   propsVerifyPassed.value = true
@@ -578,38 +569,10 @@ const columns = computed(() => {
 })
 // 表格引用
 const tableRef = ref<InstanceType<typeof NDataTable>>()
-// 拖拽開關
-const dragSwitch = ref(false)
-// 檢查是否允許開啟拖拽
-const hasDrag = computed(() => {
-  return props.drag
-})
 // 檢查是否包含sort列
 const hasSortColumn = computed(() => {
   return props.columns.some(column => 'key' in column && column.key === 'sort')
 })
-// 處理拖拽後的排序
-async function handleDragSort(_rows: TableRow[], newList: TableRow[], draggedRow: TableRow, newSort: number) {
-  // 更新後端數據
-  await props.updateFunction!({
-    id: draggedRow.id,
-    sort: newSort,
-  })
-
-  // 更新前端數據
-  draggedRow.sort = newSort
-}
-// 使用拖拽 hook
-async function handleDragSwitch() {
-  dragSwitch.value = !dragSwitch.value
-  const { initDrag } = useTableDrag({
-    tableRef,
-    data: list,
-    onRowDrag: handleDragSort,
-  })
-  await initDrag()
-}
-
 // 定義遞迴排序函數
 function sortBySort(items: TableRow[]) {
   // 如果有 sort 列，則根據 sort 排序
@@ -1432,13 +1395,6 @@ onMounted(async () => {
               批次刪除
             </NButton>
           </div>
-          <NButton v-if="drag" secondary class="m-l-10px" @click="handleDragSwitch">
-            <template #icon>
-              <icon-park-outline-close-one v-if="dragSwitch" />
-              <icon-park-outline-drag v-else />
-            </template>
-            {{ dragSwitch ? '關閉拖拽' : '開啟拖拽' }}
-          </NButton>
         </n-flex>
       </template>
       <NSpace vertical>
@@ -1450,7 +1406,6 @@ onMounted(async () => {
           :data="list"
           :loading="tableLoading"
           :row-key="row => row.id"
-          :row-class-name="hasDrag && dragSwitch ? 'drag-handle' : ''"
         />
         <template v-if="pagination">
           <Pagination
