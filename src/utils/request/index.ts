@@ -7,7 +7,6 @@ const { defaultHeaders } = config
 function request(option: any) {
   // 默認將物件中所有的空值移除
   const isFilterEmpty = option.isFilterEmpty === undefined ? true : option.isFilterEmpty
-  console.log('isFilterEmpty', isFilterEmpty)
   if (isFilterEmpty) {
     if (option.params)
       option.params = filterEmpty(option.params)

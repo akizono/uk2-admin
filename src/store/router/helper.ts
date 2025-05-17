@@ -80,7 +80,7 @@ export function createRoutes(routes: AppRoute.RowRoute[]) {
     redirect: import.meta.env.VITE_HOME_PATH,
     component: Layout,
     meta: {
-      title: '',
+      title: 'Home',
       icon: 'icon-park-outline:home',
     },
     children: [],
@@ -101,8 +101,6 @@ export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
       return item.isCache === 1
     })
     .map((item: any) => {
-      // 除錯輸出
-      console.log('快取路由:', item.name, item)
       return item.name
     })
 
@@ -176,7 +174,6 @@ function transformAuthRoutesToMenus(userRoutes: AppRoute.Route[]) {
     })
     // Convert to side menu data structure
     .map((item) => {
-      console.log('item', item)
       const target: MenuOption = {
         id: item.id,
         parentId: item.parentId,
