@@ -91,7 +91,7 @@ const initFormData: InitFormData[] = [
     selectOptions: {
       api: MenuApi.getMenuPage,
       selectParam: 'name',
-      itemMapping: { label: 'name', value: 'id' },
+      itemMapping: { label: 'title', value: 'id' },
     },
   },
   {
@@ -163,8 +163,8 @@ const initFormData: InitFormData[] = [
     label: '選單類型',
     type: 'radio',
     dictType: 'system_menu_type',
-    disableEditInput: true,
-    disableUpdate: true,
+    // disableEditInput: true,
+    // disableUpdate: true,
   },
   {
     name: 'icon',
