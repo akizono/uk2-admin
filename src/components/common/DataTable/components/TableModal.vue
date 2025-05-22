@@ -125,9 +125,14 @@ async function setOptionsWithNextTick(
     list.sort((a, b) => (a.sort || 0) - (b.sort || 0))
   }
 
-  // 如果list的某些數據存在「multilingualFields」屬性，則將該條數據的「labelKey」屬性值進行替換
+  // 獲取已經打開了 multilingual 的欄位
+  // eslint-disable-next-line ts/no-use-before-define
+  const yesMultilingualFields = Object.values(formDataMapping.value).filter(item => item.multilingual)
+  const isMultilingual = yesMultilingualFields.some(item => item.name === fieldName)
+
+  //  如果list的某些數據已經打開了「多語言」且存在「multilingualFields」屬性，則將該條數據的「labelKey」屬性值進行替換
   list.forEach((item) => {
-    if (item.multilingualFields) {
+    if (isMultilingual && item.multilingualFields) {
       if (item.multilingualFields[labelKey]) {
         item[labelKey] = item.multilingualFields[labelKey].find((field: MultilingualFieldsVO) => field.language === languageStore.current)?.value
       }
@@ -633,7 +638,6 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
         radioLoadingMap.value[item.name] = true
         try {
           const { data: result } = await item.selectOptions.api({ pageSize: 0, currentPage: 1 })
-          console.log('result', result)
           if (result.list.length > 0) {
             await setOptionsWithNextTick(
               item.name,

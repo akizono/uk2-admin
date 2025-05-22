@@ -93,6 +93,7 @@ const initFormData: InitFormData[] = [
       selectParam: 'name',
       itemMapping: { label: 'title', value: 'id' },
     },
+    multilingual: true,
   },
   {
     name: 'title',
@@ -165,6 +166,7 @@ const initFormData: InitFormData[] = [
     dictType: 'system_menu_type',
     // disableEditInput: true,
     // disableUpdate: true,
+    multilingual: true,
   },
   {
     name: 'icon',

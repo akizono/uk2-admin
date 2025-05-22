@@ -1,4 +1,5 @@
 import { DictDataApi } from '@/api/system/dict-data'
+import { useLanguageStore } from '@/store/model/language'
 import { session } from '@/utils'
 
 export interface DictItem {
@@ -88,6 +89,7 @@ export const useDictStore = defineStore('dict-store', {
      * @throws 當網路請求失敗時拋出錯誤
      */
     async getDictByNet(type: string) {
+      const languageStore = useLanguageStore()
       try {
         const { data: result } = await DictDataApi.getDictDataPage({
           pageSize: 0,
@@ -96,10 +98,21 @@ export const useDictStore = defineStore('dict-store', {
           dictType: type,
         })
 
-        // 將資料庫中的數據轉化為對應的類型
         for (const item of result.list) {
           const dataType = item.dataType
           const value = item.value
+
+          // 將資料庫中的數據轉化為「當前系統語言」
+          if (item.multilingualFields) {
+            for (const key in item.multilingualFields) {
+              if (item.multilingualFields[key].length > 0) {
+                // @ts-expect-error neglect
+                item[key] = item.multilingualFields[key].find(item => item.language === languageStore.current)?.value
+              }
+            }
+          }
+
+          // 將資料庫中的數據轉化為「對應的類型」
           switch (dataType) {
             case 'undefined':
               item.value = undefined

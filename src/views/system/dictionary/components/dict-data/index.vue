@@ -17,11 +17,14 @@ const columns: DataTableColumns<DictDataVO> = [
     title: '字典標籤',
     align: 'center',
     key: 'label',
+    copy: true,
+    multilingual: true,
   },
   {
     title: '字典鍵值',
     align: 'center',
     key: 'value',
+    copy: true,
   },
   {
     title: '數據類型',
@@ -63,6 +66,7 @@ const initFormData: InitFormData[] = [
     span: 2,
     label: '字典標籤',
     type: 'input',
+    multilingual: true,
   },
   {
     name: 'dataType',

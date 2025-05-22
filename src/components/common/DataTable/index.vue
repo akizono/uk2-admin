@@ -468,6 +468,28 @@ const columns = computed(() => {
       }
     }
 
+    // 處理一般文字欄位
+    if ('key' in newColumn && newColumn.multilingual) {
+      return {
+        ...newColumn,
+        render: (row: TableRow) => {
+          const themeVars = useThemeVars()
+          if (!(row.multilingualFields?.[newColumn.key].length)) {
+            return h('div', [
+              h('span', row[newColumn.key]),
+              h(NPopover, {
+                trigger: 'hover',
+              }, {
+                trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
+                default: () => h('span', '未設置多語言'),
+              }),
+            ])
+          }
+          return h('span', row[newColumn.key])
+        },
+      }
+    }
+
     // 返回新的 column
     if ('key' in newColumn
       && !('children' in newColumn)
@@ -485,6 +507,7 @@ const columns = computed(() => {
         },
       }
     }
+
     return newColumn
   })
 

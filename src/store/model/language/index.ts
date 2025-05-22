@@ -25,6 +25,12 @@ export const useLanguageStore = defineStore('language-store', {
     languageCodeList: (state) => {
       return state.list.map(item => item.value)
     },
+
+    // list，將系統當前語言排在最前面的語言列表
+    currentLanguageFirstList: (state): App.SelectOption[] => {
+      const currentLanguage = state.list.find(item => item.value === state.current)
+      return currentLanguage ? [currentLanguage, ...state.list.filter(item => item.value !== state.current)] : []
+    },
   },
   actions: {
     /** 設置語言 */

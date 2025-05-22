@@ -36,11 +36,13 @@ const columns: DataTableColumns<DictTypeVO> = [
     title: '字典名稱',
     align: 'center',
     key: 'name',
+    multilingual: true,
   },
   {
     title: '字典類型',
     align: 'center',
     key: 'type',
+    copy: true,
   },
   {
     title: '排序',
@@ -82,6 +84,7 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: '字典名稱',
     type: 'input',
+    multilingual: true,
   },
   {
     name: 'type',

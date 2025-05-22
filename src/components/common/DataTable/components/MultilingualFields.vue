@@ -37,7 +37,7 @@ const multilingualFields = ref<Record<string, any>>({})
 
 // 多語言列表
 const languageList = computed(() => {
-  return languageStore.list
+  return languageStore.currentLanguageFirstList
 })
 
 // 表單類型與標題

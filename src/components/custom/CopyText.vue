@@ -3,17 +3,17 @@ interface Props {
   maxLength?: string
 }
 const { maxLength } = defineProps<Props>()
-const modelValue = defineModel<string | null>('value')
+const modelValue = defineModel<string | null | number>('value')
 </script>
 
 <template>
-  <div v-if="modelValue" class="inline-flex items-center gap-0.5em">
+  <div v-if="modelValue === 0 || modelValue" class="inline-flex items-center gap-0.5em">
     <n-ellipsis :style="{ 'max-width': maxLength || '12em' }">
       {{ modelValue }}
     </n-ellipsis>
     <n-tooltip trigger="hover">
       <template #trigger>
-        <span v-copy="modelValue" class="cursor-pointer">
+        <span v-copy="`${modelValue}`" class="cursor-pointer">
           <icon-park-outline-copy />
         </span>
       </template>
