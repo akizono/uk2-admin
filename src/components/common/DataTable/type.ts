@@ -22,6 +22,8 @@ export interface InitQueryParams {
   inputType: string
   /** 字典代碼（用於下拉選單等） */
   dictType?: string
+  /** 是否多語言 */
+  multilingual?: boolean
 }
 
 /** 條件運算符 */

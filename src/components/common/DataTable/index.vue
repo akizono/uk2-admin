@@ -1,6 +1,4 @@
 <script setup lang="tsx">
-// TODO: 不同分類要用不同顏色區分
-// 測試添加功能
 import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
@@ -324,6 +322,13 @@ function handleResetSearch() {
     // 為 queryParams 添加初始值
     if (props.initQueryParams && Array.isArray(props.initQueryParams)) {
       props.initQueryParams.forEach(async (item: InitQueryParams) => {
+        if (item.multilingual) {
+          if (!queryParams.value.multilingualFields) {
+            queryParams.value.multilingualFields = []
+          }
+          queryParams.value.multilingualFields.push(item.name)
+        }
+
         queryParamsMapping.value[item.name] = item
         queryParams.value[item.name] = item.value === undefined ? null : item.value
 

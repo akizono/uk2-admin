@@ -21,12 +21,13 @@ const initQueryParams: InitQueryParams[] = [
     inputType: 'pagination',
   },
   {
-    name: 'name',
+    name: 'title',
     value: undefined,
     label: '選單標題',
     class: '!w-64',
     placeholder: '請填寫選單標題',
     inputType: 'input',
+    multilingual: true,
   },
   {
     name: 'status',
