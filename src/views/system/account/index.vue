@@ -10,6 +10,10 @@ import CopyText from '@/components/custom/CopyText.vue'
 import { createCopyableDialog } from '@/utils/dialog'
 import { NSwitch } from 'naive-ui'
 
+defineOptions({
+  name: 'User Management',
+})
+
 /** 更新用戶狀態 */
 const dataTableRef = ref()
 function handleUpdateDisabled(value: 0 | 1, id: string) {

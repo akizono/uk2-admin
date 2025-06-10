@@ -438,13 +438,14 @@ function processFormData() {
   const newMFData: Record<string, MultilingualFieldsVO[]> = {}
   for (const key in formDataMapping.value) {
     const item = formDataMapping.value[key]
-    if (item.multilingual) {
+    if (item.multilingual && item.type !== 'select' && item.type !== 'switch' && item.type !== 'radio') {
       // 只儲存需要提交的多語言欄位
       newMFData[item.name] = multilingualFields.value[item.name]
       // 將是「多語言欄位」的欄位的值修改為「多語言欄位」的fieldId
       processedData[item.name] = multilingualFields.value[item.name][0].fieldId
     }
   }
+
   multilingualFields.value = newMFData
 
   return processedData
@@ -549,16 +550,16 @@ async function submitModal() {
     // 驗證表單
     await formRef.value?.validate()
 
-    // 如果id和parentId相同，則提示不能將自己設為父級
+    // 如果 id 和 parentId 相同，則提示不能將自己設為父級
     if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
       window.$message.error('不能將自己設為父級')
       return
     }
 
-    // 如果某個欄位需要設置多語言，則檢查是否完成全部語言的設置
+    // 如果某個欄位需要設置多語言 且 欄位的 type 不為 select 和 switch 和 radio,則檢查是否完成全部語言的設置
     for (const key in formDataMapping.value) {
       const item = formDataMapping.value[key]
-      if (item.multilingual) {
+      if (item.multilingual && item.type !== 'select' && item.type !== 'switch' && item.type !== 'radio') {
         if (!multilingualFields.value[item.name]) {
           window.$message.error(`請填寫「${item.label}」的多語言欄位`)
           return
@@ -788,8 +789,6 @@ function closeModal() {
         action: true,
       }"
     >
-      <!-- <div>{{ formData }}</div> -->
-      <!-- <div>{{ multilingualFields }}</div> -->
       <template v-if="modalType === 'view'">
         <n-descriptions :column="2" bordered label-placement="left">
           <template v-for="(item, key) in formDataMapping" :key="key">

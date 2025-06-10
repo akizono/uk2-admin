@@ -3,6 +3,10 @@ import { useAuthStore } from '@/store'
 
 import Chart from './components/chart.vue'
 
+defineOptions({
+  name: 'Workbench',
+})
+
 const { userInfo } = useAuthStore()
 </script>
 

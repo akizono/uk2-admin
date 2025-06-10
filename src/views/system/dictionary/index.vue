@@ -7,6 +7,9 @@ import { NButton, NSwitch } from 'naive-ui'
 
 import DictData from './components/dict-data/index.vue'
 
+defineOptions({
+  name: 'Dictionary Management',
+})
 const dataTableRef = ref()
 const modalRef = ref()
 

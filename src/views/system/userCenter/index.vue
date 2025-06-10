@@ -5,6 +5,10 @@ import { UserApi } from '@/api/system/user'
 import { useAuthStore } from '@/store'
 import { onMounted } from 'vue'
 
+defineOptions({
+  name: 'Personal Center',
+})
+
 const authStore = useAuthStore()
 
 const { user } = authStore

@@ -167,7 +167,7 @@ const initFormData: InitFormData[] = [
     dictType: 'system_menu_type',
     // disableEditInput: true,
     // disableUpdate: true,
-    multilingual: true,
+    // multilingual: true,
   },
   {
     name: 'icon',

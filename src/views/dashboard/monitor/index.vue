@@ -3,6 +3,10 @@ import Chart2 from './components/chart2.vue'
 import Chart3 from './components/chart3.vue'
 import Chart from './components/chart.vue'
 
+defineOptions({
+  name: 'Monitoring Page',
+})
+
 const tableData = [
   {
     id: 0,

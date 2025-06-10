@@ -7,6 +7,10 @@ import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
+defineOptions({
+  name: 'Department Management',
+})
+
 const dataTableRef = ref()
 
 /** 初始化查詢參數 */
@@ -94,6 +98,7 @@ const initFormData: InitFormData[] = [
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
     },
+    multilingual: true,
   },
   {
     name: 'name',

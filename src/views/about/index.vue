@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import lib from '@/../package.json'
+
+defineOptions({
+  name: 'About',
+})
 </script>
 
 <template>
