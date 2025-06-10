@@ -23,7 +23,7 @@ export const routes: RouteRecordRaw[] = [
     name: '403',
     component: () => import('@/views/error/403/index.vue'),
     meta: {
-      title: '用戶無權限',
+      title: '使用者無權限',
       withoutTab: true,
     },
   },

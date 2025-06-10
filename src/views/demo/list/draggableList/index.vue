@@ -19,7 +19,7 @@ const model = ref({ ...initialModel })
 
 const formRef = ref<FormInst | null>()
 function sendMail(id?: number) {
-  window.$message.success(`刪除用戶id:${id}`)
+  window.$message.success(`刪除使用者id:${id}`)
 }
 const columns: DataTableColumns<Entity.User> = [
   {

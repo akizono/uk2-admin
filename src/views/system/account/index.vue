@@ -14,7 +14,7 @@ defineOptions({
   name: 'User Management',
 })
 
-/** 更新用戶狀態 */
+/** 更新使用者狀態 */
 const dataTableRef = ref()
 function handleUpdateDisabled(value: 0 | 1, id: string) {
   dataTableRef.value.setListItemFieldValue(id, 'status', value)

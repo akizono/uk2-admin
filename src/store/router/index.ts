@@ -41,10 +41,10 @@ export const useRouteStore = defineStore('route-store', {
 
     async initRouteInfo() {
       // 獲取選單列表
-      const { data } = await MenuApi.getMenuPage({
+      const { data } = await MenuApi.getUserMenus({
         pageSize: 0,
-        // @ts-expect-error 忽略狀態不為1的選單
-        status: 1,
+        // // @ts-expect-error 忽略狀態不為1的選單
+        // status: 1,
       })
 
       // 處理路由

@@ -18,11 +18,12 @@ export interface UserVo extends BaseVO {
   avatar?: string
 
   role?: string[]
+  roleIds?: string[]
   token?: Token
 }
 
 export const UserApi = {
-  /** 獲取用戶分頁列表 */
+  /** 獲取使用者分頁列表 */
   getUserPage: async (params: PageParams): PageRes<UserVo> => {
     return await request.get({ url: '/system/user/page', params })
   },

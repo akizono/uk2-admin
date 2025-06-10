@@ -151,7 +151,7 @@ const initFormData: InitFormData[] = [
     label: '路由權限',
     type: 'input',
     placeholder: 'Eg: system:user:page',
-    helpInfo: `控制器中定義的權限表示，如 @HasPermission('system:user:create')`,
+    helpInfo: `控制器中定義的權限表示，如 @HasPermission('system:user:create');未填寫則對所有使用者開放`,
     showCondition: {
       field: 'type',
       operator: 'in',
