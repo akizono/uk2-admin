@@ -6,7 +6,8 @@ import { useAuthStore } from '@/store'
 
 const authStore = useAuthStore()
 const { hasPermission } = usePermission()
-const { role } = authStore
+const { user } = authStore
+const role = user?.role || []
 
 const roleList: Role[] = ['super_admin', 'common']
 
@@ -37,13 +38,10 @@ function toggleUserRole(role: string) {
         {{ item }}
       </n-button>
     </n-button-group>
-    <n-h2>v-permission 指令用法</n-h2>
+    <n-h2>v-hasPermi 指令用法</n-h2>
     <n-space>
-      <n-button v-permission="['super_admin']">
-        僅super_admin可見
-      </n-button>
-      <n-button v-permission="['common']">
-        common可見
+      <n-button v-hasPermi="['system:dept:page']">
+        僅包含system:dept:page權限可見
       </n-button>
     </n-space>
 

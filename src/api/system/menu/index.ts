@@ -27,7 +27,7 @@ export const MenuApi = {
   },
 
   /** 獲取使用者有權限的菜單 */
-  getUserMenus: async (params: PageParams): PageRes<MenuVO[]> => {
+  getUserMenus: async (params: PageParams): PageRes<MenuVO> => {
     return await request.get({ url: '/system/menu/user-menus', params })
   },
 

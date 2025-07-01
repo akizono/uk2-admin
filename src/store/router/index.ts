@@ -14,6 +14,7 @@ interface RoutesStatus {
   rowRoutes: AppRoute.RowRoute[]
   activeMenu: string | null
   cacheRoutes: string[]
+  permissions: string[]
 }
 export const useRouteStore = defineStore('route-store', {
   state: (): RoutesStatus => {
@@ -23,6 +24,7 @@ export const useRouteStore = defineStore('route-store', {
       menus: [],
       rowRoutes: [],
       cacheRoutes: [],
+      permissions: [],
     }
   },
   actions: {
@@ -43,8 +45,6 @@ export const useRouteStore = defineStore('route-store', {
       // 獲取選單列表
       const { data } = await MenuApi.getUserMenus({
         pageSize: 0,
-        // // @ts-expect-error 忽略狀態不為1的選單
-        // status: 1,
       })
 
       // 處理路由
@@ -65,9 +65,12 @@ export const useRouteStore = defineStore('route-store', {
         }
 
         // 只保留type為0或1的選單(目錄和頁面)
-        if (item.type === 0 || item.type === 1) {
+        if (item.type === 0 || item.type === 1)
           newRowRoutes.push(item)
-        }
+
+        // 儲存權限
+        if (item.permission)
+          this.permissions.push(item.permission)
       })
 
       this.rowRoutes = newRowRoutes
