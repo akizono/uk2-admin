@@ -37,9 +37,9 @@
     "UnoCSS"
   ],
   "scripts": {
-    "dev": "vite --mode dev --port 9980",
-    "dev:test": "vite --mode test",
-    "dev:prod": "vite --mode prod",
+    "dev": "rm -rf ./node_modules/.vite && vite --mode dev --port 9980",
+    "dev:test": "rm -rf ./node_modules/.vite && vite --mode test",
+    "dev:prod": "rm -rf ./node_modules/.vite && vite --mode prod",
     "build": "vite build --mode prod",
     "build:dev": "vite build --mode dev",
     "build:test": "vite build --mode test",
