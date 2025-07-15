@@ -5,13 +5,26 @@ import type { InitFormData, InitQueryParams } from '@/components/common/DataTabl
 import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { usePermi } from '@/hooks'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Department Management',
 })
 
+const { hasPermi } = usePermi()
+
 const dataTableRef = ref()
+
+/** 權限配置 */
+const permission = {
+  create: ['system:dept:create'],
+  page: ['system:dept:page'],
+  update: ['system:dept:update'],
+  delete: ['system:dept:delete'],
+  block: ['system:dept:block'],
+  unblock: ['system:dept:unblock'],
+}
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -75,7 +88,7 @@ const columns: DataTableColumns<DeptVO> = [
     align: 'center',
     key: 'status',
     render: (row: DeptVO) => {
-      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
+      return <NSwitch disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)} value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
 ]
@@ -208,6 +221,7 @@ const options = {
   modalWidth: '800px', // 表格的寬度
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '800px', // 多語言欄位彈出視窗的寬度
+  permission, // 權限配置
 }
 </script>
 

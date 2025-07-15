@@ -789,6 +789,21 @@ function closeModal() {
         action: true,
       }"
     >
+      <!-- Debug -->
+      <!-- <div class="mb-15px">
+        <div>formData:</div>
+        <div>{{ formData }}</div>
+      </div>
+      <div class="mb-15px">
+        <div>multilingualFields:</div>
+        <div v-for="item in Object.keys(multilingualFields)" :key="item" class="border-1px border-gray-200 rounded-md p-3px">
+          <div>{{ item }}</div>
+          <div v-for="sub in multilingualFields[item]" :key="sub.language" class="border-1px border-gray-200 rounded-md p-3px">
+            {{ sub }}
+          </div>
+        </div>
+      </div> -->
+
       <template v-if="modalType === 'view'">
         <n-descriptions :column="2" bordered label-placement="left">
           <template v-for="(item, key) in formDataMapping" :key="key">
@@ -890,11 +905,13 @@ function closeModal() {
       </n-form>
       <template #action>
         <n-space justify="center">
-          <n-button type="primary" :loading="submitLoading" @click="submitModal">
-            提交
-          </n-button>
+          <template v-if="modalType !== 'view'">
+            <n-button type="primary" :loading="submitLoading" @click="submitModal">
+              提交
+            </n-button>
+          </template>
           <n-button @click="closeModal">
-            取消
+            {{ modalType === 'view' ? '關閉' : '取消' }}
           </n-button>
         </n-space>
       </template>

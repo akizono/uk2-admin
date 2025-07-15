@@ -45,6 +45,7 @@ const props = defineProps<{
 
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
+  permission: Record<string, string[]> // 權限配置
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
 const languageStore = useLanguageStore()
@@ -534,6 +535,7 @@ const columns = computed(() => {
             {externalActionsColumn?.render?.(row)}
             {props.view && (
               <NButton
+                v-hasPermi={props.permission.page}
                 size="small"
                 onClick={() => {
                   const parentData = findParentItem(list.value, row.parentId)
@@ -545,6 +547,7 @@ const columns = computed(() => {
             )}
             {props.edit && (
               <NButton
+                v-hasPermi={props.permission.update}
                 size="small"
                 onClick={() => {
                   const parentData = findParentItem(list.value, row.parentId)
@@ -560,6 +563,7 @@ const columns = computed(() => {
                   default: () => '確認刪除本項?',
                   trigger: () => (
                     <NButton
+                      v-hasPermi={props.permission.delete}
                       size="small"
                       type="error"
                       loading={delBtnLoadMap.value[row.id!]}
@@ -1397,14 +1401,14 @@ onMounted(async () => {
       <template #header>
         <n-flex justify="space-between">
           <div>
-            <NButton v-if="add" type="primary" @click="modalRef.openModal('add')">
+            <NButton v-if="add" v-hasPermi="permission.create" type="primary" @click="modalRef.openModal('add')">
               <template #icon>
                 <icon-park-outline-add-one />
               </template>
               新建{{ props.modalName }}
             </NButton>
 
-            <NButton v-if="del" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+            <NButton v-if="del" v-hasPermi="permission.delete" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
               <template #icon>
                 <icon-park-outline-delete />
               </template>

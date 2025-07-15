@@ -7,12 +7,15 @@ import type { DataTableColumns, FormRules } from 'naive-ui'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import CopyText from '@/components/custom/CopyText.vue'
+import { usePermi } from '@/hooks'
 import { createCopyableDialog } from '@/utils/dialog'
 import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'User Management',
 })
+
+const { hasPermi } = usePermi()
 
 /** 更新使用者狀態 */
 const dataTableRef = ref()
@@ -33,6 +36,16 @@ function handleCreateSuccess(params: TableRow) {
     positiveText: '確認',
     negativeText: '複製資訊',
   })
+}
+
+/** 權限配置 */
+const permission = {
+  create: ['system:user:create'],
+  page: ['system:user:page'],
+  update: ['system:user:update'],
+  delete: ['system:user:delete'],
+  block: ['system:user:block'],
+  unblock: ['system:user:unblock'],
 }
 
 const initQueryParams: InitQueryParams[] = [
@@ -142,9 +155,10 @@ const columns: DataTableColumns<UserVo> = [
     title: '狀態',
     align: 'center',
     key: 'status',
-    render: (row) => {
+    render: (row: UserVo) => {
       return (
         <NSwitch
+          disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)}
           value={row.status}
           checked-value={1}
           unchecked-value={0}
@@ -288,6 +302,7 @@ const options = {
   /** 其他配置 */
   modalName: '使用者', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
+  permission, // 權限配置
 }
 </script>
 

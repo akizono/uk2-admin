@@ -11,6 +11,16 @@ const modalRef = ref()
 const modalTitle = ref('')
 const filterColumnValue = ref<string>('')
 
+/** 權限配置 */
+const permission = {
+  create: ['system:dict-data:create'],
+  page: ['system:dict-data:page'],
+  update: ['system:dict-data:update'],
+  delete: ['system:dict-data:delete'],
+  block: ['system:dict-data:block'],
+  unblock: ['system:dict-data:unblock'],
+}
+
 /** 表格列定義 */
 const columns: DataTableColumns<DictDataVO> = [
   {
@@ -220,6 +230,7 @@ const options = {
   /** 其他配置 */
   modalName: '字典數據', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
+  permission, // 權限配置
 }
 
 defineExpose({

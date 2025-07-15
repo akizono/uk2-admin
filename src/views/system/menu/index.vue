@@ -5,13 +5,26 @@ import type { InitFormData, InitQueryParams } from '@/components/common/DataTabl
 
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { usePermi } from '@/hooks'
 import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
 })
 
+const { hasPermi } = usePermi()
+
 const dataTableRef = ref()
+
+/** 權限配置 */
+const permission = {
+  create: ['system:menu:create'],
+  page: ['system:menu:page'],
+  update: ['system:menu:update'],
+  delete: ['system:menu:delete'],
+  block: ['system:menu:block'],
+  unblock: ['system:menu:unblock'],
+}
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -70,8 +83,9 @@ const columns: DataTableColumns<MenuVO> = [
     title: '狀態',
     align: 'center',
     key: 'status',
-    render: (row) => {
-      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
+    render: (row: MenuVO) => {
+      if (row.status === 1)
+        return <NSwitch disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)} value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
 ]
@@ -333,6 +347,7 @@ const options = {
   modalName: '選單', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
+  permission, // 權限配置
 }
 </script>
 

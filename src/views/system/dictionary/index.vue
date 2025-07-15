@@ -3,6 +3,7 @@ import type { InitFormData, InitQueryParams } from '@/components/common/DataTabl
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DictTypeApi, type DictTypeVO } from '@/api/system/dict-type'
+import { usePermi } from '@/hooks'
 import { NButton, NSwitch } from 'naive-ui'
 
 import DictData from './components/dict-data/index.vue'
@@ -10,8 +11,21 @@ import DictData from './components/dict-data/index.vue'
 defineOptions({
   name: 'Dictionary Management',
 })
+
+const { hasPermi } = usePermi()
+
 const dataTableRef = ref()
 const modalRef = ref()
+
+/** 權限配置 */
+const permission = {
+  create: ['system:dict-type:create'],
+  page: ['system:dict-type:page'],
+  update: ['system:dict-type:update'],
+  delete: ['system:dict-type:delete'],
+  block: ['system:dict-type:block'],
+  unblock: ['system:dict-type:unblock'],
+}
 
 /** 初始化查詢參數 */
 const initQueryParams: InitQueryParams[] = [
@@ -61,14 +75,14 @@ const columns: DataTableColumns<DictTypeVO> = [
     title: '狀態',
     align: 'center',
     key: 'status',
-    render: (row) => {
-      return <NSwitch value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
+    render: (row: DictTypeVO) => {
+      return <NSwitch disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)} value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
     },
   },
   {
     title: '操作',
     key: 'actions',
-    render: (row) => {
+    render: (row: DictTypeVO) => {
       return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>字典數據</NButton>
     },
   },
@@ -171,6 +185,8 @@ const options = {
   /** 其他配置 */
   modalName: '字典', // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
+  permission, // 權限配置
+
 }
 </script>
 

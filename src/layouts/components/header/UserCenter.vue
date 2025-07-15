@@ -55,7 +55,7 @@ function handleSelect(key: string | number) {
     })
   }
   if (key === 'userCenter')
-    router.push('/userCenter')
+    router.push('/system/userCenter')
 
   if (key === 'guthub')
     window.open('https://github.com/akizono/uk2-admin')
