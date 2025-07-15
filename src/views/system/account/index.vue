@@ -4,6 +4,7 @@ import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
+import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import CopyText from '@/components/custom/CopyText.vue'
@@ -140,7 +141,7 @@ const columns: DataTableColumns<UserVo> = [
     title: '手機號碼',
     align: 'center',
     key: 'mobile',
-    render: (row) => {
+    render: (row: UserVo) => {
       return (
         <CopyText value={row.mobile} />
       )
@@ -282,6 +283,13 @@ const options = {
   add: true, // 是否顯示「新增按鈕」
   index: true, // 是否顯示「索引」
   pagination: true, // 是否開啟分頁
+
+  /** 菜單配置 */
+  showMenu: true, // 開啟菜單功能
+  menuMultilingual: true, // 菜單開啟多語言
+  getMenuDataFunction: DeptApi.getDeptPage, // 獲取菜單數據的 API
+  filterField: 'deptId', // 過濾欄位
+  menuDefaultExpandRoot: false, // 默認展開根節點
 
   /** 表格配置 */
   columns, // 表格欄位的定義

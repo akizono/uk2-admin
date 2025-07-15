@@ -6,6 +6,13 @@ export interface TableRow {
   [key: string]: any
 }
 
+/** 菜單樹節點 */
+export interface menuTreeNode {
+  id: string
+  label: string
+  children?: menuTreeNode[]
+}
+
 /** 查詢參數介面 */
 export interface InitQueryParams {
   /** 欄位名稱 */

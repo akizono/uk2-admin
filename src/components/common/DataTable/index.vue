@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import type { InitFormData, InitQueryParams, ModalType, TableRow } from './type'
+import type { InitFormData, InitQueryParams, menuTreeNode, ModalType, TableRow } from './type'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
@@ -28,6 +28,12 @@ const props = defineProps<{
   index?: boolean // 開啟序號
   view?: boolean // 開啟查看
   pagination?: boolean // 開啟分頁
+
+  showMenu?: boolean // 開啟菜單功能
+  menuMultilingual?: boolean // 菜單開啟多語言
+  getMenuDataFunction?: (...args: any[]) => Promise<any> // 獲取菜單數據的函數
+  filterField?: string // 過濾欄位
+  menuDefaultExpandRoot?: boolean // 默認展開根節點
 
   filterColumnName?: string // 過濾條件的欄位名稱
   filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
@@ -290,6 +296,13 @@ function propsVerify() {
     }
   }
 
+  // 如果開啟了菜單功能，則必須提供 getMenuDataFunction 和 filterField
+  if (props.showMenu && (!props.getMenuDataFunction || !props.filterField)) {
+    propsVerifyErrorMsg.value = '開啟了菜單功能，但缺少 getMenuDataFunction 或 filterField'
+    propsVerifyPassed.value = false
+    return
+  }
+
   propsVerifyPassed.value = true
 }
 
@@ -368,6 +381,54 @@ async function getDictOptions(dictType: string) {
   finally {
     // 設置 loading 狀態為 false
     selectLoadingMap.value[dictType] = false
+  }
+}
+
+/** 菜單 */
+const selectedMenuKeys = ref<string[]>([])
+const selectedMenuId = computed(() => selectedMenuKeys.value[0] || '') // 選中的菜單 ID
+
+const menuTreeData = ref<menuTreeNode[]>([])
+// 獲取菜單數據
+async function getMenuData() {
+  if (props.getMenuDataFunction) {
+    try {
+      const { data: result } = await props.getMenuDataFunction()
+
+      // 系統當前語言
+      const languageCurrent = languageStore.current
+
+      // 如果開啟了多語言
+      if (props.menuMultilingual) {
+        // 將多語言欄位轉換為當前語言的值
+        result.list.forEach((item: any) => {
+          if (!item.multilingualFields)
+            return
+
+          // 處理多語言欄位
+          Object.entries(item.multilingualFields).forEach(([field, translations]) => {
+            if (item[field]) {
+              // 使用型別斷言確保型別安全
+              const multilangFields = translations as MultilingualFieldsVO[]
+              const languageText = multilangFields.find(t => t.language === languageCurrent)?.value
+              if (languageText) {
+                item[field] = languageText
+              }
+            }
+          })
+        })
+      }
+
+      // 將數據轉換為樹狀結構
+      menuTreeData.value = arrayToTree(result.list)
+
+      // 默認選中第一個節點
+      if (props.menuDefaultExpandRoot && menuTreeData.value && menuTreeData.value.length > 0) {
+        selectedMenuKeys.value = [menuTreeData.value[0].id]
+      }
+    }
+    catch {
+    }
   }
 }
 
@@ -612,18 +673,24 @@ function sortBySort(items: TableRow[]) {
 async function getList() {
   try {
     startTableLoading()
-    const { data: result } = await props.getFunction({
+
+    const params = {
       ...queryParams.value,
       ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
-    })
+    }
+    if (props.showMenu && props.filterField) {
+      params[props.filterField] = selectedMenuId.value
+    }
+
+    const { data: result } = await props.getFunction(params)
+
+    // 系統當前語言
+    const languageCurrent = languageStore.current
 
     // 將多語言欄位轉換為當前語言的值
     result.list.forEach((item: any) => {
       if (!item.multilingualFields)
         return
-
-      // 使用當前語言作為查詢條件
-      const languageCurrent = languageStore.current
 
       // 先找出所有多語言欄位
       const multilingualColumns = props.columns
@@ -1336,6 +1403,9 @@ onMounted(async () => {
   await startTableLoading()
   await startQueryLoading()
 
+  // 查詢菜單
+  await getMenuData()
+
   // 排隊查詢
   await handleResetSearch()
 })
@@ -1349,124 +1419,137 @@ onMounted(async () => {
     :description="propsVerifyErrorMsg"
   />
 
-  <NSpace v-else vertical class="flex-1">
-    <n-card v-if="search && initQueryParams">
-      <n-spin :show="queryLoading" size="large">
-        <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
-          <n-flex>
-            <template v-for="item in queryParamsMapping" :key="item.name">
-              <n-form-item
-                v-if="item.inputType !== 'pagination'" :label="item.label || '未知'" :path="item.name"
-                :class="item.class"
-              >
-                <n-input
-                  v-if="item.inputType === 'input'" v-model:value="queryParams[item.name]"
-                  :placeholder="item.placeholder || '請輸入'"
-                />
-                <n-input-number
-                  v-if="item.inputType === 'input-number'" v-model:value="queryParams[item.name]"
-                  :placeholder="item.placeholder || '請輸入'"
-                />
-                <n-select
-                  v-if="item.inputType === 'select' && item.dictType"
-                  v-model:value="queryParams[item.name]"
-                  :options="dictOptionsMap[item.dictType]"
-                  :placeholder="item.placeholder || '請選擇'"
-                  :loading="selectLoadingMap[item.dictType]"
-                  clearable
-                  @update:value="getList"
-                />
-              </n-form-item>
-            </template>
-            <n-flex class="ml-auto">
-              <NButton type="primary" @click="getList">
-                <template #icon>
-                  <icon-park-outline-search />
-                </template>
-                搜索
-              </NButton>
-              <NButton strong secondary @click="handleResetSearch">
-                <template #icon>
-                  <icon-park-outline-redo />
-                </template>
-                重設
-              </NButton>
+  <n-flex v-else>
+    <n-card v-if="showMenu" class="w-70">
+      <n-tree
+        v-model:selected-keys="selectedMenuKeys"
+        block-line
+        :data="menuTreeData"
+        key-field="id"
+        label-field="name"
+        selectable
+      />
+    </n-card>
+
+    <NSpace vertical class="flex-1">
+      <n-card v-if="search && initQueryParams">
+        <n-spin :show="queryLoading" size="large">
+          <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
+            <n-flex>
+              <template v-for="item in queryParamsMapping" :key="item.name">
+                <n-form-item
+                  v-if="item.inputType !== 'pagination'" :label="item.label || '未知'" :path="item.name"
+                  :class="item.class"
+                >
+                  <n-input
+                    v-if="item.inputType === 'input'" v-model:value="queryParams[item.name]"
+                    :placeholder="item.placeholder || '請輸入'"
+                  />
+                  <n-input-number
+                    v-if="item.inputType === 'input-number'" v-model:value="queryParams[item.name]"
+                    :placeholder="item.placeholder || '請輸入'"
+                  />
+                  <n-select
+                    v-if="item.inputType === 'select' && item.dictType"
+                    v-model:value="queryParams[item.name]"
+                    :options="dictOptionsMap[item.dictType]"
+                    :placeholder="item.placeholder || '請選擇'"
+                    :loading="selectLoadingMap[item.dictType]"
+                    clearable
+                    @update:value="getList"
+                  />
+                </n-form-item>
+              </template>
+              <n-flex class="ml-auto">
+                <NButton type="primary" @click="getList">
+                  <template #icon>
+                    <icon-park-outline-search />
+                  </template>
+                  搜索
+                </NButton>
+                <NButton strong secondary @click="handleResetSearch">
+                  <template #icon>
+                    <icon-park-outline-redo />
+                  </template>
+                  重設
+                </NButton>
+              </n-flex>
             </n-flex>
+          </n-form>
+        </n-spin>
+      </n-card>
+
+      <n-card class="flex-1">
+        <template #header>
+          <n-flex justify="space-between">
+            <div>
+              <NButton v-if="add" v-hasPermi="permission.create" type="primary" @click="modalRef.openModal('add')">
+                <template #icon>
+                  <icon-park-outline-add-one />
+                </template>
+                新建{{ props.modalName }}
+              </NButton>
+
+              <NButton v-if="del" v-hasPermi="permission.delete" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+                <template #icon>
+                  <icon-park-outline-delete />
+                </template>
+                批次刪除
+              </NButton>
+            </div>
           </n-flex>
-        </n-form>
-      </n-spin>
-    </n-card>
-
-    <n-card class="flex-1">
-      <template #header>
-        <n-flex justify="space-between">
-          <div>
-            <NButton v-if="add" v-hasPermi="permission.create" type="primary" @click="modalRef.openModal('add')">
-              <template #icon>
-                <icon-park-outline-add-one />
-              </template>
-              新建{{ props.modalName }}
-            </NButton>
-
-            <NButton v-if="del" v-hasPermi="permission.delete" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
-              <template #icon>
-                <icon-park-outline-delete />
-              </template>
-              批次刪除
-            </NButton>
-          </div>
-        </n-flex>
-      </template>
-      <NSpace vertical>
-        <n-data-table
-          ref="tableRef"
-          v-model:checked-row-keys="checkedRowKeys"
-          v-model:expanded-row-keys="expandedRowKeys"
-          :columns="columns as DataTableColumns"
-          :data="list"
-          :loading="tableLoading"
-          :row-key="row => row.id"
-        />
-        <template v-if="pagination">
-          <Pagination
-            v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
-            :current-page="queryParams.currentPage" @change="changePage"
-          />
-          <Pagination v-else :total="total" @change="changePage" />
         </template>
-      </NSpace>
-    </n-card>
+        <NSpace vertical>
+          <n-data-table
+            ref="tableRef"
+            v-model:checked-row-keys="checkedRowKeys"
+            v-model:expanded-row-keys="expandedRowKeys"
+            :columns="columns as DataTableColumns"
+            :data="list"
+            :loading="tableLoading"
+            :row-key="row => row.id"
+          />
+          <template v-if="pagination">
+            <Pagination
+              v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
+              :current-page="queryParams.currentPage" @change="changePage"
+            />
+            <Pagination v-else :total="total" @change="changePage" />
+          </template>
+        </NSpace>
+      </n-card>
 
-    <TableModal
-      ref="modalRef"
-      :modal-width="modalWidth"
-      :modal-form-label-width="modalFormLabelWidth"
-      :modal-name="modalName"
-      :multilingual-fields-modal-width="multilingualFieldsModalWidth"
-      :update-function="updateFunction || undefined"
-      :create-function="createFunction || undefined"
+      <TableModal
+        ref="modalRef"
+        :modal-width="modalWidth"
+        :modal-form-label-width="modalFormLabelWidth"
+        :modal-name="modalName"
+        :multilingual-fields-modal-width="multilingualFieldsModalWidth"
+        :update-function="updateFunction || undefined"
+        :create-function="createFunction || undefined"
 
-      :rules="rules"
-      :init-form-data="initFormData"
+        :rules="rules"
+        :init-form-data="initFormData"
 
-      @success="tableModalSuccess"
-      @resort="handleResort"
-    />
+        @success="tableModalSuccess"
+        @resort="handleResort"
+      />
 
-    <!-- 批次刪除確認 Modal -->
-    <n-modal
-      v-model:show="showBatchDeleteModalRef"
-      preset="dialog"
-      title="確認刪除"
-      positive-text="確認"
-      negative-text="取消"
-      :loading="batchDeleteLoading"
-      @positive-click="confirmBatchDelete"
-      @negative-click="() => { showBatchDeleteModalRef = false }"
-    >
-      <template #default>
-        確定要刪除選中的 {{ checkedRowKeys.length }} 條紀錄嗎？此操作無法復原！
-      </template>
-    </n-modal>
-  </NSpace>
+      <!-- 批次刪除確認 Modal -->
+      <n-modal
+        v-model:show="showBatchDeleteModalRef"
+        preset="dialog"
+        title="確認刪除"
+        positive-text="確認"
+        negative-text="取消"
+        :loading="batchDeleteLoading"
+        @positive-click="confirmBatchDelete"
+        @negative-click="() => { showBatchDeleteModalRef = false }"
+      >
+        <template #default>
+          確定要刪除選中的 {{ checkedRowKeys.length }} 條紀錄嗎？此操作無法復原！
+        </template>
+      </n-modal>
+    </NSpace>
+  </n-flex>
 </template>
