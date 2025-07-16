@@ -9,7 +9,8 @@ const appStore = useAppStore()
 const languageStore = useLanguageStore()
 
 const naiveLocale = computed(() => {
-  return naiveI18nOptions[languageStore.current] ? naiveI18nOptions[languageStore.current] : naiveI18nOptions.enUS
+  const currentLang = languageStore.current
+  return naiveI18nOptions[currentLang] ? naiveI18nOptions[currentLang] : naiveI18nOptions.enUS
 })
 
 // 初始化語言列表
