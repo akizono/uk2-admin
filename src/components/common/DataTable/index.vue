@@ -386,7 +386,7 @@ async function getDictOptions(dictType: string) {
 
 /** 菜單 */
 const selectedMenuKeys = ref<string[]>([])
-const selectedMenuId = computed(() => selectedMenuKeys.value[0] || '') // 選中的菜單 ID
+const selectedMenuId = computed(() => selectedMenuKeys.value[0] || undefined) // 選中的菜單 ID
 
 const menuTreeData = ref<menuTreeNode[]>([])
 // 獲取菜單數據
@@ -752,6 +752,17 @@ function getRowIndex(rowIndex: number): number {
   const currentPage = queryParams.value.currentPage || 1
   const pageSize = queryParams.value.pageSize || 10
   return (currentPage - 1) * pageSize + rowIndex + 1
+}
+
+/** 「新增」按鈕 */
+function handleAdd() {
+  if (props.showMenu && selectedMenuId.value && props.filterField) {
+    const dataParams: Record<string, any> = {}
+    dataParams[props.filterField] = selectedMenuId.value
+    modalRef.value.openModal('add', dataParams)
+    return
+  }
+  modalRef.value.openModal('add')
 }
 
 /** 「刪除」按鈕 */
@@ -1483,7 +1494,7 @@ onMounted(async () => {
         <template #header>
           <n-flex justify="space-between">
             <div>
-              <NButton v-if="add" v-hasPermi="permission.create" type="primary" @click="modalRef.openModal('add')">
+              <NButton v-if="add" v-hasPermi="permission.create" type="primary" @click="handleAdd">
                 <template #icon>
                   <icon-park-outline-add-one />
                 </template>

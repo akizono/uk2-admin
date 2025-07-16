@@ -226,6 +226,19 @@ const initFormData: InitFormData[] = [
     type: 'input',
   },
   {
+    name: 'deptId',
+    value: undefined,
+    span: 2,
+    label: '部門',
+    type: 'select',
+    selectOptions: {
+      api: DeptApi.getDeptPage,
+      selectParam: 'name',
+      itemMapping: { label: 'name', value: 'id' },
+    },
+    multilingual: true,
+  },
+  {
     name: 'remark',
     value: undefined,
     span: 2,
