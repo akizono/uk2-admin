@@ -229,7 +229,7 @@ const initFormData: InitFormData[] = [
     showCondition: {
       field: 'type',
       operator: 'in',
-      value: [0, 1],
+      value: [1],
     },
   },
   {
