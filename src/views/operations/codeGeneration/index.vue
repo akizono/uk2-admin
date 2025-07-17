@@ -54,10 +54,14 @@ const columns = ref<DataTableColumns<TableRow>>([
     width: 250,
     align: 'center',
     render: (row: TableRow) => {
+      const updatePermi = ['operations:code-generation:update']
+      const deletePermi = ['operations:code-generation:delete']
+
       return (
         <NSpace justify="center">
           <NButton
             size="small"
+            v-hasPermi={updatePermi}
             onClick={() => {
               moduleModalRef.value.openModal('edit', row)
             }}
@@ -70,6 +74,7 @@ const columns = ref<DataTableColumns<TableRow>>([
               trigger: () => (
                 <NButton
                   size="small"
+                  v-hasPermi={deletePermi}
                   type="error"
                   loading={delBtnLoadMap.value[row.id!]}
                 >
@@ -244,13 +249,13 @@ onMounted(async () => {
       <template #header>
         <n-flex justify="space-between">
           <div>
-            <NButton type="primary" strong @click="moduleModalRef.openModal('add')">
+            <NButton v-hasPermi="['operations:code-generation:create']" type="primary" strong @click="moduleModalRef.openModal('add')">
               <template #icon>
                 <icon-park-outline-add-web />
               </template>
               創建模組
             </NButton>
-            <NButton type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+            <NButton v-hasPermi="['operations:code-generation:delete']" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
               <template #icon>
                 <icon-park-outline-delete />
               </template>
