@@ -12,6 +12,8 @@ defineProps<{
 
 const emit = defineEmits(['submit'])
 
+const { t } = useI18n()
+
 const languageStore = useLanguageStore()
 
 defineExpose({
@@ -47,10 +49,10 @@ const modalTitle = computed(() => {
   if (!modalType.value)
     return ''
   return `${{
-    add: '新增',
-    view: '檢視',
-    edit: '編輯',
-  }[modalType.value]}：「${(modalName.value ?? '')}」多語言欄位`
+    add: t('common.add'),
+    view: t('common.view'),
+    edit: t('common.edit'),
+  }[modalType.value]}：「${(modalName.value ?? '')}」${t('dataTable.multilingualFields')}`
 })
 // 表單驗證規則
 const formRules = computed(() => {
@@ -58,7 +60,7 @@ const formRules = computed(() => {
   languageList.value.forEach((item) => {
     rules[item.value] = {
       required: true,
-      message: '請填寫語言欄位',
+      message: t('dataTable.pleaseFillMultilingualFields'),
       trigger: ['blur', 'input'],
     }
   })
@@ -138,8 +140,8 @@ async function handleSubmit() {
   }
   catch (errors) {
     endSubmitLoading()
-    console.error('表單驗證失敗：', errors)
-    window.$message.error('表單驗證失敗')
+    console.error('Form validation failed:', errors)
+    window.$message.error(t('dataTable.formValidationFailed'))
   }
 }
 
@@ -147,14 +149,14 @@ async function handleSubmit() {
 async function handleConvertLanguage() {
   try {
     if (!formData.value[languageStore.current]) {
-      return window.$message.error(`請先填寫「${languageStore.currentName}」`)
+      return window.$message.error(`${t('dataTable.pleaseFill')}「${languageStore.currentName}」`)
     }
     startFormLoading()
     const { data: result } = await MultilingualFieldsApi.convertLanguage({ text: formData.value[languageStore.current] })
     for (const item of languageList.value) {
       formData.value[item.value] = result[item.value]
     }
-    window.$message.success('轉換成功')
+    window.$message.success(t('dataTable.convertSuccess'))
   }
   finally {
     endFormLoading()
@@ -172,7 +174,7 @@ async function openModal(type: ModalType, data: TableRow, /* _rowData?: TableRow
   showModal()
 
   // console.log('rowData.value', rowData.value)
-  console.log('columnData.value', columnData.value)
+  // console.log('columnData.value', columnData.value)
 }
 
 // 關閉彈出視窗
@@ -208,7 +210,7 @@ function closeModal() {
         <template #icon>
           <icon-park-outline-magic-wand />
         </template>
-        根據「{{ languageStore.currentName }}」自動生成其他語言
+        {{ t('dataTable.convertSuccessTitle1') }}「{{ languageStore.currentName }}」{{ t('dataTable.convertSuccessTitle2') }}
       </n-button>
     </n-flex>
 
@@ -229,10 +231,10 @@ function closeModal() {
     <template #action>
       <n-space justify="center">
         <n-button type="primary" :loading="submitLoading" @click="handleSubmit">
-          提交
+          {{ t('common.submit') }}
         </n-button>
         <n-button @click="closeModal">
-          取消
+          {{ t('common.cancel') }}
         </n-button>
       </n-space>
     </template>

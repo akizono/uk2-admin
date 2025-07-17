@@ -7,6 +7,8 @@ import { useTableDrag } from '@/hooks/useTableDrag'
 import { fetchUserPage } from '@/service'
 import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
 
+const { t } = useI18n()
+
 const { bool: loading, setTrue: startLoading, setFalse: endLoading } = useBoolean(false)
 
 const initialModel = {
@@ -36,7 +38,7 @@ const columns: DataTableColumns<Entity.User> = [
     title: '性別',
     align: 'center',
     key: 'gender',
-    render: (row) => {
+    render: (row: Entity.User) => {
       const tagType = {
         0: 'primary',
         1: 'success',
@@ -59,7 +61,7 @@ const columns: DataTableColumns<Entity.User> = [
     title: '狀態',
     align: 'center',
     key: 'status',
-    render: (row) => {
+    render: (row: Entity.User) => {
       return (
         <NSwitch
           value={row.status}
@@ -68,7 +70,7 @@ const columns: DataTableColumns<Entity.User> = [
           onUpdateValue={(value: 0 | 1) =>
             handleUpdateDisabled(value, row.id!)}
         >
-          {{ checked: () => '啟用', unchecked: () => '禁用' }}
+          {{ checked: () => t('common.enable'), unchecked: () => t('common.disable') }}
         </NSwitch>
       )
     },
@@ -77,7 +79,7 @@ const columns: DataTableColumns<Entity.User> = [
     title: '操作',
     align: 'center',
     key: 'actions',
-    render: (row) => {
+    render: (row: Entity.User) => {
       return (
         <NSpace justify="center">
           <NPopconfirm onPositiveClick={() => sendMail(row.id)}>

@@ -1,6 +1,7 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
 import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/system/auth'
+import { i18n } from '@/modules/i18n'
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
 import axios from 'axios'
@@ -9,6 +10,8 @@ import qs from 'qs'
 import { config } from './config'
 import * as handle from './handle'
 
+// 使用 i18n 實例的全局 t 方法
+const t = i18n.global.t
 const { baseURL, requestTimeout } = config
 
 // 等待重新執行的請求佇列
@@ -63,24 +66,8 @@ service.interceptors.response.use(
     //   ?? handle.handleNetworkErrorMessage(error.message)
 
     // 前端預設的錯誤訊息
-    const errorStatus = {
-      400: '請求格式錯誤',
-      401: '未經授權，請重新登入',
-      402: '需要付費才能繼續操作',
-      403: '無權限存取該資源',
-      404: '請求的資源不存在',
-      405: '不允許使用該請求方法',
-      408: '請求超時，請稍後再試',
-      420: '帳號或密碼錯誤',
-      500: '伺服器發生錯誤',
-      501: '伺服器不支援該功能',
-      502: '閘道器錯誤',
-      503: '服務暫時無法使用',
-      504: '閘道器超時',
-      505: 'HTTP 版本不支援',
-    }
     const message = error.response?.status
-      ? errorStatus[error.response.status as keyof typeof errorStatus]
+      ? t(`http.${error.response.status}`)
       : handle.handleNetworkErrorMessage(error.message)
 
     // 如果是重新整理 Token 的請求失敗，直接登出

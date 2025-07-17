@@ -27,6 +27,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['success', 'resort'])
 
+const { t } = useI18n()
+
 const languageStore = useLanguageStore()
 
 // 樹狀結構的節點
@@ -360,9 +362,9 @@ const modalTitle = computed(() => {
   if (!modalType.value)
     return ''
   return {
-    add: '新增',
-    view: '檢視',
-    edit: '編輯',
+    add: t('common.add'),
+    view: t('common.view'),
+    edit: t('common.edit'),
   }[modalType.value] + (props.modalName ?? '')
 })
 
@@ -470,6 +472,8 @@ async function add() {
     ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
   })
 
+  window.$message.success(t('dataTable.addSuccess'))
+
   const emitData = handleIdDataMapping(
     {
       modalType: modalType.value!,
@@ -528,8 +532,8 @@ async function edit() {
     processedData[key] = itemArray.find((item: MultilingualFieldsVO) => item.language === languageStore.current)?.value
   }
 
-  const { message } = await props.updateFunction!({ ...remain })
-  window.$message.success(message)
+  await props.updateFunction!({ ...remain })
+  window.$message.success(t('dataTable.updateSuccess'))
 
   const emitData = handleIdDataMapping(
     {
@@ -552,7 +556,7 @@ async function submitModal() {
 
     // 如果 id 和 parentId 相同，則提示不能將自己設為父級
     if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
-      window.$message.error('不能將自己設為父級')
+      window.$message.error(t('dataTable.cannotSetSelfAsParent'))
       return
     }
 
@@ -561,7 +565,7 @@ async function submitModal() {
       const item = formDataMapping.value[key]
       if (item.multilingual && item.type !== 'select' && item.type !== 'switch' && item.type !== 'radio') {
         if (!multilingualFields.value[item.name]) {
-          window.$message.error(`請填寫「${item.label}」的多語言欄位`)
+          window.$message.error(t('dataTable.multilingualNotSetError1') + item.label + t('dataTable.multilingualNotSetError2'))
           return
         }
       }
@@ -809,7 +813,7 @@ function closeModal() {
           <template v-for="(item, key) in formDataMapping" :key="key">
             <n-descriptions-item v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)" :label="item.label" :span="item.span || 1">
               <template v-if="item.type === 'switch'">
-                {{ formData[item.name] === 1 ? '啟用' : '停用' }}
+                {{ formData[item.name] === 1 ? $t('common.enable') : $t('common.disable') }}
               </template>
               <template v-else>
                 {{ formData[item.name] }}
@@ -853,8 +857,8 @@ function closeModal() {
                     remote
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
-                    :placeholder="item.placeholder || '請輸入關鍵字搜索'"
-                    :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                    :placeholder="item.placeholder || t('dataTable.searchPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
                     key-field="key"
                     label-field="label"
                     children-field="children"
@@ -872,7 +876,7 @@ function closeModal() {
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
                     :placeholder="item.placeholder"
-                    :empty="selectLoadingMap[item.name] ? '搜索中...' : '無符合條件的選項'"
+                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
                     clearable
                     @search="(query: string) => handleSearch(query, item)"
                   />
@@ -907,11 +911,11 @@ function closeModal() {
         <n-space justify="center">
           <template v-if="modalType !== 'view'">
             <n-button type="primary" :loading="submitLoading" @click="submitModal">
-              提交
+              {{ t('common.submit') }}
             </n-button>
           </template>
           <n-button @click="closeModal">
-            {{ modalType === 'view' ? '關閉' : '取消' }}
+            {{ modalType === 'view' ? t('common.close') : t('common.cancel') }}
           </n-button>
         </n-space>
       </template>

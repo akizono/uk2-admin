@@ -1,5 +1,4 @@
 <script setup lang="tsx">
-// TODO：還需要最佳化
 import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
@@ -13,6 +12,7 @@ defineOptions({
 })
 
 const { hasPermi } = usePermi()
+const { t } = useI18n()
 
 const dataTableRef = ref()
 
@@ -36,18 +36,18 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'title',
     value: undefined,
-    label: '選單標題',
+    label: t('menu.menuTitle'),
     class: '!w-64',
-    placeholder: '請填寫選單標題',
+    placeholder: t('menu.menuTitlePlaceholder'),
     inputType: 'input',
     multilingual: true,
   },
   {
     name: 'status',
     value: undefined,
-    label: '狀態',
+    label: t('common.status'),
     class: '!w-64',
-    placeholder: '請填寫狀態',
+    placeholder: t('common.statusPlaceholder'),
     inputType: 'select',
     dictType: 'common_status',
   },
@@ -56,7 +56,7 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<MenuVO> = [
   {
-    title: '選單標題',
+    title: t('menu.menuTitle'),
     align: 'left',
     key: 'title',
     multilingual: true,
@@ -64,23 +64,23 @@ const columns: DataTableColumns<MenuVO> = [
     fixed: 'left',
   },
   {
-    title: '選單圖示',
+    title: t('menu.menuIcon'),
     align: 'center',
     key: 'icon',
   },
   {
-    title: '選單類型',
+    title: t('menu.menuType'),
     align: 'center',
     key: 'type',
     dictType: 'system_menu_type',
   },
   {
-    title: '排序',
+    title: t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: '狀態',
+    title: t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: MenuVO) => {
@@ -101,7 +101,7 @@ const initFormData: InitFormData[] = [
     name: 'parentId',
     value: undefined,
     span: 2,
-    label: '父級選單',
+    label: t('menu.parentMenu'),
     type: 'select',
     selectOptions: {
       api: MenuApi.getMenuPage,
@@ -114,7 +114,7 @@ const initFormData: InitFormData[] = [
     name: 'title',
     value: undefined,
     span: 2,
-    label: '選單標題',
+    label: t('menu.menuTitle'),
     type: 'input',
     multilingual: true,
   },
@@ -122,7 +122,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 2,
-    label: '選單標識',
+    label: t('menu.menuCode'),
     type: 'input',
     showCondition: {
       field: 'type',
@@ -134,7 +134,7 @@ const initFormData: InitFormData[] = [
     name: 'path',
     value: undefined,
     span: 1,
-    label: '路由路徑',
+    label: t('menu.routePath'),
     type: 'input',
     placeholder: 'Eg: /system/user',
     showCondition: {
@@ -147,7 +147,7 @@ const initFormData: InitFormData[] = [
     name: 'component',
     value: undefined,
     span: 1,
-    label: '元件路徑',
+    label: t('menu.componentPath'),
     type: 'input',
     placeholder: 'Eg: /system/user/index.vue',
     inputPrefix: '@/src/view',
@@ -162,10 +162,10 @@ const initFormData: InitFormData[] = [
     name: 'permission',
     value: undefined,
     span: 1,
-    label: '路由權限',
+    label: t('menu.routePermission'),
     type: 'input',
     placeholder: 'Eg: system:user:page',
-    helpInfo: `控制器中定義的權限表示，如 @HasPermission('system:user:create');未填寫則對所有使用者開放`,
+    helpInfo: `${t('menu.helpInfo')}`,
     showCondition: {
       field: 'type',
       operator: 'in',
@@ -176,7 +176,7 @@ const initFormData: InitFormData[] = [
     name: 'type',
     value: 0,
     span: 1,
-    label: '選單類型',
+    label: t('menu.menuType'),
     type: 'radio',
     dictType: 'system_menu_type',
     // disableEditInput: true,
@@ -187,7 +187,7 @@ const initFormData: InitFormData[] = [
     name: 'icon',
     value: undefined,
     span: 1,
-    label: '選單圖示',
+    label: t('menu.menuIcon'),
     type: 'icon-select',
     showCondition: {
       field: 'type',
@@ -199,7 +199,7 @@ const initFormData: InitFormData[] = [
     name: 'link',
     value: undefined,
     span: 1,
-    label: '外鏈',
+    label: t('menu.externalLink'),
     type: 'input',
     placeholder: 'Eg: https://google.com',
     showCondition: {
@@ -212,7 +212,7 @@ const initFormData: InitFormData[] = [
     name: 'isCache',
     value: undefined,
     span: 1,
-    label: '是否快取',
+    label: t('menu.isCache'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -224,7 +224,7 @@ const initFormData: InitFormData[] = [
     name: 'isShowTab',
     value: undefined,
     span: 1,
-    label: '顯示與TAB欄',
+    label: t('menu.isShowTab'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -236,7 +236,7 @@ const initFormData: InitFormData[] = [
     name: 'isPersistentTab',
     value: undefined,
     span: 1,
-    label: '常駐TAB欄',
+    label: t('menu.isPersistentTab'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -248,7 +248,7 @@ const initFormData: InitFormData[] = [
     name: 'isShowSide',
     value: 1,
     span: 1,
-    label: '顯示與側邊目錄',
+    label: t('menu.isShowSide'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -260,21 +260,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 2,
-    label: '排序',
+    label: t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: '備註',
+    label: t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 2,
-    label: '狀態',
+    label: t('common.status'),
     type: 'switch',
   },
 
@@ -285,29 +285,29 @@ const rules: FormRules = {
   name: [
     {
       required: true,
-      message: '選單標識不能為空',
+      message: t('menu.menuCodePlaceholder'),
       trigger: ['blur', 'input'],
     },
     {
       pattern: /^[\s\w-]+$/, // 正則表達式：允許空格(\s)、橫槓(-)、下劃線(\w包含_)、英文和數字
-      message: '選單標識只能包含空格、橫槓(-)、下劃線(_)、英文和數字',
+      message: t('menu.menuCodeRule'),
       trigger: ['blur', 'input'],
     },
   ],
   title: {
     required: true,
-    message: '請填寫選單標題',
+    message: t('menu.menuTitleRule'),
     trigger: ['blur', 'input'],
   },
   type: {
     required: true,
-    message: '請選擇選單類型',
+    message: t('menu.menuTypeRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
   sort: {
     required: true,
-    message: '請填寫排序',
+    message: t('common.sortPlaceholder'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -344,7 +344,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '選單', // 表格中的數據名稱
+  modalName: t('menu.menu'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
   permission, // 權限配置

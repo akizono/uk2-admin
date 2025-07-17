@@ -11,7 +11,7 @@ import DictData from './components/dict-data/index.vue'
 defineOptions({
   name: 'Dictionary Management',
 })
-
+const { t } = useI18n()
 const { hasPermi } = usePermi()
 
 const dataTableRef = ref()
@@ -32,17 +32,17 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: '字典名稱',
+    label: t('dictionary.dictName'),
     class: '!w-64',
-    placeholder: '請填寫字典名稱',
+    placeholder: t('dictionary.dictNamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'type',
     value: undefined,
-    label: '字典類型',
+    label: t('dictionary.dictType'),
     class: '!w-64',
-    placeholder: '請填寫字典類型',
+    placeholder: t('dictionary.dictTypePlaceholder'),
     inputType: 'input',
   },
 ]
@@ -50,29 +50,29 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<DictTypeVO> = [
   {
-    title: '字典名稱',
+    title: t('dictionary.dictName'),
     align: 'center',
     key: 'name',
     multilingual: true,
   },
   {
-    title: '字典類型',
+    title: t('dictionary.dictType'),
     align: 'center',
     key: 'type',
     copy: true,
   },
   {
-    title: '排序',
+    title: t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: '備註',
+    title: t('common.remark'),
     align: 'center',
     key: 'remark',
   },
   {
-    title: '狀態',
+    title: t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: DictTypeVO) => {
@@ -80,10 +80,10 @@ const columns: DataTableColumns<DictTypeVO> = [
     },
   },
   {
-    title: '操作',
+    title: t('common.action'),
     key: 'actions',
     render: (row: DictTypeVO) => {
-      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>字典數據</NButton>
+      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>{t('dictionary.dictData')}</NButton>
     },
   },
 ]
@@ -99,7 +99,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 1,
-    label: '字典名稱',
+    label: t('dictionary.dictName'),
     type: 'input',
     multilingual: true,
   },
@@ -107,7 +107,7 @@ const initFormData: InitFormData[] = [
     name: 'type',
     value: undefined,
     span: 1,
-    label: '字典類型',
+    label: t('dictionary.dictType'),
     type: 'input',
     disableEditInput: true,
     disableUpdate: true,
@@ -116,21 +116,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: '排序',
+    label: t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: '備註',
+    label: t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: '狀態',
+    label: t('common.status'),
     type: 'switch',
   },
 ]
@@ -139,17 +139,17 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   name: {
     required: true,
-    message: '請填寫字典名稱',
+    message: t('dictionary.dictNameRule'),
     trigger: ['blur', 'input'],
   },
   type: {
     required: true,
-    message: '請填寫字典類型',
+    message: t('dictionary.dictTypeRule'),
     trigger: ['blur', 'input'],
   },
   sort: {
     required: true,
-    message: '請填寫排序',
+    message: t('dictionary.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -183,10 +183,9 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: '字典', // 表格中的數據名稱
+  modalName: t('dictionary.dictionary'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
-
 }
 </script>
 

@@ -12,6 +12,7 @@ defineOptions({
   name: 'Department Management',
 })
 
+const { t } = useI18n()
 const { hasPermi } = usePermi()
 
 const dataTableRef = ref()
@@ -36,25 +37,25 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: '部門名稱',
+    label: t('dept.deptName'),
     class: '!w-64',
-    placeholder: '請填寫部門名稱',
+    placeholder: t('dept.deptNamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'code',
     value: undefined,
-    label: '部門編碼',
+    label: t('dept.deptCode'),
     class: '!w-64',
-    placeholder: '請填寫部門編碼',
+    placeholder: t('dept.deptCodePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'status',
     value: undefined,
-    label: '狀態',
+    label: t('common.status'),
     class: '!w-64',
-    placeholder: '請填寫狀態',
+    placeholder: t('common.statusPlaceholder'),
     inputType: 'select',
     dictType: 'common_status',
   },
@@ -63,28 +64,28 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<DeptVO> = [
   {
-    title: '部門名稱',
+    title: t('dept.deptName'),
     align: 'center',
     key: 'name',
     multilingual: true,
   },
   {
-    title: '部門編碼',
+    title: t('dept.deptCode'),
     align: 'center',
     key: 'code',
   },
   {
-    title: '負責人',
+    title: t('dept.leaderUser'),
     align: 'center',
     key: 'leaderUser.nickname',
   },
   {
-    title: '排序',
+    title: t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: '狀態',
+    title: t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: DeptVO) => {
@@ -104,7 +105,7 @@ const initFormData: InitFormData[] = [
     name: 'parentId',
     value: undefined,
     span: 2,
-    label: '父級部門',
+    label: t('dept.parentDept'),
     type: 'select',
     selectOptions: {
       api: DeptApi.getDeptPage,
@@ -117,7 +118,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 1,
-    label: '部門名稱',
+    label: t('dept.deptName'),
     type: 'input',
     multilingual: true,
   },
@@ -125,14 +126,14 @@ const initFormData: InitFormData[] = [
     name: 'code',
     value: undefined,
     span: 1,
-    label: '部門編碼',
+    label: t('dept.deptCode'),
     type: 'input',
   },
   {
     name: 'leaderUserId',
     value: undefined,
     span: 1,
-    label: '負責人',
+    label: t('dept.leaderUser'),
     type: 'select',
     selectOptions: {
       api: UserApi.getUserPage,
@@ -145,21 +146,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: '排序',
+    label: t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: '備註',
+    label: t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: '狀態',
+    label: t('common.status'),
     type: 'switch',
   },
 ]
@@ -168,22 +169,22 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   name: {
     required: true,
-    message: '請填寫部門名稱',
+    message: t('dept.deptNameRule'),
     trigger: ['blur', 'input'],
   },
   code: {
     required: true,
-    message: '請填寫部門編碼',
+    message: t('dept.deptCodeRule'),
     trigger: ['blur', 'input'],
   },
   leaderUserId: {
     required: true,
-    message: '請選擇負責人',
+    message: t('dept.leaderUserRule'),
     trigger: ['blur', 'change'],
   },
   sort: {
     required: true,
-    message: '請填寫排序',
+    message: t('common.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -217,7 +218,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: '部門', // 表格中的數據名稱
+  modalName: t('dept.dept'), // 表格中的數據名稱
   modalWidth: '800px', // 表格的寬度
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '800px', // 多語言欄位彈出視窗的寬度

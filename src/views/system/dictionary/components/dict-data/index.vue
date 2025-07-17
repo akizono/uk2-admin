@@ -6,6 +6,7 @@ import type { DataTableColumns, FormRules } from 'naive-ui'
 import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
 import { wrapOptionsToPromise } from '@/utils/initFormData'
 
+const { t } = useI18n()
 const modalRef = ref()
 // const dataTableRef = ref()
 const modalTitle = ref('')
@@ -24,35 +25,35 @@ const permission = {
 /** 表格列定義 */
 const columns: DataTableColumns<DictDataVO> = [
   {
-    title: '字典標籤',
+    title: t('dictData.dictLabel'),
     align: 'center',
     key: 'label',
     copy: true,
     multilingual: true,
   },
   {
-    title: '字典鍵值',
+    title: t('dictData.dictValue'),
     align: 'center',
     key: 'value',
     copy: true,
   },
   {
-    title: '數據類型',
+    title: t('dictData.dataType'),
     align: 'center',
     key: 'dataType',
   },
   {
-    title: '排序',
+    title: t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: '備註',
+    title: t('common.remark'),
     align: 'center',
     key: 'remark',
   },
   {
-    title: '狀態',
+    title: t('common.status'),
     align: 'center',
     key: 'status',
   },
@@ -74,7 +75,7 @@ const initFormData: InitFormData[] = [
     name: 'label',
     value: undefined,
     span: 2,
-    label: '字典標籤',
+    label: t('dictData.dictLabel'),
     type: 'input',
     multilingual: true,
   },
@@ -82,7 +83,7 @@ const initFormData: InitFormData[] = [
     name: 'dataType',
     value: undefined,
     span: 2,
-    label: '數據類型',
+    label: t('dictData.dataType'),
     type: 'select',
     dictType: 'system_dict_data_data_type',
   },
@@ -90,7 +91,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: '',
     span: 2,
-    label: '字典鍵值',
+    label: t('dictData.dictLabel'),
     type: 'input',
     disableAddInput: true,
     disableEditInput: true,
@@ -111,7 +112,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: 0,
     span: 2,
-    label: '字典鍵值',
+    label: t('dictData.dictLabel'),
     type: 'input-number',
     rulesType: 'number',
     showCondition: {
@@ -124,7 +125,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: undefined,
     span: 2,
-    label: '字典鍵值',
+    label: t('dictData.dictLabel'),
     type: 'input',
     rulesType: 'string',
     showCondition: {
@@ -137,7 +138,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: undefined,
     span: 2,
-    label: '字典鍵值',
+    label: t('dictData.dictLabel'),
     type: 'radio',
     selectOptions: {
       api: wrapOptionsToPromise([
@@ -159,21 +160,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: '排序',
+    label: t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: '備註',
+    label: t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: '狀態',
+    label: t('common.status'),
     type: 'switch',
   },
 ]
@@ -182,17 +183,17 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   label: {
     required: true,
-    message: '請填寫字典標籤',
+    message: t('dictData.dictLabelRule'),
     trigger: ['blur', 'input'],
   },
   value: {
     required: true,
-    message: '請填寫字典鍵值',
+    message: t('dictData.dictValueRule'),
     trigger: ['blur', 'input'],
   },
   sort: {
     required: true,
-    message: '請填寫排序',
+    message: t('dictData.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -228,7 +229,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: '字典數據', // 表格中的數據名稱
+  modalName: t('dictData.dictData'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }
@@ -253,7 +254,7 @@ defineExpose({
 <template>
   <PageModal
     ref="modalRef"
-    :title="`${modalTitle} - 字典數據`"
+    :title="`${modalTitle} - ${t('dictData.dictData')}`"
     width="90%"
   >
     <DataTable

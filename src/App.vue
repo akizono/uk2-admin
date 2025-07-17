@@ -10,7 +10,7 @@ const languageStore = useLanguageStore()
 
 const naiveLocale = computed(() => {
   const currentLang = languageStore.current
-  return naiveI18nOptions[currentLang] ? naiveI18nOptions[currentLang] : naiveI18nOptions.enUS
+  return naiveI18nOptions[currentLang] ? naiveI18nOptions[currentLang] : naiveI18nOptions['en-US']
 })
 
 // 初始化語言列表

@@ -16,6 +16,8 @@ defineOptions({
   name: 'User Management',
 })
 
+const { t } = useI18n()
+
 const { hasPermi } = usePermi()
 
 /** 更新使用者狀態 */
@@ -30,12 +32,12 @@ function handleUpdateDisabled(value: 0 | 1, id: string) {
 
 /** 處理 Modal 提交成功後返回的數據 */
 function handleCreateSuccess(params: TableRow) {
-  const tips = `帳號：${params.username}<br />密碼：${params.password}<br />請盡快登錄系統修改您的默認密碼。`
+  const tips = `${t('account.username')}：${params.username}<br />${t('account.password')}：${params.password}<br />${t('account.pleaseChangePassword')}`
   createCopyableDialog({
-    title: '新增使用者成功',
+    title: t('account.addSuccess'),
     content: tips,
-    positiveText: '確認',
-    negativeText: '複製資訊',
+    positiveText: t('common.confirm'),
+    negativeText: t('account.copyInfo'),
   })
 }
 
@@ -53,56 +55,56 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'username',
     value: undefined,
-    label: '使用者名稱',
+    label: t('account.username'),
     class: '!w-64',
-    placeholder: '請填寫使用者名稱',
+    placeholder: t('account.usernamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'nickname',
     value: undefined,
-    label: '暱稱',
+    label: t('account.nickname'),
     class: '!w-64',
-    placeholder: '請填寫暱稱',
+    placeholder: t('account.nicknamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'age',
     value: undefined,
-    label: '年齡',
+    label: t('account.age'),
     class: '!w-64',
-    placeholder: '請填寫年齡',
+    placeholder: t('account.agePlaceholder'),
     inputType: 'input-number',
   },
   {
     name: 'sex',
     value: undefined,
-    label: '性別',
+    label: t('account.sex'),
     class: '!w-64',
-    placeholder: '請填寫性別',
+    placeholder: t('account.sexPlaceholder'),
     inputType: 'select',
     dictType: 'system_user_sex',
   },
   {
     name: 'email',
     value: undefined,
-    label: '電子郵件',
+    label: t('account.email'),
     class: '!w-64',
-    placeholder: '請填寫電子郵件',
+    placeholder: t('account.emailPlaceholder'),
     inputType: 'input',
   },
   {
     name: 'mobile',
     value: undefined,
-    label: '手機號碼',
+    label: t('account.mobile'),
     class: '!w-64',
-    placeholder: '請填寫手機號碼',
+    placeholder: t('account.mobilePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'status',
     value: undefined,
-    label: '狀態',
+    label: t('common.status'),
     class: '!w-64',
     inputType: 'select',
     dictType: 'common_status',
@@ -111,34 +113,34 @@ const initQueryParams: InitQueryParams[] = [
 
 const columns: DataTableColumns<UserVo> = [
   {
-    title: '使用者名稱',
+    title: t('account.username'),
     align: 'center',
     key: 'username',
     // fixed: 'left',
   },
   {
-    title: '暱稱',
+    title: t('account.nickname'),
     align: 'center',
     key: 'nickname',
   },
   {
-    title: '年齡',
+    title: t('account.age'),
     align: 'center',
     key: 'age',
   },
   {
-    title: '性別',
+    title: t('account.sex'),
     align: 'center',
     key: 'sex',
     dictType: 'system_user_sex',
   },
   {
-    title: '電子郵件',
+    title: t('account.email'),
     align: 'center',
     key: 'email',
   },
   {
-    title: '手機號碼',
+    title: t('account.mobile'),
     align: 'center',
     key: 'mobile',
     render: (row: UserVo) => {
@@ -148,12 +150,12 @@ const columns: DataTableColumns<UserVo> = [
     },
   },
   {
-    title: '備註',
+    title: t('common.remark'),
     align: 'center',
     key: 'remark',
   },
   {
-    title: '狀態',
+    title: t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: UserVo) => {
@@ -166,7 +168,7 @@ const columns: DataTableColumns<UserVo> = [
           onUpdateValue={(value: 0 | 1) =>
             handleUpdateDisabled(value, row.id!)}
         >
-          {{ checked: () => '啟用', unchecked: () => '禁用' }}
+          {{ checked: () => t('common.enable'), unchecked: () => t('common.disable') }}
         </NSwitch>
       )
     },
@@ -184,7 +186,7 @@ const initFormData: InitFormData[] = [
     name: 'username',
     value: undefined,
     span: 1,
-    label: '使用者名稱',
+    label: t('account.username'),
     type: 'input',
     disableEditInput: true,
     disableUpdate: true,
@@ -193,21 +195,21 @@ const initFormData: InitFormData[] = [
     name: 'nickname',
     value: undefined,
     span: 1,
-    label: '暱稱',
+    label: t('account.nickname'),
     type: 'input',
   },
   {
     name: 'age',
     value: undefined,
     span: 1,
-    label: '年齡',
+    label: t('account.age'),
     type: 'input-number',
   },
   {
     name: 'sex',
     value: undefined,
     span: 1,
-    label: '性別',
+    label: t('account.sex'),
     type: 'radio',
     dictType: 'system_user_sex',
   },
@@ -215,21 +217,21 @@ const initFormData: InitFormData[] = [
     name: 'email',
     value: undefined,
     span: 1,
-    label: '電子郵件',
+    label: t('account.email'),
     type: 'input',
   },
   {
     name: 'mobile',
     value: undefined,
     span: 1,
-    label: '手機號碼',
+    label: t('account.mobile'),
     type: 'input',
   },
   {
     name: 'deptId',
     value: undefined,
     span: 2,
-    label: '部門',
+    label: t('account.dept'),
     type: 'select',
     selectOptions: {
       api: DeptApi.getDeptPage,
@@ -242,14 +244,14 @@ const initFormData: InitFormData[] = [
     name: 'remark',
     value: undefined,
     span: 2,
-    label: '備註',
+    label: t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: '使用者狀態',
+    label: t('account.userStatus'),
     type: 'switch',
   },
 ]
@@ -257,31 +259,31 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   username: {
     required: true,
-    message: '請輸入使用者名稱',
+    message: t('account.usernameRule'),
     trigger: ['blur', 'input'],
   },
   nickname: {
-    message: '請輸入暱稱',
+    message: t('account.nicknameRule'),
     trigger: ['blur', 'input'],
   },
   age: {
     type: 'number',
-    message: '請輸入年齡',
+    message: t('account.ageRule'),
     trigger: ['blur', 'input'],
   },
   sex: {
     type: 'number',
-    message: '請選擇性別',
+    message: t('account.sexRule'),
     trigger: ['blur', 'change'],
   },
   email: {
     type: 'email',
-    message: '請輸入正確的電子郵件格式',
+    message: t('account.emailRule'),
     trigger: ['blur', 'input'],
   },
   mobile: {
     pattern: /^[\d\s+]{1,20}$/,
-    message: '請輸入正確的手機號碼格式',
+    message: t('account.mobileRule'),
     trigger: ['blur', 'input'],
   },
 }
@@ -321,7 +323,7 @@ const options = {
   initFormData, // 初始化表單數據
 
   /** 其他配置 */
-  modalName: '使用者', // 表格中的數據名稱
+  modalName: t('account.user'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }

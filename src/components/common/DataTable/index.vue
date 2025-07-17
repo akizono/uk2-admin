@@ -54,6 +54,7 @@ const props = defineProps<{
   permission: Record<string, string[]> // 權限配置
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
+const { t } = useI18n()
 const languageStore = useLanguageStore()
 
 const propsVerifyPassed = ref(false)
@@ -63,29 +64,29 @@ function propsVerify() {
   const paginationON = props.pagination
   const initQueryParamsIncludePageSize0 = props.initQueryParams?.some((item: InitQueryParams) => item.name === 'pageSize' && item.value === 0)
   if (initQueryParamsIncludePageSize0 && paginationON) {
-    propsVerifyErrorMsg.value = '分頁器已開啟，pageSize不能為0'
+    propsVerifyErrorMsg.value = t('dataTable.paginationError')
     propsVerifyPassed.value = false
     return
   }
 
   // 檢查必要的 CRUD 函數
   if (!props.getFunction) {
-    propsVerifyErrorMsg.value = '缺少 getFunction'
+    propsVerifyErrorMsg.value = t('dataTable.getFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.del && !props.deleteFunction) {
-    propsVerifyErrorMsg.value = '開啟刪除功能但缺少 deleteFunction'
+    propsVerifyErrorMsg.value = t('dataTable.deleteFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.edit && !props.updateFunction) {
-    propsVerifyErrorMsg.value = '開啟編輯功能但缺少 updateFunction'
+    propsVerifyErrorMsg.value = t('dataTable.updateFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.add && !props.createFunction) {
-    propsVerifyErrorMsg.value = '開啟新增功能但缺少 createFunction'
+    propsVerifyErrorMsg.value = t('dataTable.createFunctionError')
     propsVerifyPassed.value = false
     return
   }
@@ -94,7 +95,7 @@ function propsVerify() {
   const searchON = props.search
   const hasPageOutside = props.initQueryParams?.some(item => item.name !== 'pageSize' && item.name !== 'currentPage') || false
   if (searchON && !hasPageOutside) {
-    propsVerifyErrorMsg.value = '開啟了search，initQueryParams必須有除了pageSize和currentPageq以外的其他屬性'
+    propsVerifyErrorMsg.value = t('dataTable.searchError')
     propsVerifyPassed.value = false
     return
   }
@@ -105,7 +106,7 @@ function propsVerify() {
     ['name', 'value', 'inputType'].every(key => key in item),
   ) || false
   if (props.initQueryParams && !hasEssential) {
-    propsVerifyErrorMsg.value = 'initQueryParams必須包含name、value、inputType'
+    propsVerifyErrorMsg.value = t('dataTable.initQueryParamsError')
     propsVerifyPassed.value = false
     return
   }
@@ -115,7 +116,7 @@ function propsVerify() {
     item.inputType === 'select' && !item.dictType,
   )
   if (!hasSelectCarryDictType) {
-    propsVerifyErrorMsg.value = 'initQueryParams中如果inputType是select的時候，必須包含dictType'
+    propsVerifyErrorMsg.value = t('dataTable.initQueryParamsSelectError')
     propsVerifyPassed.value = false
     return
   }
@@ -127,12 +128,12 @@ function propsVerify() {
 
     if (pageSizeParam) {
       if (typeof pageSizeParam.value !== 'number') {
-        propsVerifyErrorMsg.value = 'pageSize 必須是數字類型'
+        propsVerifyErrorMsg.value = t('dataTable.pageSizeError')
         propsVerifyPassed.value = false
         return
       }
       if (pageSizeParam.value < 0) {
-        propsVerifyErrorMsg.value = 'pageSize 不能為負數'
+        propsVerifyErrorMsg.value = t('dataTable.pageSizeNegativeError')
         propsVerifyPassed.value = false
         return
       }
@@ -140,12 +141,12 @@ function propsVerify() {
 
     if (currentPageParam) {
       if (typeof currentPageParam.value !== 'number') {
-        propsVerifyErrorMsg.value = 'currentPage 必須是數字類型'
+        propsVerifyErrorMsg.value = t('dataTable.currentPageError')
         propsVerifyPassed.value = false
         return
       }
       if (currentPageParam.value <= 0) {
-        propsVerifyErrorMsg.value = 'currentPage 必須大於 0'
+        propsVerifyErrorMsg.value = t('dataTable.currentPageNegativeError')
         propsVerifyPassed.value = false
         return
       }
@@ -157,14 +158,14 @@ function propsVerify() {
   for (const item of selectFormItems) {
     // 檢查是否有任一選項來源
     if (!item.selectOptions && !item.dictType) {
-      propsVerifyErrorMsg.value = 'select類型的表單項必須指定selectOptions或dictType其中之一作為選項來源'
+      propsVerifyErrorMsg.value = t('dataTable.selectOptionsError')
       propsVerifyPassed.value = false
       return
     }
 
     // 檢查是否同時存在兩種選項來源
     if (item.selectOptions && item.dictType) {
-      propsVerifyErrorMsg.value = 'select類型的表單項不能同時指定selectOptions和dictType'
+      propsVerifyErrorMsg.value = t('dataTable.selectOptionsDictTypeError')
       propsVerifyPassed.value = false
       return
     }
@@ -172,22 +173,22 @@ function propsVerify() {
     // 如果使用selectOptions，檢查必要屬性
     if (item.selectOptions) {
       if (!item.selectOptions.api) {
-        propsVerifyErrorMsg.value = 'selectOptions必須包含api屬性'
+        propsVerifyErrorMsg.value = t('dataTable.selectOptionsApiError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.selectParam) {
-        propsVerifyErrorMsg.value = 'selectOptions必須包含selectParam屬性'
+        propsVerifyErrorMsg.value = t('dataTable.selectOptionsSelectParamError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping) {
-        propsVerifyErrorMsg.value = 'selectOptions必須包含itemMapping屬性'
+        propsVerifyErrorMsg.value = t('dataTable.selectOptionsItemMappingError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
-        propsVerifyErrorMsg.value = 'itemMapping必須包含label和value屬性'
+        propsVerifyErrorMsg.value = t('dataTable.itemMappingError')
         propsVerifyPassed.value = false
         return
       }
@@ -199,14 +200,14 @@ function propsVerify() {
   for (const item of radioFormItems) {
     // 檢查是否有任一選項來源
     if (!item.selectOptions && !item.dictType) {
-      propsVerifyErrorMsg.value = 'radio類型的表單項必須指定selectOptions或dictType其中之一作為選項來源'
+      propsVerifyErrorMsg.value = t('dataTable.radioOptionsError')
       propsVerifyPassed.value = false
       return
     }
 
     // 檢查是否同時存在兩種選項來源
     if (item.selectOptions && item.dictType) {
-      propsVerifyErrorMsg.value = 'radio類型的表單項不能同時指定selectOptions和dictType'
+      propsVerifyErrorMsg.value = t('dataTable.radioOptionsDictTypeError')
       propsVerifyPassed.value = false
       return
     }
@@ -214,17 +215,17 @@ function propsVerify() {
     // 如果使用selectOptions，檢查必要屬性
     if (item.selectOptions) {
       if (!item.selectOptions.api) {
-        propsVerifyErrorMsg.value = 'selectOptions必須包含api屬性'
+        propsVerifyErrorMsg.value = t('dataTable.selectOptionsApiError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping) {
-        propsVerifyErrorMsg.value = 'selectOptions必須包含itemMapping屬性'
+        propsVerifyErrorMsg.value = t('dataTable.selectOptionsItemMappingError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
-        propsVerifyErrorMsg.value = 'itemMapping必須包含label和value屬性'
+        propsVerifyErrorMsg.value = t('dataTable.itemMappingError')
         propsVerifyPassed.value = false
         return
       }
@@ -236,7 +237,7 @@ function propsVerify() {
     item.type === 'radio' && !item.dictType && (!item.selectOptions || !item.selectOptions.api || !item.selectOptions.itemMapping || !item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value),
   )
   if (!hasRadioCarryDictType) {
-    propsVerifyErrorMsg.value = 'initFormData中如果type是radio的時候，必須包含dictType 或者 selectOptions（且selectOptions中必須包含api、itemMapping，且itemMapping中必須包含label和value）'
+    propsVerifyErrorMsg.value = t('dataTable.radioOptionsErrorMsg')
     propsVerifyPassed.value = false
     return
   }
@@ -244,28 +245,28 @@ function propsVerify() {
   // 如果 columns 存在 status 欄位，則必須包含 blockFunction 和 unblockFunction
   const hasStatusColumn = props.columns.some(item => 'key' in item && item.key === 'status')
   if (hasStatusColumn && (!props.blockFunction || !props.unblockFunction)) {
-    propsVerifyErrorMsg.value = '當表格包含 status 欄位時，必須提供 blockFunction 和 unblockFunction'
+    propsVerifyErrorMsg.value = t('dataTable.statusColumnError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnName 存在則必須提供 filterColumnValue
   if (props.filterColumnName && !props.filterColumnValue) {
-    propsVerifyErrorMsg.value = '如果 filterColumnName 存在則必須提供 filterColumnValue'
+    propsVerifyErrorMsg.value = t('dataTable.filterColumnNameError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnValue 存在則必須提供 filterColumnName
   if (props.filterColumnValue && !props.filterColumnName) {
-    propsVerifyErrorMsg.value = '如果 filterColumnValue 存在則必須提供 filterColumnName'
+    propsVerifyErrorMsg.value = t('dataTable.filterColumnValueError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnValue.value 不是非空 string 則報錯
   if (props.filterColumnValue && (typeof props.filterColumnValue.value !== 'string' || props.filterColumnValue.value === '')) {
-    propsVerifyErrorMsg.value = 'filterColumnValue.value 必須是 string 且不能為空'
+    propsVerifyErrorMsg.value = t('dataTable.filterColumnValueStringError')
     propsVerifyPassed.value = false
     return
   }
@@ -288,7 +289,7 @@ function propsVerify() {
         const allHaveShowCondition = itemsWithSameName.every(item => item.showCondition !== undefined)
 
         if (!allHaveShowCondition) {
-          propsVerifyErrorMsg.value = `存在多個name為"${name}"的表單項，但並非所有項目都包含showCondition屬性`
+          propsVerifyErrorMsg.value = t('dataTable.initFormDataNameError1') + name + t('dataTable.initFormDataNameError2')
           propsVerifyPassed.value = false
           return
         }
@@ -298,7 +299,7 @@ function propsVerify() {
 
   // 如果開啟了菜單功能，則必須提供 getMenuDataFunction 和 filterField
   if (props.showMenu && (!props.getMenuDataFunction || !props.filterField)) {
-    propsVerifyErrorMsg.value = '開啟了菜單功能，但缺少 getMenuDataFunction 或 filterField'
+    propsVerifyErrorMsg.value = t('dataTable.menuFunctionError')
     propsVerifyPassed.value = false
     return
   }
@@ -453,7 +454,7 @@ const columns = computed(() => {
   const indexColumn = props.index
     ? [
         {
-          title: '序號',
+          title: t('dataTable.serialNumber'),
           key: 'index',
           align: 'center',
           fixed: 'left',
@@ -510,7 +511,7 @@ const columns = computed(() => {
                 trigger: 'hover',
               }, {
                 trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
-                default: () => h('span', '未設置多語言'),
+                default: () => h('span', t('dataTable.multilingualNotSet')),
               }),
             ])
           }
@@ -548,7 +549,7 @@ const columns = computed(() => {
                 trigger: 'hover',
               }, {
                 trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
-                default: () => h('span', '未設置多語言'),
+                default: () => h('span', t('dataTable.multilingualNotSet')),
               }),
             ])
           }
@@ -585,10 +586,10 @@ const columns = computed(() => {
 
   const operateColumn = [
     {
-      title: '操作',
+      title: t('common.action'),
       align: 'center',
       key: 'actions',
-      width: 250,
+      width: 280,
       render: (row: TableRow) => {
         return (
           <NSpace justify="center">
@@ -603,7 +604,7 @@ const columns = computed(() => {
                   modalRef.value.openModal('view', row, parentData)
                 }}
               >
-                查看
+                {t('common.check')}
               </NButton>
             )}
             {props.edit && (
@@ -615,13 +616,13 @@ const columns = computed(() => {
                   modalRef.value.openModal('edit', row, parentData)
                 }}
               >
-                編輯
+                {t('common.edit')}
               </NButton>
             )}
             {props.del && (
               <NPopconfirm onPositiveClick={() => handleDelete(row)}>
                 {{
-                  default: () => '確認刪除本項?',
+                  default: () => t('common.deleteConfirm'),
                   trigger: () => (
                     <NButton
                       v-hasPermi={props.permission.delete}
@@ -629,7 +630,7 @@ const columns = computed(() => {
                       type="error"
                       loading={delBtnLoadMap.value[row.id!]}
                     >
-                      刪除
+                      {t('common.delete')}
                     </NButton>
                   ),
                 }}
@@ -769,7 +770,7 @@ function handleAdd() {
 async function handleDelete(row: TableRow) {
   try {
     if (row.children && row.children.length > 0) {
-      window.$message.warning('該項目存在子項，無法刪除')
+      window.$message.warning(t('dataTable.hasChildrenDeleteError'))
       return
     }
 
@@ -808,10 +809,10 @@ async function handleDelete(row: TableRow) {
       deleteRecursively(list.value)
     }
 
-    window.$message.success(`已經刪除${props.modalName}`)
+    window.$message.success(t('dataTable.deleteSuccess') + props.modalName)
   }
   catch (error) {
-    window.$message.error(`刪除 ID ${row.id} 失敗:${error}`)
+    window.$message.error(t('dataTable.deleteError-1') + row.id + t('dataTable.deleteError-2') + error)
   }
   finally {
     delBtnLoadMap.value[row.id!] = false
@@ -824,7 +825,7 @@ const batchDeleteLoading = ref(false)
 const checkedRowKeys = ref<string[]>([])
 async function handleBatchDelete() {
   if (checkedRowKeys.value.length === 0) {
-    window.$message.warning('請至少選擇一條紀錄')
+    window.$message.warning(t('dataTable.batchDeleteError'))
     return
   }
   showBatchDeleteModalRef.value = true
@@ -863,8 +864,8 @@ async function confirmBatchDelete() {
         successDeletedIds.push(id)
       }
       catch (error) {
-        console.error(`刪除 ID ${id} 失敗:`, error)
-        window.$message.error(`刪除 ID ${id} 失敗`)
+        console.error(t('dataTable.deleteError-1') + id + t('dataTable.deleteError-2') + error)
+        window.$message.error(t('dataTable.deleteError-1') + id + t('dataTable.deleteError-2'))
         // 繼續處理下一個，不中斷整個過程
       }
     }
@@ -883,7 +884,7 @@ async function confirmBatchDelete() {
     }
 
     if (successDeletedIds.length > 0) {
-      window.$message.success(`已批次刪除 ${successDeletedIds.length} 條紀錄`)
+      window.$message.success(t('dataTable.batchDeleteSuccess1') + successDeletedIds.length + t('dataTable.batchDeleteSuccess2'))
     }
 
     // 只移除成功刪除的 ID
@@ -895,11 +896,11 @@ async function confirmBatchDelete() {
     }
     else {
       // 如果有剩餘的未成功刪除的項目，顯示提示
-      window.$message.warning(`有 ${checkedRowKeys.value.length} 條紀錄未能成功刪除`)
+      window.$message.warning(checkedRowKeys.value.length + t('dataTable.batchDeleteFailed'))
     }
   }
   catch {
-    window.$message.error('批次刪除過程中發生錯誤')
+    window.$message.error(t('dataTable.batchDeleteProcessError'))
   }
   finally {
     batchDeleteLoading.value = false
@@ -1020,11 +1021,10 @@ async function updateChildrenStatus(item: TableRow) {
           try {
             await props.blockFunction(child.id)
           }
-          catch (error) {
-            console.error(`Block operation failed for id ${child.id}:`, error)
+          catch {
             // API調用失敗，恢復狀態為啟用
             child.status = 1
-            window.$message.error(`封鎖操作失敗: ${child.id}`)
+            window.$message.error(t('dataTable.blockOperationFailed') + child.id)
           }
         }
         // 繼續處理這個子項的子項（如果有的話）
@@ -1424,7 +1424,7 @@ onMounted(async () => {
   <n-result
     v-if="!propsVerifyPassed"
     status="error"
-    title="請檢查props參數"
+    :title="t('dataTable.propsVerifyError')"
     :description="propsVerifyErrorMsg"
   />
 
@@ -1452,17 +1452,17 @@ onMounted(async () => {
                 >
                   <n-input
                     v-if="item.inputType === 'input'" v-model:value="queryParams[item.name]"
-                    :placeholder="item.placeholder || '請輸入'"
+                    :placeholder="item.placeholder || t('common.inputPlaceholder')"
                   />
                   <n-input-number
                     v-if="item.inputType === 'input-number'" v-model:value="queryParams[item.name]"
-                    :placeholder="item.placeholder || '請輸入'"
+                    :placeholder="item.placeholder || t('common.inputPlaceholder')"
                   />
                   <n-select
                     v-if="item.inputType === 'select' && item.dictType"
                     v-model:value="queryParams[item.name]"
                     :options="dictOptionsMap[item.dictType]"
-                    :placeholder="item.placeholder || '請選擇'"
+                    :placeholder="item.placeholder || t('common.selectPlaceholder')"
                     :loading="selectLoadingMap[item.dictType]"
                     clearable
                     @update:value="getList"
@@ -1474,13 +1474,13 @@ onMounted(async () => {
                   <template #icon>
                     <icon-park-outline-search />
                   </template>
-                  搜索
+                  {{ t('common.search') }}
                 </NButton>
                 <NButton strong secondary @click="handleResetSearch">
                   <template #icon>
                     <icon-park-outline-redo />
                   </template>
-                  重設
+                  {{ t('common.reset') }}
                 </NButton>
               </n-flex>
             </n-flex>
@@ -1496,14 +1496,14 @@ onMounted(async () => {
                 <template #icon>
                   <icon-park-outline-add-one />
                 </template>
-                新建{{ props.modalName }}
+                {{ t('common.add') + props.modalName }}
               </NButton>
 
               <NButton v-if="del" v-hasPermi="permission.delete" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
                 <template #icon>
                   <icon-park-outline-delete />
                 </template>
-                批次刪除
+                {{ t('common.batchDelete') }}
               </NButton>
             </div>
           </n-flex>
@@ -1548,15 +1548,15 @@ onMounted(async () => {
       <n-modal
         v-model:show="showBatchDeleteModalRef"
         preset="dialog"
-        title="確認刪除"
-        positive-text="確認"
-        negative-text="取消"
+        :title="t('common.confirmDelete')"
+        :positive-text="t('common.confirm')"
+        :negative-text="t('common.cancel')"
         :loading="batchDeleteLoading"
         @positive-click="confirmBatchDelete"
         @negative-click="() => { showBatchDeleteModalRef = false }"
       >
         <template #default>
-          確定要刪除選中的 {{ checkedRowKeys.length }} 條紀錄嗎？此操作無法復原！
+          {{ t('dataTable.batchDeleteModalTitle1') + checkedRowKeys.length + t('dataTable.batchDeleteModalTitle2') }}
         </template>
       </n-modal>
     </NSpace>
