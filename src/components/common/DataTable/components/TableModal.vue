@@ -571,13 +571,13 @@ async function submitModal() {
 
     if (modalType.value === 'add') {
       await add()
-      closeModal()
     }
 
     else if (modalType.value === 'edit') {
       await edit()
-      closeModal()
     }
+
+    closeModal()
   }
   catch {
     endLoading()

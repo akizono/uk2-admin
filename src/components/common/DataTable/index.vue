@@ -1416,8 +1416,6 @@ onMounted(async () => {
 
   // 查詢菜單
   await getMenuData()
-
-  // 排隊查詢
   await handleResetSearch()
 })
 </script>
@@ -1515,7 +1513,7 @@ onMounted(async () => {
             ref="tableRef"
             v-model:checked-row-keys="checkedRowKeys"
             v-model:expanded-row-keys="expandedRowKeys"
-            :columns="columns as DataTableColumns"
+            :columns="columns"
             :data="list"
             :loading="tableLoading"
             :row-key="row => row.id"
