@@ -1,19 +1,23 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import type { TableRow } from './type'
 import type { DataTableColumns, FormInst, NDataTable } from 'naive-ui'
 
 import { useBoolean } from '@/hooks'
 import { delay } from '@/utils/delay'
+import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
-import CreateModuleModal from './importTableModal.vue'
+import ModuleInfo from './components/module-info/index.vue'
+import ModuleModal from './components/module-modal/index.vue'
 
 // 表格的載入狀態
 const { bool: tableLoading, setTrue: startTableLoading, setFalse: endTableLoading } = useBoolean(false)
+// 刪除按鈕的 loading 狀態追蹤
+const delBtnLoadMap = ref<Record<string, boolean>>({})
 
 /** 列表 */
 const formRef = ref<FormInst | null>()
 const tableRef = ref<InstanceType<typeof NDataTable>>()
-const createModuleModalRef = ref()
+const moduleModalRef = ref()
 const total = ref(100)
 const queryParams = ref<Record<string, any>>({})
 const initQueryParams = {
@@ -22,8 +26,6 @@ const initQueryParams = {
 
   name: null,
   code: null,
-  createTime: null,
-  updateTime: null,
 }
 const list = ref<TableRow[]>([])
 const columns = ref<DataTableColumns<TableRow>>([
@@ -32,8 +34,11 @@ const columns = ref<DataTableColumns<TableRow>>([
     key: 'selection',
   },
   {
-    type: 'index',
-    key: 'index',
+    type: 'expand',
+    // expandable: rowData => rowData.name !== 'Jim Green',
+    renderExpand: (row: TableRow) => {
+      return <ModuleInfo row={row} />
+    },
   },
   {
     key: 'name',
@@ -44,8 +49,38 @@ const columns = ref<DataTableColumns<TableRow>>([
     title: '模組標識',
   },
   {
-    key: 'createTime',
-    title: '創建時間',
+    key: 'actions',
+    title: '操作',
+    width: 250,
+    align: 'center',
+    render: (row: TableRow) => {
+      return (
+        <NSpace justify="center">
+          <NButton
+            size="small"
+            onClick={() => {
+              moduleModalRef.value.openModal('edit', row)
+            }}
+          >
+            編輯
+          </NButton>
+          <NPopconfirm onPositiveClick={() => handleDelete(row)}>
+            {{
+              default: () => '確認刪除本項?',
+              trigger: () => (
+                <NButton
+                  size="small"
+                  type="error"
+                  loading={delBtnLoadMap.value[row.id!]}
+                >
+                  刪除
+                </NButton>
+              ),
+            }}
+          </NPopconfirm>
+        </NSpace>
+      )
+    },
   },
 ])
 async function getList() {
@@ -56,14 +91,45 @@ async function getList() {
     id: `${Date.now()}`,
     name: 'test',
     code: 'test',
-    createTime: '2021-01-01 11:11:11',
-    updateTime: '2021-02-01 11:11:11',
   })
   endTableLoading()
 }
 async function handleResetSearch() {
   queryParams.value = { ...initQueryParams }
   await getList()
+}
+
+/** 模組彈出視窗成功 */
+function moduleModalSuccess(data: TableRow & { modalType: ModalType }) {
+  const { modalType, ...remain } = data
+
+  if (modalType === 'add') {
+    list.value.push(remain as TableRow)
+  }
+  else if (modalType === 'edit') {
+    const index = list.value.findIndex(item => item.id === remain.id)
+    if (index > -1) {
+      list.value[index] = { ...list.value[index], ...remain }
+    }
+  }
+}
+
+/** 刪除 */
+async function handleDelete(row: TableRow) {
+  delBtnLoadMap.value[row.id!] = true
+
+  // 後端刪除
+  await delay(500)
+
+  // 後端刪除成功後，再從前端移除
+  const index = list.value.findIndex(item => item.id === row.id)
+  if (index > -1) {
+    list.value.splice(index, 1)
+  }
+
+  window.$message.success(`已經刪除${row.name}`)
+
+  delBtnLoadMap.value[row.id!] = false
 }
 
 /** 批次刪除 */
@@ -139,14 +205,13 @@ function changePage(page: number, size: number) {
 
 onMounted(async () => {
   await getList()
-  await handleResetSearch()
 })
 </script>
 
 <template>
   <NSpace vertical class="flex-1">
-    <n-alert type="info" closable>
-      點擊“創建模組”，將創建一個新的模組，並執行程式碼的生成。
+    <n-alert type="warning" closable>
+      只有在該頁面創建的模組會顯示在這此處，請務必將流程跑完再手動修改或操作代碼。
     </n-alert>
     <n-card>
       <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
@@ -154,14 +219,8 @@ onMounted(async () => {
           <n-form-item label="模組名" path="name">
             <n-input v-model:value="queryParams.name" placeholder="請輸入Name" />
           </n-form-item>
-          <n-form-item label="模組標題" path="code">
-            <n-input v-model:value="queryParams.tableDesc" placeholder="請輸入Code" />
-          </n-form-item>
-          <n-form-item label="創建時間" path="createTime">
-            <n-date-picker v-model:value="queryParams.createTime" type="daterange" placeholder="請選擇創建時間" />
-          </n-form-item>
-          <n-form-item label="更新時間" path="updateTime">
-            <n-date-picker v-model:value="queryParams.updateTime" type="daterange" placeholder="請選擇更新時間" />
+          <n-form-item label="模組標識" path="code">
+            <n-input v-model:value="queryParams.code" placeholder="請輸入Code" />
           </n-form-item>
           <n-flex class="ml-auto">
             <NButton type="primary" @click="getList">
@@ -185,7 +244,7 @@ onMounted(async () => {
       <template #header>
         <n-flex justify="space-between">
           <div>
-            <NButton type="primary" strong @click="createModuleModalRef.openModal()">
+            <NButton type="primary" strong @click="moduleModalRef.openModal('add')">
               <template #icon>
                 <icon-park-outline-add-web />
               </template>
@@ -209,8 +268,7 @@ onMounted(async () => {
       </NSpace>
     </n-card>
 
-    <!-- 創建模組 Modal -->
-    <CreateModuleModal ref="createModuleModalRef" />
+    <ModuleModal ref="moduleModalRef" @success="moduleModalSuccess" />
 
     <!-- 批次刪除確認 Modal -->
     <n-modal
