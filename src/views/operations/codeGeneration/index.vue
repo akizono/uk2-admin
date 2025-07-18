@@ -1,9 +1,9 @@
 <script setup lang="tsx">
-import type { TableRow } from './type'
+import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 import type { DataTableColumns, FormInst, NDataTable } from 'naive-ui'
 
+import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import { useBoolean } from '@/hooks'
-import { delay } from '@/utils/delay'
 import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 
 import ModuleInfo from './components/module-info/index.vue'
@@ -27,8 +27,8 @@ const initQueryParams = {
   name: null,
   code: null,
 }
-const list = ref<TableRow[]>([])
-const columns = ref<DataTableColumns<TableRow>>([
+const list = ref<CodeGenerationVO[]>([])
+const columns = ref<DataTableColumns<CodeGenerationVO>>([
   {
     type: 'selection',
     key: 'selection',
@@ -36,7 +36,7 @@ const columns = ref<DataTableColumns<TableRow>>([
   {
     type: 'expand',
     // expandable: rowData => rowData.name !== 'Jim Green',
-    renderExpand: (row: TableRow) => {
+    renderExpand: (row: CodeGenerationVO) => {
       return <ModuleInfo row={row} />
     },
   },
@@ -49,11 +49,29 @@ const columns = ref<DataTableColumns<TableRow>>([
     title: '模組標識',
   },
   {
+    key: 'status',
+    title: '狀態',
+    render: (row: CodeGenerationVO) => {
+      return (
+        <n-switch
+          value={row.status}
+          checked-value={1}
+          unchecked-value={0}
+          onUpdateValue={(value: 0 | 1) => {
+            handleStatusChange(row, value)
+          }}
+        >
+          {{ checked: () => '啟用', unchecked: () => '鎖定' }}
+        </n-switch>
+      )
+    },
+  },
+  {
     key: 'actions',
     title: '操作',
     width: 250,
     align: 'center',
-    render: (row: TableRow) => {
+    render: (row: CodeGenerationVO) => {
       const updatePermi = ['operations:code-generation:update']
       const deletePermi = ['operations:code-generation:delete']
 
@@ -89,27 +107,40 @@ const columns = ref<DataTableColumns<TableRow>>([
   },
 ])
 async function getList() {
-  startTableLoading()
+  try {
+    startTableLoading()
 
-  await delay(300)
-  list.value.push({
-    id: `${Date.now()}`,
-    name: 'test',
-    code: 'test',
-  })
-  endTableLoading()
+    const { data: result } = await CodeGenerationApi.getCodeGenerationPage(queryParams.value)
+    list.value = result.list
+    total.value = result.total
+  }
+  finally {
+    endTableLoading()
+  }
 }
 async function handleResetSearch() {
   queryParams.value = { ...initQueryParams }
   await getList()
 }
+function handleStatusChange(row: CodeGenerationVO, value: 0 | 1) {
+  if (value === 1) {
+    CodeGenerationApi.unblockCodeGeneration(row.id!)
+  }
+  else {
+    CodeGenerationApi.blockCodeGeneration(row.id!)
+  }
+  const index = list.value.findIndex(item => item.id === row.id)
+  if (index > -1) {
+    list.value[index].status = value
+  }
+}
 
 /** 模組彈出視窗成功 */
-function moduleModalSuccess(data: TableRow & { modalType: ModalType }) {
+function moduleModalSuccess(data: CodeGenerationVO & { modalType: ModalType }) {
   const { modalType, ...remain } = data
 
   if (modalType === 'add') {
-    list.value.push(remain as TableRow)
+    list.value.push(remain as CodeGenerationVO)
   }
   else if (modalType === 'edit') {
     const index = list.value.findIndex(item => item.id === remain.id)
@@ -120,11 +151,11 @@ function moduleModalSuccess(data: TableRow & { modalType: ModalType }) {
 }
 
 /** 刪除 */
-async function handleDelete(row: TableRow) {
+async function handleDelete(row: CodeGenerationVO) {
   delBtnLoadMap.value[row.id!] = true
 
   // 後端刪除
-  await delay(500)
+  await CodeGenerationApi.deleteCodeGeneration(row.id!)
 
   // 後端刪除成功後，再從前端移除
   const index = list.value.findIndex(item => item.id === row.id)
@@ -148,7 +179,7 @@ function handleBatchDelete() {
   }
   showBatchDeleteModalRef.value = true
 }
-function confirmBatchDelete() {
+async function confirmBatchDelete() {
   try {
     batchDeleteLoading.value = true
 
@@ -158,7 +189,7 @@ function confirmBatchDelete() {
     // 依序刪除選中的紀錄，先完成所有後端刪除請求
     for (const id of checkedRowKeys.value) {
       try {
-        // await props.deleteFunction!(id)
+        await CodeGenerationApi.deleteCodeGeneration(id)
         // 後端刪除成功，將 ID 添加到成功列表
         successDeletedIds.push(id)
       }
@@ -171,7 +202,7 @@ function confirmBatchDelete() {
     // 後端刪除成功後，從前端移除這些項目
     for (const id of successDeletedIds) {
       // 先在最外層尋找
-      const index = list.value.findIndex((item: TableRow) => item.id === id)
+      const index = list.value.findIndex((item: CodeGenerationVO) => item.id === id)
       if (index > -1) {
         list.value.splice(index, 1)
       }
@@ -249,13 +280,19 @@ onMounted(async () => {
       <template #header>
         <n-flex justify="space-between">
           <div>
-            <NButton v-hasPermi="['operations:code-generation:create']" type="primary" strong @click="moduleModalRef.openModal('add')">
+            <NButton
+              v-hasPermi="['operations:code-generation:create']" type="primary" strong
+              @click="moduleModalRef.openModal('add')"
+            >
               <template #icon>
                 <icon-park-outline-add-web />
               </template>
               創建模組
             </NButton>
-            <NButton v-hasPermi="['operations:code-generation:delete']" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
+            <NButton
+              v-hasPermi="['operations:code-generation:delete']" type="error" class="m-l-10px"
+              :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete"
+            >
               <template #icon>
                 <icon-park-outline-delete />
               </template>
@@ -265,10 +302,13 @@ onMounted(async () => {
         </n-flex>
       </template>
       <NSpace vertical>
-        <n-data-table ref="tableRef" v-model:checked-row-keys="checkedRowKeys" :data="list" :loading="tableLoading" :columns="columns" :row-key="row => row.id" />
+        <n-data-table
+          ref="tableRef" v-model:checked-row-keys="checkedRowKeys" :data="list" :loading="tableLoading"
+          :columns="columns" :row-key="row => row.id"
+        />
         <Pagination
-          :total="total" :page-size="queryParams.pageSize"
-          :current-page="queryParams.currentPage" @change="changePage"
+          :total="total" :page-size="queryParams.pageSize" :current-page="queryParams.currentPage"
+          @change="changePage"
         />
       </NSpace>
     </n-card>
@@ -277,13 +317,8 @@ onMounted(async () => {
 
     <!-- 批次刪除確認 Modal -->
     <n-modal
-      v-model:show="showBatchDeleteModalRef"
-      preset="dialog"
-      title="確認刪除"
-      positive-text="確認"
-      negative-text="取消"
-      :loading="batchDeleteLoading"
-      @positive-click="confirmBatchDelete"
+      v-model:show="showBatchDeleteModalRef" preset="dialog" title="確認刪除" positive-text="確認" negative-text="取消"
+      :loading="batchDeleteLoading" @positive-click="confirmBatchDelete"
       @negative-click="() => { showBatchDeleteModalRef = false }"
     >
       <template #default>

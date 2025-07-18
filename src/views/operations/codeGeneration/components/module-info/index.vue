@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { TableRow } from '../../type'
+import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 
 import { NButton, NCard, NSpace, NTag } from 'naive-ui'
 
 const props = defineProps<{
-  row: TableRow
+  row: CodeGenerationVO
 }>()
 
 // 模擬狀態數據，實際應用中應該從 props.row 中獲取

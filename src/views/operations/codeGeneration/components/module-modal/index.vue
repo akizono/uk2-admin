@@ -1,8 +1,8 @@
 <script setup lang="tsx">
-import type { TableRow } from '../../type'
+import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 
+import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import { useBoolean } from '@/hooks'
-import { delay } from '@/utils/delay'
 
 const emit = defineEmits(['success'])
 
@@ -17,22 +17,39 @@ const { bool: submitLoading, setTrue: startSubmitLoading, setFalse: endSubmitLoa
 
 const modalType = ref<ModalType>()
 const formRef = ref()
-const formData = ref<TableRow>({
+const formData = ref({
   id: undefined,
   name: '',
   code: '',
-})
+  isGenerateTable: 0,
+  isGenerateBackendCode: 0,
+  isGenerateWebCode: 0,
+  isImportMenuAndPermission: 0,
+
+  remark: '',
+  sort: 0,
+  status: 1,
+} as CodeGenerationVO)
 
 const rules = ref({
-  name: [{ required: true, message: '請輸入模組名稱' }],
-  code: [{ required: true, message: '請輸入模組代碼' }],
+  name: [
+    { required: true, message: '請輸入模組名稱' },
+    { max: 50, message: '模組名稱不能超過50個字元' },
+  ],
+  code: [
+    { required: true, message: '請輸入模組代碼' },
+    { max: 50, message: '模組代碼不能超過50個字元' },
+    {
+      pattern: /^[\w-]+$/,
+      message: '只能輸入英文、數字、下劃線(_)和橫杆(-)',
+    },
+  ],
 })
 
 // 提交
 async function handleSubmit() {
   try {
     await formRef.value?.validate()
-
     startSubmitLoading()
 
     if (modalType.value === 'add') {
@@ -53,36 +70,33 @@ async function handleSubmit() {
 }
 
 async function add() {
-  await delay(500)
+  const { data: result } = await CodeGenerationApi.createCodeGeneration(formData.value)
+  formData.value.id = result.id
 
   emit('success', {
     modalType: modalType.value,
-
-    id: `${Date.now()}`,
-    name: formData.value.name,
-    code: formData.value.code,
+    ...formData.value,
   })
 }
 
 async function edit() {
-  await delay(500)
+  await CodeGenerationApi.updateCodeGeneration(formData.value)
 
   emit('success', {
     modalType: modalType.value,
-
-    id: formData.value.id,
-    name: formData.value.name,
-    code: formData.value.code,
+    ...formData.value,
   })
 }
 
 // 打開彈出視窗
-async function openModal(type: ModalType, data: TableRow) {
+async function openModal(type: ModalType, data: CodeGenerationVO) {
   modalType.value = type
-
-  if (data)
-    formData.value = { ...data }
-
+  if (data) {
+    for (const key in formData.value) {
+      // @ts-expect-error close-error
+      formData.value[key] = data[key]
+    }
+  }
   showModal()
 }
 
@@ -111,6 +125,22 @@ function closeModal() {
           </n-form-item-grid-item>
           <n-form-item-grid-item :span="24" label="模組代碼" path="code">
             <n-input v-model:value="formData.code" />
+          </n-form-item-grid-item>
+          <n-form-item-grid-item :span="24" label="備註" path="remark">
+            <n-input v-model:value="formData.remark" type="textarea" />
+          </n-form-item-grid-item>
+          <n-form-item-grid-item :span="24" label="排序" path="sort">
+            <n-input-number v-model:value="formData.sort" />
+          </n-form-item-grid-item>
+          <n-form-item-grid-item :span="24" label="狀態" path="status">
+            <n-switch v-model:value="formData.status" :checked-value="1" :unchecked-value="0">
+              <template #checked>
+                啟用
+              </template>
+              <template #unchecked>
+                鎖定
+              </template>
+            </n-switch>
           </n-form-item-grid-item>
         </n-grid>
       </n-form>
