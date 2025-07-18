@@ -68,7 +68,7 @@ const columns: DataTableColumns<Entity.User> = [
           checked-value={1}
           unchecked-value={0}
           onUpdateValue={(value: 0 | 1) =>
-            handleUpdateDisabled(value, row.id!)}
+            handleStatusChange(value, row.id!)}
         >
           {{ checked: () => '启用', unchecked: () => '禁用' }}
         </NSwitch>
@@ -101,7 +101,7 @@ const columns: DataTableColumns<Entity.User> = [
 ]
 
 const listData = ref<Entity.User[]>([])
-function handleUpdateDisabled(value: 0 | 1, id: number) {
+function handleStatusChange(value: 0 | 1, id: number) {
   const index = listData.value.findIndex(item => item.id === id)
   if (index > -1)
     listData.value[index].status = value

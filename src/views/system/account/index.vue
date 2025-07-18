@@ -20,15 +20,7 @@ const { t } = useI18n()
 
 const { hasPermi } = usePermi()
 
-/** 更新使用者狀態 */
 const dataTableRef = ref()
-function handleUpdateDisabled(value: 0 | 1, id: string) {
-  dataTableRef.value.setListItemFieldValue(id, 'status', value)
-  if (value === 1)
-    UserApi.unblockUser(id)
-  else
-    UserApi.blockUser(id)
-}
 
 /** 處理 Modal 提交成功後返回的數據 */
 function handleCreateSuccess(params: TableRow) {
@@ -162,11 +154,8 @@ const columns: DataTableColumns<UserVo> = [
       return (
         <NSwitch
           disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)}
-          value={row.status}
-          checked-value={1}
-          unchecked-value={0}
-          onUpdateValue={(value: 0 | 1) =>
-            handleUpdateDisabled(value, row.id!)}
+          value={row.status === 1}
+          onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)}
         >
           {{ checked: () => t('common.enable'), unchecked: () => t('common.disable') }}
         </NSwitch>
