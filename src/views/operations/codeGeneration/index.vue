@@ -4,10 +4,16 @@ import type { DataTableColumns, FormInst, NDataTable } from 'naive-ui'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import { useBoolean } from '@/hooks'
-import { NButton, NPopconfirm, NSpace } from 'naive-ui'
+import { NButton, NPopconfirm, NSpace, useDialog } from 'naive-ui'
 
-import ModuleInfo from './components/module-info/index.vue'
-import ModuleModal from './components/module-modal/index.vue'
+import ModuleGenerateInfo from './components/ModuleGenerateInfo/index.vue'
+import TableModal from './components/TableModal/index.vue'
+
+defineOptions({
+  name: 'Code Generation',
+})
+
+const dialog = useDialog()
 
 // 表格的載入狀態
 const { bool: tableLoading, setTrue: startTableLoading, setFalse: endTableLoading } = useBoolean(false)
@@ -17,7 +23,7 @@ const delBtnLoadMap = ref<Record<string, boolean>>({})
 /** 列表 */
 const formRef = ref<FormInst | null>()
 const tableRef = ref<InstanceType<typeof NDataTable>>()
-const moduleModalRef = ref()
+const TableModalRef = ref()
 const total = ref(100)
 const queryParams = ref<Record<string, any>>({})
 const initQueryParams = {
@@ -35,9 +41,11 @@ const columns = ref<DataTableColumns<CodeGenerationVO>>([
   },
   {
     type: 'expand',
-    // expandable: rowData => rowData.name !== 'Jim Green',
+    expandable: (row: CodeGenerationVO) => row.status === 1,
     renderExpand: (row: CodeGenerationVO) => {
-      return <ModuleInfo row={row} />
+      return (
+        <ModuleGenerateInfo row={row} />
+      )
     },
   },
   {
@@ -81,7 +89,7 @@ const columns = ref<DataTableColumns<CodeGenerationVO>>([
             size="small"
             v-hasPermi={updatePermi}
             onClick={() => {
-              moduleModalRef.value.openModal('edit', row)
+              TableModalRef.value.openModal('edit', row)
             }}
           >
             編輯
@@ -123,20 +131,34 @@ async function handleResetSearch() {
   await getList()
 }
 function handleStatusChange(row: CodeGenerationVO, value: 0 | 1) {
+  const updateStatus = () => {
+    const index = list.value.findIndex(item => item.id === row.id)
+    if (index > -1) {
+      list.value[index].status = value
+    }
+  }
+
   if (value === 1) {
-    CodeGenerationApi.unblockCodeGeneration(row.id!)
+    dialog.warning({
+      title: '警告',
+      content: '生成的新代碼會覆蓋原有文件中的所有代碼，請確認是否繼續？',
+      positiveText: '確認',
+      negativeText: '取消',
+      draggable: true,
+      onPositiveClick: () => {
+        CodeGenerationApi.unblockCodeGeneration(row.id!)
+        updateStatus()
+      },
+    })
   }
   else {
     CodeGenerationApi.blockCodeGeneration(row.id!)
-  }
-  const index = list.value.findIndex(item => item.id === row.id)
-  if (index > -1) {
-    list.value[index].status = value
+    updateStatus()
   }
 }
 
 /** 模組彈出視窗成功 */
-function moduleModalSuccess(data: CodeGenerationVO & { modalType: ModalType }) {
+function TableModalSuccess(data: CodeGenerationVO & { modalType: ModalType }) {
   const { modalType, ...remain } = data
 
   if (modalType === 'add') {
@@ -282,7 +304,7 @@ onMounted(async () => {
           <div>
             <NButton
               v-hasPermi="['operations:code-generation:create']" type="primary" strong
-              @click="moduleModalRef.openModal('add')"
+              @click="TableModalRef.openModal('add')"
             >
               <template #icon>
                 <icon-park-outline-add-web />
@@ -313,7 +335,7 @@ onMounted(async () => {
       </NSpace>
     </n-card>
 
-    <ModuleModal ref="moduleModalRef" @success="moduleModalSuccess" />
+    <TableModal ref="TableModalRef" @success="TableModalSuccess" />
 
     <!-- 批次刪除確認 Modal -->
     <n-modal

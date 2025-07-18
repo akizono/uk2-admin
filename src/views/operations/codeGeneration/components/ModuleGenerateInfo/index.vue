@@ -3,16 +3,15 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 
 import { NButton, NCard, NSpace, NTag } from 'naive-ui'
 
+import GenerateTableModal from './GenerateTableModal/index.vue'
+
 const props = defineProps<{
   row: CodeGenerationVO
 }>()
 
-// 模擬狀態數據，實際應用中應該從 props.row 中獲取
-const status = {
-  database: false,
-  backend: false,
-  frontend: false,
-  menu: false,
+const GenerateTableModalRef = ref()
+function handleGenerateTable() {
+  GenerateTableModalRef.value.openModal()
 }
 </script>
 
@@ -30,25 +29,25 @@ const status = {
       </div>
 
       <n-flex>
-        <!-- 創建資料庫 -->
+        <!-- 創建資料表 -->
         <NCard class="status-card" size="small">
           <template #header>
             <div class="card-header">
               <n-icon>
                 <icon-park-outline-database-setting />
               </n-icon>
-              <span>創建資料庫</span>
+              <span>創建資料表</span>
             </div>
           </template>
           <div class="card-content">
             <div class="status-row">
               <span>狀態：</span>
-              <NTag :type="status.database ? 'success' : 'error'" size="small">
-                {{ status.database ? '資料庫已創建' : '資料庫未創建' }}
+              <NTag :type="row.isGenerateTable === 1 ? 'success' : 'error'" size="small">
+                {{ row.isGenerateTable === 1 ? '資料表已創建' : '資料表未創建' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button">
-              創建資料庫
+            <NButton type="primary" size="small" class="action-button" @click="handleGenerateTable">
+              創建資料表
             </NButton>
           </div>
         </NCard>
@@ -66,11 +65,11 @@ const status = {
           <div class="card-content">
             <div class="status-row">
               <span>狀態：</span>
-              <NTag :type="status.backend ? 'success' : 'error'" size="small">
-                {{ status.backend ? '後端代碼已生成' : '後端代碼未生成' }}
+              <NTag :type="row.isGenerateBackendCode === 1 ? 'success' : 'error'" size="small">
+                {{ row.isGenerateBackendCode === 1 ? '後端代碼已生成' : '後端代碼未生成' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="!status.database">
+            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateTable === 0">
               生成後端代碼
             </NButton>
           </div>
@@ -89,11 +88,11 @@ const status = {
           <div class="card-content">
             <div class="status-row">
               <span>狀態：</span>
-              <NTag :type="status.frontend ? 'success' : 'error'" size="small">
-                {{ status.frontend ? '前端代碼已生成' : '前端代碼未生成' }}
+              <NTag :type="row.isGenerateWebCode === 1 ? 'success' : 'error'" size="small">
+                {{ row.isGenerateWebCode === 1 ? '前端代碼已生成' : '前端代碼未生成' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="!status.backend">
+            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateBackendCode === 0">
               生成前端代碼
             </NButton>
           </div>
@@ -112,17 +111,19 @@ const status = {
           <div class="card-content">
             <div class="status-row">
               <span>狀態：</span>
-              <NTag :type="status.menu ? 'success' : 'error'" size="small">
-                {{ status.menu ? '菜單已導入' : '菜單未導入' }}
+              <NTag :type="row.isImportMenuAndPermission === 1 ? 'success' : 'error'" size="small">
+                {{ row.isImportMenuAndPermission === 1 ? '菜單已導入' : '菜單未導入' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="!status.frontend">
+            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateWebCode === 0">
               導入菜單
             </NButton>
           </div>
         </NCard>
       </n-flex>
     </NSpace>
+
+    <GenerateTableModal ref="GenerateTableModalRef" />
   </NCard>
 </template>
 
