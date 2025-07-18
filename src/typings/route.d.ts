@@ -33,6 +33,22 @@ declare namespace AppRoute {
     menuType?: MenuType
     /** 菜單類型 0:目錄 1:菜單 */
     type?: number
+    /** 多語言欄位 */
+    multilingualFields?: {
+      [field: string]: Array<{
+        remark: string | null
+        status: number
+        isDeleted: number
+        creator: string
+        createTime: string
+        updater: string | null
+        updateTime: string | null
+        id: string
+        fieldId: string
+        language: string
+        value: string
+      }>
+    }
   }
 
   type MetaKeys = keyof RouteMeta

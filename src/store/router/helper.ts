@@ -22,6 +22,10 @@ function standardizedRoutes(route: AppRoute.RowRoute[]) {
       type: item.type,
     }
 
+    if (item.multilingualFields) {
+      meta.multilingualFields = item.multilingualFields
+    }
+
     if (item.link) {
       meta.href = item.link
     }

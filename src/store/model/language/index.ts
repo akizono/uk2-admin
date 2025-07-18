@@ -1,8 +1,12 @@
 import { LanguageApi } from '@/api/system/language'
 import { router } from '@/router'
 import { local, session, setLocale } from '@/utils'
+import { createDiscreteApi } from 'naive-ui'
+
+import { useTabStore } from '../tab'
 
 const { VITE_DEFAULT_LANG } = import.meta.env
+const { dialog } = createDiscreteApi(['dialog'])
 
 export const useLanguageStore = defineStore('language-store', {
   state: () => {
@@ -35,9 +39,29 @@ export const useLanguageStore = defineStore('language-store', {
   actions: {
     /** 設置語言 */
     setAppLang(lang: string) {
-      setLocale(lang)
-      local.set('languageCurrent', lang)
-      this.current = lang
+      dialog.warning({
+        title: '警告',
+        content: '確定要切換語言嗎？切換後頁面將會重新整理',
+        positiveText: '確定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          // 設置語言
+          setLocale(lang)
+          local.set('languageCurrent', lang)
+          this.current = lang
+
+          // 修改tab標籤為新語言
+          const tabStore = useTabStore()
+          tabStore.modifyTabByLang(lang)
+
+          // 重新整理頁面
+          window.location.reload()
+        },
+        onNegativeClick: () => {
+          // 取消操作，不做任何事
+        },
+      })
     },
 
     /** 初始化語言設定 */

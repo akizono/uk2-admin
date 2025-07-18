@@ -100,6 +100,21 @@ export const useTabStore = defineStore('tab-store', {
       const index = this.getTabIndex(fullPath)
       modifyFn(this.tabs[index])
     },
+
+    /** 根據當前語言修改標籤 */
+    modifyTabByLang(currentLanguage: string) {
+      function updateTabTitleByLang(tab: RouteLocationNormalized, currentLanguage: string) {
+        for (const field in tab.meta.multilingualFields) {
+          const fieldData = tab.meta.multilingualFields[field]
+          const matchedItem = fieldData.find(item => item.language === currentLanguage)
+          if (matchedItem?.value) {
+            tab.meta[field] = matchedItem.value
+          }
+        }
+      }
+      this.tabs.forEach(tab => updateTabTitleByLang(tab, currentLanguage))
+      this.persistentTabs.forEach(tab => updateTabTitleByLang(tab, currentLanguage))
+    },
   },
   persist: {
     storage: sessionStorage,
