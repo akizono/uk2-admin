@@ -1,10 +1,13 @@
 <script setup lang="tsx">
 import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, NDataTable } from 'naive-ui'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import { useBoolean } from '@/hooks'
+import { useTableDrag } from '@/hooks/useTableDrag'
 import { camelToSnakeCase, hyphenToCamelCase, replaceDashToUnderscore } from '@/utils/string'
+
+import CodePreviewModal from './CodePreviewModal/index.vue'
 
 const props = defineProps<{
   row: CodeGenerationVO
@@ -16,6 +19,8 @@ defineExpose({
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
+// 控制"生成預覽"的loading
+const { bool: generatePreviewLoading, setTrue: startGeneratePreviewLoading, setFalse: endGeneratePreviewLoading } = useBoolean(false)
 
 /**
  * MySQL資料庫欄位類型選項列表
@@ -214,6 +219,17 @@ function setValidationError(rowIndex: number, field: string, error: string | nul
 }
 
 const columns = ref<DataTableColumns<ColumnRow>>([
+  {
+    key: 'drag',
+    width: 40,
+    render: () => {
+      return (
+        <div class="cursor-move flex items-center justify-center">
+          <icon-park-outline-drag class="text-gray-400" />
+        </div>
+      )
+    },
+  },
   {
     key: 'columnName',
     title: '欄位名稱',
@@ -458,6 +474,18 @@ function removeRow(index: number) {
   }
 }
 
+// 表格引用
+const tableRef = ref<InstanceType<typeof NDataTable>>()
+// 初始化拖動功能
+const { initDrag } = useTableDrag({
+  tableRef,
+  data: formData,
+  onRowDrag(_rows, _newList) {
+    // 拖動完成後的處理，這裡不需要特別處理，因為 formData 已經被更新
+    window.$message.success('欄位順序已更新')
+  },
+})
+
 // 驗證所有欄位
 function validateAllFields(): boolean {
   let isValid = true
@@ -484,6 +512,7 @@ function validateAllFields(): boolean {
 }
 
 /** 生成預覽 */
+const codePreviewModalRef = ref()
 async function handleGeneratePreview() {
   if (!validateAllFields()) {
     window.$message.error('請修正表單中的錯誤')
@@ -495,17 +524,26 @@ async function handleGeneratePreview() {
     return
   }
 
-  await CodeGenerationApi.previewTableCode({
-    className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
-    fileName: Date.now().toString(), // plop 的臨時檔案名
-    tableName: replaceDashToUnderscore(props.row.code), // 資料表的名稱
-    // 資料表的欄位集合
-    tableColumns: formData.value.map(item => ({
-      columnNameUnderline: camelToSnakeCase(item.columnName), // 欄位名稱轉換為下劃線命名
-      jsDataType: mysqlTypeToJsDataType(item.dataType), // 資料類型轉換為 JavaScript 類型
-      ...item,
-    })),
-  })
+  try {
+    startGeneratePreviewLoading()
+
+    await CodeGenerationApi.previewTableCode({
+      className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
+      fileName: Date.now().toString(), // plop 的臨時檔案名
+      tableName: replaceDashToUnderscore(props.row.code), // 資料表的名稱
+      // 資料表的欄位集合
+      tableColumns: formData.value.map(item => ({
+        columnNameUnderline: camelToSnakeCase(item.columnName), // 欄位名稱轉換為下劃線命名
+        jsDataType: mysqlTypeToJsDataType(item.dataType), // 資料類型轉換為 JavaScript 類型
+        ...item,
+      })),
+    })
+
+    // codePreviewModalRef.value?.openModal()
+  }
+  finally {
+    endGeneratePreviewLoading()
+  }
 }
 
 /** 打開彈出視窗 */
@@ -519,6 +557,24 @@ async function openModal() {
 function closeModal() {
   hiddenModal()
 }
+
+onMounted(() => {
+  nextTick(() => {
+    // 在模態框打開後初始化拖動功能
+    if (modalVisible.value) {
+      initDrag()
+    }
+  })
+})
+
+// 監聽模態框顯示狀態，當顯示時初始化拖動功能
+watch(modalVisible, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      initDrag()
+    })
+  }
+})
 </script>
 
 <template>
@@ -535,7 +591,14 @@ function closeModal() {
         </n-alert>
 
         <div class="overflow-y-auto" style="height: calc(100vh - 300px);">
-          <n-data-table :columns="columns" :data="formData" size="small" striped />
+          <n-data-table
+            ref="tableRef"
+            :columns="columns"
+            :data="formData"
+            size="small"
+            striped
+            row-class-name="drag-handle"
+          />
           <NButton class="w-full" secondary style="border-radius: 0px;" @click="addRow">
             <template #icon>
               <icon-park-outline-add-one />
@@ -546,14 +609,36 @@ function closeModal() {
       </NSpace>
       <template #action>
         <n-space justify="center">
-          <n-button type="primary" @click="handleGeneratePreview">
+          <n-button
+            type="primary"
+            :loading="generatePreviewLoading"
+            @click="handleGeneratePreview"
+          >
             生成預覽
           </n-button>
-          <n-button @click="closeModal">
+          <n-button :disabled="generatePreviewLoading" @click="closeModal">
             取消
           </n-button>
         </n-space>
       </template>
     </n-modal>
+
+    <!-- 預覽生成代碼的彈出視窗 -->
+    <CodePreviewModal ref="codePreviewModalRef" />
   </div>
 </template>
+
+<style scoped>
+:deep(.drag-handle) {
+  cursor: move;
+}
+
+:deep(.drag-handle.sortable-ghost) {
+  background-color: #f0f9ff !important;
+  opacity: 0.8;
+}
+
+:deep(.drag-handle.sortable-chosen) {
+  background-color: #e6f4ff !important;
+}
+</style>

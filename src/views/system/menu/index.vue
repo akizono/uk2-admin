@@ -84,8 +84,13 @@ const columns: DataTableColumns<MenuVO> = [
     align: 'center',
     key: 'status',
     render: (row: MenuVO) => {
-      if (row.status === 1)
-        return <NSwitch disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)} value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
+      return (
+        <NSwitch
+          disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)}
+          value={row.status === 1}
+          onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)}
+        />
+      )
     },
   },
 ]
