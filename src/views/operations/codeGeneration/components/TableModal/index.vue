@@ -17,7 +17,7 @@ const { bool: submitLoading, setTrue: startSubmitLoading, setFalse: endSubmitLoa
 
 const modalType = ref<ModalType>()
 const formRef = ref()
-const formData = ref({
+const initFormData = {
   id: undefined,
   name: '',
   code: '',
@@ -29,7 +29,8 @@ const formData = ref({
   remark: '',
   sort: 0,
   status: 1,
-} as CodeGenerationVO)
+}
+const formData = ref({} as CodeGenerationVO)
 
 const rules = ref({
   name: [
@@ -40,8 +41,8 @@ const rules = ref({
     { required: true, message: '請輸入模組代碼' },
     { max: 50, message: '模組代碼不能超過50個字元' },
     {
-      pattern: /^[\w-]+$/,
-      message: '只能輸入英文、數字、下劃線(_)和橫杆(-)',
+      pattern: /^[a-z]+-[a-z]+$/,
+      message: '格式不正確：必須包含一個橫桿(-)，且只能包含小寫英文，橫桿不能出現在開頭或結尾',
     },
   ],
 })
@@ -91,6 +92,8 @@ async function edit() {
 // 打開彈出視窗
 async function openModal(type: ModalType, data: CodeGenerationVO) {
   modalType.value = type
+  formData.value = { ...initFormData } as CodeGenerationVO
+
   if (data) {
     for (const key in formData.value) {
       // @ts-expect-error close-error

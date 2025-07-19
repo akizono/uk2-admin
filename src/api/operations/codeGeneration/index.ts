@@ -43,4 +43,9 @@ export const CodeGenerationApi = {
   unblockCodeGeneration: async (id: string) => {
     return await request.put({ url: `/operations/code-generation/unblock/${id}` })
   },
+
+  /** 生成數據表的代碼返回前端進行預覽 */
+  previewTableCode: async (data) => {
+    return await request.post({ url: `/operations/code-generation/preview-table-code`, data })
+  },
 }

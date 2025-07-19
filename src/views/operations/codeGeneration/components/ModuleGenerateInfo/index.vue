@@ -123,7 +123,7 @@ function handleGenerateTable() {
       </n-flex>
     </NSpace>
 
-    <GenerateTableModal ref="GenerateTableModalRef" />
+    <GenerateTableModal ref="GenerateTableModalRef" :row="props.row" />
   </NCard>
 </template>
 
