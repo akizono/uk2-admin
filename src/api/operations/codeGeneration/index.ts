@@ -6,7 +6,7 @@ export interface CodeGenerationVO extends BaseVO {
   id?: string
   name: string
   code: string
-  isGenerateTable: number
+  isGenerateEntity: number
   isGenerateBackendCode: number
   isGenerateWebCode: number
   isImportMenuAndPermission: number
@@ -45,7 +45,7 @@ export const CodeGenerationApi = {
   },
 
   /** 生成數據表的代碼返回前端進行預覽 */
-  previewTableCode: async (data) => {
-    return await request.post({ url: `/operations/code-generation/preview-table-code`, data })
+  previewEntityCode: async (data) => {
+    return await request.post({ url: `/operations/code-generation/preview-entity-code`, data })
   },
 }

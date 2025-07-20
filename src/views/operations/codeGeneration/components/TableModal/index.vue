@@ -21,7 +21,7 @@ const initFormData = {
   id: undefined,
   name: '',
   code: '',
-  isGenerateTable: 0,
+  isGenerateEntity: 0,
   isGenerateBackendCode: 0,
   isGenerateWebCode: 0,
   isImportMenuAndPermission: 0,

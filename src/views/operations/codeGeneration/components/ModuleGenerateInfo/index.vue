@@ -29,25 +29,25 @@ function handleGenerateTable() {
       </div>
 
       <n-flex>
-        <!-- 創建資料表 -->
+        <!-- 創建實體 -->
         <NCard class="status-card" size="small">
           <template #header>
             <div class="card-header">
               <n-icon>
                 <icon-park-outline-database-setting />
               </n-icon>
-              <span>創建資料表</span>
+              <span>創建實體</span>
             </div>
           </template>
           <div class="card-content">
             <div class="status-row">
               <span>狀態：</span>
-              <NTag :type="row.isGenerateTable === 1 ? 'success' : 'error'" size="small">
-                {{ row.isGenerateTable === 1 ? '資料表已創建' : '資料表未創建' }}
+              <NTag :type="row.isGenerateEntity === 1 ? 'success' : 'error'" size="small">
+                {{ row.isGenerateEntity === 1 ? '實體已創建' : '實體未創建' }}
               </NTag>
             </div>
             <NButton type="primary" size="small" class="action-button" @click="handleGenerateTable">
-              創建資料表
+              創建實體
             </NButton>
           </div>
         </NCard>
@@ -69,7 +69,7 @@ function handleGenerateTable() {
                 {{ row.isGenerateBackendCode === 1 ? '後端代碼已生成' : '後端代碼未生成' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateTable === 0">
+            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateEntity === 0">
               生成後端代碼
             </NButton>
           </div>

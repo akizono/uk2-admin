@@ -527,9 +527,10 @@ async function handleGeneratePreview() {
   try {
     startGeneratePreviewLoading()
 
-    await CodeGenerationApi.previewTableCode({
+    await CodeGenerationApi.previewEntityCode({
       className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
-      fileName: Date.now().toString(), // plop 的臨時檔案名
+      timestamp: Date.now().toString(), // 時間戳記
+      fileName: props.row.code, // 檔案名（不包含後綴和格式）
       tableName: replaceDashToUnderscore(props.row.code), // 資料表的名稱
       // 資料表的欄位集合
       tableColumns: formData.value.map(item => ({
