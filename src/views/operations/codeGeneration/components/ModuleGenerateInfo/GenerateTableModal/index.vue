@@ -142,39 +142,6 @@ const rowTemplate: ColumnRow = {
 // 表單數據
 const formData = ref<ColumnRow[]>([
   // { ...rowTemplate },
-  {
-    columnName: 'name',
-    dataType: 'varchar',
-    length: 55,
-    isNotNull: 1,
-    isAutoIncrement: 0,
-    isPrimaryKey: 0,
-    isUnique: 0,
-    defaultValue: null,
-    comment: '姓名',
-  },
-  {
-    columnName: 'age',
-    dataType: 'int',
-    length: null,
-    isNotNull: 0,
-    isAutoIncrement: 0,
-    isPrimaryKey: 0,
-    isUnique: 0,
-    defaultValue: '12',
-    comment: '年齡',
-  },
-  {
-    columnName: 'idCard',
-    dataType: 'varchar',
-    length: 55,
-    isNotNull: 0,
-    isAutoIncrement: 0,
-    isPrimaryKey: 0,
-    isUnique: 1,
-    defaultValue: null,
-    comment: '證件號碼',
-  },
 ])
 
 // 驗證狀態
@@ -223,7 +190,7 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     width: 40,
     render: () => {
       return (
-        <div class="cursor-move flex items-center justify-center">
+        <div class="drag-handle cursor-move flex items-center justify-center">
           <icon-park-outline-drag class="text-gray-400" />
         </div>
       )
@@ -481,7 +448,7 @@ const { initDrag } = useTableDrag({
   data: formData,
   onRowDrag(_rows, _newList) {
     // 拖動完成後的處理，這裡不需要特別處理，因為 formData 已經被更新
-    window.$message.success('欄位順序已更新')
+    // window.$message.success('欄位順序已更新')
   },
 })
 
@@ -550,6 +517,54 @@ async function handleGeneratePreview() {
 /** 打開彈出視窗 */
 async function openModal() {
   showModal()
+
+  formData.value = [
+    {
+      columnName: 'id',
+      dataType: 'bigint',
+      length: null,
+      isNotNull: 1,
+      isAutoIncrement: 1,
+      isPrimaryKey: 1,
+      isUnique: 1,
+      defaultValue: null,
+      comment: 'id主鍵',
+    },
+    {
+      columnName: 'name',
+      dataType: 'varchar',
+      length: 55,
+      isNotNull: 1,
+      isAutoIncrement: 0,
+      isPrimaryKey: 0,
+      isUnique: 0,
+      defaultValue: null,
+      comment: '姓名',
+    },
+    {
+      columnName: 'age',
+      dataType: 'int',
+      length: null,
+      isNotNull: 0,
+      isAutoIncrement: 0,
+      isPrimaryKey: 0,
+      isUnique: 0,
+      defaultValue: '12',
+      comment: '年齡',
+    },
+    {
+      columnName: 'idCard',
+      dataType: 'varchar',
+      length: 55,
+      isNotNull: 0,
+      isAutoIncrement: 0,
+      isPrimaryKey: 0,
+      isUnique: 1,
+      defaultValue: null,
+      comment: '證件號碼',
+    },
+  ]
+
   // 重設驗證錯誤
   validationErrors.value = {}
 }
@@ -594,7 +609,6 @@ watch(modalVisible, (newVal) => {
         <div class="overflow-y-auto" style="height: calc(100vh - 300px);">
           <n-data-table
             ref="tableRef" :columns="columns" :data="formData" size="small" striped
-            row-class-name="drag-handle"
           />
           <NButton class="w-full" secondary style="border-radius: 0px;" @click="addRow">
             <template #icon>

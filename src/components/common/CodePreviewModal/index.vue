@@ -100,7 +100,7 @@ function closeModal() {
   >
     <div class="flex h-full">
       <!-- 左側樹狀菜單 -->
-      <div class="w-1/4 pr-4 border-r border-gray-200 overflow-y-auto">
+      <div class="w-1/4 pr-4 border-r border-gray-200 overflow-y-auto h-[calc(80vh-120px)]">
         <NTree
           :data="treeData"
           selectable
@@ -111,7 +111,7 @@ function closeModal() {
       </div>
 
       <!-- 右側代碼預覽 -->
-      <div class="w-3/4 pl-4 overflow-y-auto">
+      <div class="w-3/4 pl-4 overflow-y-auto h-[calc(80vh-120px)]">
         <NCode
           v-if="selectedFileKey"
           :code="findFileCode(treeData, selectedFileKey) || ''"
@@ -134,6 +134,6 @@ function closeModal() {
 
 <style scoped>
 :deep(.n-code) {
-  height: calc(80vh - 100px) !important;
+  height: 100% !important;
 }
 </style>
