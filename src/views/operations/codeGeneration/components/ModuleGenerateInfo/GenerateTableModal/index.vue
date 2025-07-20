@@ -13,13 +13,15 @@ const props = defineProps<{
   row: CodeGenerationVO
 }>()
 
+const emit = defineEmits(['success'])
+
 defineExpose({
   openModal,
 })
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
-// 控制"生成預覽"的loading
+// 控制"查看預覽"的loading
 const { bool: generatePreviewLoading, setTrue: startGeneratePreviewLoading, setFalse: endGeneratePreviewLoading } = useBoolean(false)
 
 /**
@@ -478,7 +480,7 @@ function validateAllFields(): boolean {
   return isValid
 }
 
-/** 生成預覽 */
+/** 查看預覽 */
 const codePreviewModalRef = ref()
 async function handleGeneratePreview() {
   if (!validateAllFields()) {
@@ -494,7 +496,7 @@ async function handleGeneratePreview() {
   try {
     startGeneratePreviewLoading()
 
-    const { data: result } = await CodeGenerationApi.previewEntityCode({
+    const codeGenerateParams = {
       timestamp: Date.now().toString(), // 時間戳記
       className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
       fileName: props.row.code, // 檔案名（不包含後綴和格式）
@@ -506,14 +508,21 @@ async function handleGeneratePreview() {
         jsDataType: mysqlTypeToJsDataType(item.dataType), // 資料類型轉換為 JavaScript 類型
         ...item,
       })),
-    })
-    codePreviewModalRef.value?.openModal(result.treeData)
+    }
+    const { data: result } = await CodeGenerationApi.previewEntityCode(codeGenerateParams)
+    codePreviewModalRef.value?.openModal(result.treeData, codeGenerateParams)
 
     // codePreviewModalRef.value?.openModal([{ label: 'src', key: 'IAOaBr8e', type: 'folder', children: [{ label: 'modules', key: 'Vu5moTNi', type: 'folder', children: [{ label: 'demo', key: 'yqPCYC4B', type: 'folder', children: [{ label: 'student', key: 'AGIgCQgb', type: 'folder', children: [{ label: 'entity', key: 'C9v8P0FH', type: 'folder', children: [{ label: 'demo-student.entity.ts', key: 'H97KIVdE', type: 'file', code: 'import { Entity, Column, PrimaryGeneratedColumn } from \'typeorm\'\n\nimport { BaseEntity } from \'@/common/entities/base.entity\'\n\n@Entity(\'demo_student\')\nexport class DemoStudentEntity extends BaseEntity {\n  @PrimaryGeneratedColumn({\n    name: \'id\',\n    type: \'bigint\',\n    comment: \'id主鍵\'\n  })\n  id: number\n\n  @Column({\n    name: \'name\',\n    type: \'varchar\',\n    length: 55,\n    nullable: false,\n    comment: \'姓名\'\n  })\n  name: string\n\n  @Column({\n    name: \'age\',\n    type: \'int\',\n    comment: \'年齡\'\n  })\n  age: number\n\n  @Column({\n    name: \'id_card\',\n    type: \'varchar\',\n    length: 55,\n    comment: \'證件號碼\'\n  })\n  idCard: string\n\n}' }] }] }] }] }] }])
   }
   finally {
     endGeneratePreviewLoading()
   }
+}
+
+/** 生成實體成功 */
+function handleGenerateEntitySuccess() {
+  closeModal()
+  emit('success')
 }
 
 /** 打開彈出視窗 */
@@ -603,27 +612,30 @@ watch(modalVisible, (newVal) => {
         action: true,
       }" style="max-width: 2000px;"
     >
-      <NSpace vertical class="flex-1">
-        <n-alert type="info">
-          系統將根據您在下方填寫的資訊進行資料庫的創建。請仔細填寫每個欄位的屬性。
-        </n-alert>
+      <n-spin :show="generatePreviewLoading" size="large">
+        <NSpace vertical class="flex-1">
+          <n-alert type="info">
+            系統將根據您在下方填寫的資訊進行資料庫的創建。請仔細填寫每個欄位的屬性。
+          </n-alert>
 
-        <div class="overflow-y-auto" style="height: calc(100vh - 300px);">
-          <n-data-table
-            ref="tableRef" :columns="columns" :data="formData" size="small" striped
-          />
-          <NButton class="w-full" secondary style="border-radius: 0px;" @click="addRow">
-            <template #icon>
-              <icon-park-outline-add-one />
-            </template>
-            增加一個欄位
-          </NButton>
-        </div>
-      </NSpace>
+          <div class="overflow-y-auto" style="height: calc(100vh - 300px);">
+            <n-data-table
+              ref="tableRef" :columns="columns" :data="formData" size="small" striped
+            />
+            <NButton class="w-full" secondary style="border-radius: 0px;" @click="addRow">
+              <template #icon>
+                <icon-park-outline-add-one />
+              </template>
+              增加一個欄位
+            </NButton>
+          </div>
+        </NSpace>
+      </n-spin>
+
       <template #action>
         <n-space justify="center">
           <n-button type="primary" :loading="generatePreviewLoading" @click="handleGeneratePreview">
-            生成預覽
+            查看預覽
           </n-button>
           <n-button :disabled="generatePreviewLoading" @click="closeModal">
             取消
@@ -633,7 +645,7 @@ watch(modalVisible, (newVal) => {
     </n-modal>
 
     <!-- 預覽生成代碼的彈出視窗 -->
-    <CodePreviewModal ref="codePreviewModalRef" />
+    <CodePreviewModal ref="codePreviewModalRef" @success="handleGenerateEntitySuccess" />
   </div>
 </template>
 

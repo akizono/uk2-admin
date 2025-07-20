@@ -44,7 +44,13 @@ const columns = ref<DataTableColumns<CodeGenerationVO>>([
     expandable: (row: CodeGenerationVO) => row.status === 1,
     renderExpand: (row: CodeGenerationVO) => {
       return (
-        <ModuleGenerateInfo row={row} />
+        <ModuleGenerateInfo
+          row={row}
+          onSuccess={
+            (key: 'isGenerateBackendCode' | 'isGenerateWebCode' | 'isGenerateEntity' | 'isImportMenuAndPermission') =>
+              handleModuleGenerateSuccess(row, key)
+          }
+        />
       )
     },
   },
@@ -169,6 +175,14 @@ function TableModalSuccess(data: CodeGenerationVO & { modalType: ModalType }) {
     if (index > -1) {
       list.value[index] = { ...list.value[index], ...remain }
     }
+  }
+}
+
+/** 模組生成成功 */
+function handleModuleGenerateSuccess(row: CodeGenerationVO, key: 'isGenerateBackendCode' | 'isGenerateWebCode' | 'isGenerateEntity' | 'isImportMenuAndPermission') {
+  const index = list.value.findIndex(item => item.id === row.id)
+  if (index > -1) {
+    list.value[index][key] = 1
   }
 }
 

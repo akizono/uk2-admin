@@ -13,7 +13,7 @@ export interface CodeGenerationVO extends BaseVO {
   sort: number
 }
 
-interface PreviewEntityCodeData {
+export interface CodeGenerateParamsVO {
   timestamp: string
   className: string
   fileName: string
@@ -98,7 +98,12 @@ export const CodeGenerationApi = {
   },
 
   /** 生成數據表的代碼返回前端進行預覽 */
-  previewEntityCode: async (data: PreviewEntityCodeData): ApiResponse<{ treeData: TreeData[] }> => {
+  previewEntityCode: async (data: CodeGenerateParamsVO): ApiResponse<{ treeData: TreeData[] }> => {
     return await request.post({ url: `/operations/code-generation/preview-entity-code`, data })
+  },
+
+  /** 插入實體代碼 */
+  insertEntityCode: async (data: CodeGenerateParamsVO) => {
+    return await request.post({ url: `/operations/code-generation/insert-entity-code`, data })
   },
 }

@@ -9,9 +9,14 @@ const props = defineProps<{
   row: CodeGenerationVO
 }>()
 
+const emit = defineEmits(['success'])
+
 const GenerateTableModalRef = ref()
 function handleGenerateTable() {
   GenerateTableModalRef.value.openModal()
+}
+function handleGenerateTableSuccess() {
+  emit('success', 'isGenerateEntity')
 }
 </script>
 
@@ -123,7 +128,7 @@ function handleGenerateTable() {
       </n-flex>
     </NSpace>
 
-    <GenerateTableModal ref="GenerateTableModalRef" :row="props.row" />
+    <GenerateTableModal ref="GenerateTableModalRef" :row="props.row" @success="handleGenerateTableSuccess" />
   </NCard>
 </template>
 
