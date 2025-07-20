@@ -13,6 +13,59 @@ export interface CodeGenerationVO extends BaseVO {
   sort: number
 }
 
+interface PreviewEntityCodeData {
+  timestamp: string
+  className: string
+  fileName: string
+  splitName: string[]
+  tableName: string
+  tableColumns: {
+    columnNameUnderline: string
+    jsDataType: 'number' | 'string' | 'boolean' | 'Date' | any // Can be more specific based on possible values
+    columnName: string
+    dataType: string
+    length: number | null
+    isNotNull: number // 0 or 1
+    isAutoIncrement: number // 0 or 1
+    isPrimaryKey: number // 0 or 1
+    isUnique: number // 0 or 1
+    defaultValue: string | number | null
+    comment: string | null
+  }[]
+}
+
+export interface TreeData {
+  label: string
+  key: string
+  type: 'folder' | 'file'
+  children?: Array<{
+    label: string
+    key: string
+    type: 'folder' | 'file'
+    children?: Array<{
+      label: string
+      key: string
+      type: 'folder' | 'file'
+      children?: Array<{
+        label: string
+        key: string
+        type: 'folder' | 'file'
+        children?: Array<{
+          label: string
+          key: string
+          type: 'folder' | 'file'
+          children?: Array<{
+            label: string
+            key: string
+            type: 'folder' | 'file'
+            code?: string
+          }>
+        }>
+      }>
+    }>
+  }>
+}
+
 export const CodeGenerationApi = {
   /** 獲取模組分頁列表 */
   getCodeGenerationPage: async (params: PageParams): PageRes<CodeGenerationVO> => {
@@ -45,7 +98,7 @@ export const CodeGenerationApi = {
   },
 
   /** 生成數據表的代碼返回前端進行預覽 */
-  previewEntityCode: async (data) => {
+  previewEntityCode: async (data: PreviewEntityCodeData): ApiResponse<{ treeData: TreeData[] }> => {
     return await request.post({ url: `/operations/code-generation/preview-entity-code`, data })
   },
 }

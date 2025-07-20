@@ -3,10 +3,11 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 import type { DataTableColumns, NDataTable } from 'naive-ui'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
-import CodePreviewModal from '@/components/common/CodePreviewModal/index.vue'
 import { useBoolean } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'
 import { camelToSnakeCase, hyphenToCamelCase, replaceDashToUnderscore } from '@/utils/string'
+
+import CodePreviewModal from './CodePreviewModal/index.vue'
 
 const props = defineProps<{
   row: CodeGenerationVO
@@ -506,8 +507,9 @@ async function handleGeneratePreview() {
         ...item,
       })),
     })
-
     codePreviewModalRef.value?.openModal(result.treeData)
+
+    // codePreviewModalRef.value?.openModal([{ label: 'src', key: 'IAOaBr8e', type: 'folder', children: [{ label: 'modules', key: 'Vu5moTNi', type: 'folder', children: [{ label: 'demo', key: 'yqPCYC4B', type: 'folder', children: [{ label: 'student', key: 'AGIgCQgb', type: 'folder', children: [{ label: 'entity', key: 'C9v8P0FH', type: 'folder', children: [{ label: 'demo-student.entity.ts', key: 'H97KIVdE', type: 'file', code: 'import { Entity, Column, PrimaryGeneratedColumn } from \'typeorm\'\n\nimport { BaseEntity } from \'@/common/entities/base.entity\'\n\n@Entity(\'demo_student\')\nexport class DemoStudentEntity extends BaseEntity {\n  @PrimaryGeneratedColumn({\n    name: \'id\',\n    type: \'bigint\',\n    comment: \'id主鍵\'\n  })\n  id: number\n\n  @Column({\n    name: \'name\',\n    type: \'varchar\',\n    length: 55,\n    nullable: false,\n    comment: \'姓名\'\n  })\n  name: string\n\n  @Column({\n    name: \'age\',\n    type: \'int\',\n    comment: \'年齡\'\n  })\n  age: number\n\n  @Column({\n    name: \'id_card\',\n    type: \'varchar\',\n    length: 55,\n    comment: \'證件號碼\'\n  })\n  idCard: string\n\n}' }] }] }] }] }] }])
   }
   finally {
     endGeneratePreviewLoading()
