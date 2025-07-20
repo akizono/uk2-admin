@@ -87,11 +87,16 @@ export async function handleResponseData(response: AxiosResponse<any>) {
  * @returns 翻譯後的錯誤訊息
  */
 export function handleNetworkErrorMessage(errorMsg: string) {
-  if (errorMsg === 'Network Error')
-    return $t('http.networkError')
+  const networkErrorKey = 'http.networkError'
+  const requestTimeoutKey = 'http.requestTimeout'
 
-  if (errorMsg.includes('timeout'))
-    return $t('http.requestTimeout')
+  if (errorMsg === 'Network Error') {
+    return $t(networkErrorKey) !== networkErrorKey ? $t(networkErrorKey) : 'Network Error'
+  }
+
+  if (errorMsg.includes('timeout')) {
+    return $t(requestTimeoutKey) !== requestTimeoutKey ? $t(requestTimeoutKey) : 'Request timeout'
+  }
 
   return errorMsg
 }

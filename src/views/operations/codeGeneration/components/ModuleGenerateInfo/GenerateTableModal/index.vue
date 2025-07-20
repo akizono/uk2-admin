@@ -3,11 +3,10 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 import type { DataTableColumns, NDataTable } from 'naive-ui'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
+import CodePreviewModal from '@/components/common/CodePreviewModal/index.vue'
 import { useBoolean } from '@/hooks'
 import { useTableDrag } from '@/hooks/useTableDrag'
 import { camelToSnakeCase, hyphenToCamelCase, replaceDashToUnderscore } from '@/utils/string'
-
-import CodePreviewModal from './CodePreviewModal/index.vue'
 
 const props = defineProps<{
   row: CodeGenerationVO
@@ -527,10 +526,11 @@ async function handleGeneratePreview() {
   try {
     startGeneratePreviewLoading()
 
-    await CodeGenerationApi.previewEntityCode({
-      className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
+    const { data: result } = await CodeGenerationApi.previewEntityCode({
       timestamp: Date.now().toString(), // 時間戳記
+      className: `${hyphenToCamelCase(props.row.code)}Entity`, // Entit 的類名
       fileName: props.row.code, // 檔案名（不包含後綴和格式）
+      splitName: (props.row.code).split('-'), // 分割名稱
       tableName: replaceDashToUnderscore(props.row.code), // 資料表的名稱
       // 資料表的欄位集合
       tableColumns: formData.value.map(item => ({
@@ -540,7 +540,7 @@ async function handleGeneratePreview() {
       })),
     })
 
-    // codePreviewModalRef.value?.openModal()
+    codePreviewModalRef.value?.openModal(result.treeData)
   }
   finally {
     endGeneratePreviewLoading()
@@ -593,11 +593,7 @@ watch(modalVisible, (newVal) => {
 
         <div class="overflow-y-auto" style="height: calc(100vh - 300px);">
           <n-data-table
-            ref="tableRef"
-            :columns="columns"
-            :data="formData"
-            size="small"
-            striped
+            ref="tableRef" :columns="columns" :data="formData" size="small" striped
             row-class-name="drag-handle"
           />
           <NButton class="w-full" secondary style="border-radius: 0px;" @click="addRow">
@@ -610,11 +606,7 @@ watch(modalVisible, (newVal) => {
       </NSpace>
       <template #action>
         <n-space justify="center">
-          <n-button
-            type="primary"
-            :loading="generatePreviewLoading"
-            @click="handleGeneratePreview"
-          >
+          <n-button type="primary" :loading="generatePreviewLoading" @click="handleGeneratePreview">
             生成預覽
           </n-button>
           <n-button :disabled="generatePreviewLoading" @click="closeModal">

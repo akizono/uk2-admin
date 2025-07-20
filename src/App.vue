@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { naiveI18nOptions } from '@/utils'
+import hljs from 'highlight.js/lib/core'
+import typescript from 'highlight.js/lib/languages/typescript'
 import { darkTheme } from 'naive-ui'
 
 import { useAppStore } from './store'
 import { useLanguageStore } from './store/model/language'
+
+hljs.registerLanguage('ts', typescript)
 
 const appStore = useAppStore()
 const languageStore = useLanguageStore()
@@ -21,6 +25,7 @@ languageStore.getLanguageList()
   <n-config-provider
     class="wh-full" inline-theme-disabled :theme="appStore.colorMode === 'dark' ? darkTheme : null"
     :locale="naiveLocale.locale" :date-locale="naiveLocale.dateLocale" :theme-overrides="appStore.theme"
+    :hljs="hljs"
   >
     <naive-provider>
       <router-view />
