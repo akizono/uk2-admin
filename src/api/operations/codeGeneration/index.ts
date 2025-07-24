@@ -106,4 +106,23 @@ export const CodeGenerationApi = {
   insertEntityCode: async (data: CodeGenerateParamsVO) => {
     return await request.post({ url: `/operations/code-generation/insert-entity-code`, data })
   },
+
+  /** 獲取 Entity 中的所有自訂欄位 */
+  getEntityCustomFields: async (params: { moduleSplitName: string }) => {
+    return await request.get({ url: '/operations/code-generation/get-entity-custom-fields', params })
+  },
+
+  /** 預覽後端代碼 */
+  previewBackendCode: async (data: {
+    fileName: string
+    camelName: string
+    timestamp: string
+    moduleSplitName: string[]
+    classNamePrefix: string
+    exampleData: Record<string, any>
+    unitName: string
+    columns: Record<string, { label: string, type: string, nullable: boolean }>
+  }) => {
+    return await request.post({ url: '/operations/code-generation/preview-backend-code', data })
+  },
 }

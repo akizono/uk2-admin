@@ -56,3 +56,12 @@ export function camelToSnakeCase(camelStr: string) {
     .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2') // 處理連續大寫後跟小寫的情況
     .toLowerCase() // 全部轉換為小寫
 }
+
+/**
+ * 將帶橫槓的字串轉換為駝峰命名
+ * @param str 輸入字串（例如："hello-world" 或 "api-v1-user"）
+ * @returns 駝峰命名字串（例如："helloWorld" 或 "apiV1User"）
+ */
+export function kebabToCamel(str: string): string {
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+}

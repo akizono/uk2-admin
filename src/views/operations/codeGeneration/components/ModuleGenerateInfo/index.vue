@@ -3,6 +3,7 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 
 import { NButton, NCard, NSpace, NTag } from 'naive-ui'
 
+import GenerateBackendCode from './GenerateBackendCode/index.vue'
 import GenerateTableModal from './GenerateTableModal/index.vue'
 
 const props = defineProps<{
@@ -17,6 +18,11 @@ function handleGenerateTable() {
 }
 function handleGenerateTableSuccess() {
   emit('success', 'isGenerateEntity')
+}
+
+const GenerateBackendCodeRef = ref()
+function handleGenerateBackendCode() {
+  GenerateBackendCodeRef.value.openModal()
 }
 </script>
 
@@ -74,7 +80,13 @@ function handleGenerateTableSuccess() {
                 {{ row.isGenerateBackendCode === 1 ? '後端代碼已生成' : '後端代碼未生成' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateEntity === 0">
+            <NButton
+              type="primary"
+              size="small"
+              class="action-button"
+              :disabled="row.isGenerateEntity === 0"
+              @click="handleGenerateBackendCode"
+            >
               生成後端代碼
             </NButton>
           </div>
@@ -129,6 +141,7 @@ function handleGenerateTableSuccess() {
     </NSpace>
 
     <GenerateTableModal ref="GenerateTableModalRef" :row="props.row" @success="handleGenerateTableSuccess" />
+    <GenerateBackendCode ref="GenerateBackendCodeRef" :row="props.row" />
   </NCard>
 </template>
 

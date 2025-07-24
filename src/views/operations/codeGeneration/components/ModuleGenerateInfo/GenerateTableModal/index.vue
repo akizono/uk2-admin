@@ -77,7 +77,7 @@ const dataTypeToJsDataTypeMap: Record<string, string> = {
   tinyint: 'number',
   smallint: 'number',
   int: 'number',
-  bigint: 'number',
+  bigint: 'string',
   float: 'number',
   double: 'number',
   decimal: 'number',
@@ -520,7 +520,7 @@ async function handleGeneratePreview() {
 }
 
 /** 生成實體成功 */
-function handleGenerateEntitySuccess() {
+function handleGenerateSuccess() {
   closeModal()
   emit('success')
 }
@@ -645,7 +645,7 @@ watch(modalVisible, (newVal) => {
     </n-modal>
 
     <!-- 預覽生成代碼的彈出視窗 -->
-    <CodePreviewModal ref="codePreviewModalRef" @success="handleGenerateEntitySuccess" />
+    <CodePreviewModal ref="codePreviewModalRef" @success="handleGenerateSuccess" />
   </div>
 </template>
 
