@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CodeGenerateParamsVO, TreeData } from '@/api/operations/codeGeneration'
+import type { CodeGenerateBackendParamsVO, TreeData } from '@/api/operations/codeGeneration'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import CodePreview from '@/components/common/CodePreview/index.vue'
@@ -16,43 +16,43 @@ defineExpose({
 
 // 控制彈出視窗的顯示
 const { bool: modalVisible, setTrue: showModal, setFalse: hiddenModal } = useBoolean(false)
-// 控制"生成實體"的loading
+// 控制"生成後端"的loading
 const { bool: generateEntityLoading, setTrue: startGenerateEntityLoading, setFalse: endGenerateEntityLoading } = useBoolean(false)
 
 // 文件樹
 const treeData = ref<TreeData[]>([])
 
 // 代碼生成參數
-let codeGenerateParams = {} as CodeGenerateParamsVO
+let codeGenerateParams = {} as CodeGenerateBackendParamsVO
 
-// 生成實體代碼
-async function handleGenerateEntity() {
+// 生成後端代碼
+function handleGenerateEntity() {
   startGenerateEntityLoading()
-  try {
-    await CodeGenerationApi.insertEntityCode(codeGenerateParams)
-    await delay(3000) // 生成文件後，後端需要時間進行重啟，這裡延遲3秒
 
-    window.$message.success('生成實體成功')
-    emit('success')
-    closeModal()
-  }
-  catch (error) {
-    // @ts-expect-error neglect
-    if (error.status === 400) {
-      dialog.error({
-        title: '系統錯誤',
-        content: '文件已存在！如需生成代碼，請先刪除文件',
-        positiveText: '確定',
-      })
-    }
-  }
-  finally {
-    endGenerateEntityLoading()
-  }
+  CodeGenerationApi.insertBackendCode(codeGenerateParams)
+    .then(async () => {
+      await delay(3000) // 生成文件後，後端需要時間進行重啟，這裡延遲3秒
+      window.$message.success('生成後端代碼成功')
+
+      emit('success')
+      closeModal()
+    })
+    .catch((error) => {
+      if (error.status === 400) {
+        dialog.error({
+          title: '系統錯誤',
+          content: error.response.data.message,
+          positiveText: '確定',
+        })
+      }
+    })
+    .finally(() => {
+      endGenerateEntityLoading()
+    })
 }
 
 /** 打開彈出視窗 */
-async function openModal(data: TreeData[], _codeGenerateParams: CodeGenerateParamsVO) {
+async function openModal(data: TreeData[], _codeGenerateParams: CodeGenerateBackendParamsVO) {
   treeData.value = data
   codeGenerateParams = _codeGenerateParams
   showModal()
@@ -83,7 +83,7 @@ function closeModal() {
     <template #action>
       <n-space justify="center">
         <n-button type="primary" :loading="generateEntityLoading" @click="handleGenerateEntity">
-          生成實體
+          生成後端
         </n-button>
         <n-button :disabled="generateEntityLoading" @click="closeModal">
           取消

@@ -13,27 +13,7 @@ export interface CodeGenerationVO extends BaseVO {
   sort: number
 }
 
-export interface CodeGenerateParamsVO {
-  timestamp: string
-  className: string
-  fileName: string
-  splitName: string[]
-  tableName: string
-  tableColumns: {
-    columnNameUnderline: string
-    jsDataType: 'number' | 'string' | 'boolean' | 'Date' | any // Can be more specific based on possible values
-    columnName: string
-    dataType: string
-    length: number | null
-    isNotNull: number // 0 or 1
-    isAutoIncrement: number // 0 or 1
-    isPrimaryKey: number // 0 or 1
-    isUnique: number // 0 or 1
-    defaultValue: string | number | null
-    comment: string | null
-  }[]
-}
-
+// 「代碼生成」後的「預覽樹」的結構
 export interface TreeData {
   label: string
   key: string
@@ -64,6 +44,40 @@ export interface TreeData {
       }>
     }>
   }>
+}
+
+// 生成「實體」代碼的參數
+export interface CodeGenerateEntityParamsVO {
+  timestamp: string
+  className: string
+  fileName: string
+  splitName: string[]
+  tableName: string
+  tableColumns: {
+    columnNameUnderline: string
+    jsDataType: 'number' | 'string' | 'boolean' | 'Date' | any // Can be more specific based on possible values
+    columnName: string
+    dataType: string
+    length: number | null
+    isNotNull: number // 0 or 1
+    isAutoIncrement: number // 0 or 1
+    isPrimaryKey: number // 0 or 1
+    isUnique: number // 0 or 1
+    defaultValue: string | number | null
+    comment: string | null
+  }[]
+}
+
+// 生成「後端代碼」的參數
+export interface CodeGenerateBackendParamsVO {
+  fileName: string
+  camelName: string
+  timestamp: string
+  splitName: string[]
+  classNamePrefix: string
+  exampleData: Record<string, any>
+  unitName: string
+  columns: Record<string, { label: string, type: string, nullable: boolean }>
 }
 
 export const CodeGenerationApi = {
@@ -98,31 +112,27 @@ export const CodeGenerationApi = {
   },
 
   /** 生成數據表的代碼返回前端進行預覽 */
-  previewEntityCode: async (data: CodeGenerateParamsVO): ApiResponse<{ treeData: TreeData[] }> => {
+  previewEntityCode: async (data: CodeGenerateEntityParamsVO): ApiResponse<{ treeData: TreeData[] }> => {
     return await request.post({ url: `/operations/code-generation/preview-entity-code`, data })
   },
 
   /** 插入實體代碼 */
-  insertEntityCode: async (data: CodeGenerateParamsVO) => {
+  insertEntityCode: async (data: CodeGenerateEntityParamsVO) => {
     return await request.post({ url: `/operations/code-generation/insert-entity-code`, data })
   },
 
   /** 獲取 Entity 中的所有自訂欄位 */
-  getEntityCustomFields: async (params: { moduleSplitName: string }) => {
+  getEntityCustomFields: async (params: { splitName: string }) => {
     return await request.get({ url: '/operations/code-generation/get-entity-custom-fields', params })
   },
 
   /** 預覽後端代碼 */
-  previewBackendCode: async (data: {
-    fileName: string
-    camelName: string
-    timestamp: string
-    moduleSplitName: string[]
-    classNamePrefix: string
-    exampleData: Record<string, any>
-    unitName: string
-    columns: Record<string, { label: string, type: string, nullable: boolean }>
-  }) => {
+  previewBackendCode: async (data: CodeGenerateBackendParamsVO): ApiResponse<{ treeData: TreeData[] }> => {
     return await request.post({ url: '/operations/code-generation/preview-backend-code', data })
+  },
+
+  /** 插入後端代碼 */
+  insertBackendCode: async (data: CodeGenerateBackendParamsVO) => {
+    return await request.post({ url: '/operations/code-generation/insert-backend-code', data })
   },
 }

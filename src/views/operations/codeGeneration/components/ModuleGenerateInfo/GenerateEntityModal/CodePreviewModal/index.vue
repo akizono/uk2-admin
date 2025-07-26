@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CodeGenerateParamsVO, TreeData } from '@/api/operations/codeGeneration'
+import type { CodeGenerateEntityParamsVO, TreeData } from '@/api/operations/codeGeneration'
 
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import CodePreview from '@/components/common/CodePreview/index.vue'
@@ -23,36 +23,36 @@ const { bool: generateEntityLoading, setTrue: startGenerateEntityLoading, setFal
 const treeData = ref<TreeData[]>([])
 
 // 代碼生成參數
-let codeGenerateParams = {} as CodeGenerateParamsVO
+let codeGenerateParams = {} as CodeGenerateEntityParamsVO
 
 // 生成實體代碼
-async function handleGenerateEntity() {
+function handleGenerateEntity() {
   startGenerateEntityLoading()
-  try {
-    await CodeGenerationApi.insertEntityCode(codeGenerateParams)
-    await delay(3000) // 生成文件後，後端需要時間進行重啟，這裡延遲3秒
 
-    window.$message.success('生成實體成功')
-    emit('success')
-    closeModal()
-  }
-  catch (error) {
-    // @ts-expect-error neglect
-    if (error.status === 400) {
-      dialog.error({
-        title: '系統錯誤',
-        content: '文件已存在！如需生成代碼，請先刪除文件',
-        positiveText: '確定',
-      })
-    }
-  }
-  finally {
-    endGenerateEntityLoading()
-  }
+  CodeGenerationApi.insertEntityCode(codeGenerateParams)
+    .then(async () => {
+      await delay(3000) // 生成文件後，後端需要時間進行重啟，這裡延遲3秒
+      window.$message.success('生成實體成功')
+
+      emit('success')
+      closeModal()
+    })
+    .catch((error) => {
+      if (error.status === 400) {
+        dialog.error({
+          title: '系統錯誤',
+          content: error.response.data.message,
+          positiveText: '確定',
+        })
+      }
+    })
+    .finally(() => {
+      endGenerateEntityLoading()
+    })
 }
 
 /** 打開彈出視窗 */
-async function openModal(data: TreeData[], _codeGenerateParams: CodeGenerateParamsVO) {
+async function openModal(data: TreeData[], _codeGenerateParams: CodeGenerateEntityParamsVO) {
   treeData.value = data
   codeGenerateParams = _codeGenerateParams
   showModal()

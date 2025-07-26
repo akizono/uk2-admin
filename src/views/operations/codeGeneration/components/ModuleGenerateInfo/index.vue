@@ -4,7 +4,7 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 import { NButton, NCard, NSpace, NTag } from 'naive-ui'
 
 import GenerateBackendCode from './GenerateBackendCode/index.vue'
-import GenerateTableModal from './GenerateTableModal/index.vue'
+import GenerateEntityModal from './GenerateEntityModal/index.vue'
 
 const props = defineProps<{
   row: CodeGenerationVO
@@ -12,17 +12,20 @@ const props = defineProps<{
 
 const emit = defineEmits(['success'])
 
-const GenerateTableModalRef = ref()
-function handleGenerateTable() {
-  GenerateTableModalRef.value.openModal()
+const GenerateEntityModalRef = ref()
+function handleGenerateEntity() {
+  GenerateEntityModalRef.value.openModal()
 }
-function handleGenerateTableSuccess() {
+function handleGenerateEntitySuccess() {
   emit('success', 'isGenerateEntity')
 }
 
 const GenerateBackendCodeRef = ref()
 function handleGenerateBackendCode() {
   GenerateBackendCodeRef.value.openModal()
+}
+function handleGenerateBackendCodeSuccess() {
+  emit('success', 'isGenerateBackendCode')
 }
 </script>
 
@@ -57,7 +60,7 @@ function handleGenerateBackendCode() {
                 {{ row.isGenerateEntity === 1 ? '實體已創建' : '實體未創建' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" @click="handleGenerateTable">
+            <NButton type="primary" size="small" class="action-button" @click="handleGenerateEntity">
               創建實體
             </NButton>
           </div>
@@ -140,8 +143,8 @@ function handleGenerateBackendCode() {
       </n-flex>
     </NSpace>
 
-    <GenerateTableModal ref="GenerateTableModalRef" :row="props.row" @success="handleGenerateTableSuccess" />
-    <GenerateBackendCode ref="GenerateBackendCodeRef" :row="props.row" />
+    <GenerateEntityModal ref="GenerateEntityModalRef" :row="props.row" @success="handleGenerateEntitySuccess" />
+    <GenerateBackendCode ref="GenerateBackendCodeRef" :row="props.row" @success="handleGenerateBackendCodeSuccess" />
   </NCard>
 </template>
 

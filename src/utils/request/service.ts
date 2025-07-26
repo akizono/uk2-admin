@@ -65,7 +65,7 @@ service.interceptors.response.use(
     // const message = (error.response?.data as { message?: string })?.message
     //   ?? handle.handleNetworkErrorMessage(error.message)
 
-    // 前端預設的錯誤訊息
+    // 根據狀態碼，回傳前端預設的錯誤訊息
     const message = error.response?.status
       ? t(`http.${error.response.status}`)
       : handle.handleNetworkErrorMessage(error.message)

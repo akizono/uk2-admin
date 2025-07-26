@@ -41,7 +41,7 @@ const unitFormRules = {
 
 async function getFormData() {
   const { data: result } = await CodeGenerationApi.getEntityCustomFields({
-    moduleSplitName: JSON.stringify(props.row.code.split('-')),
+    splitName: JSON.stringify(props.row.code.split('-')),
   })
 
   // 設置表單映射
@@ -72,11 +72,11 @@ async function handleGeneratePreview() {
     // 驗證通過，繼續處理
     startGeneratePreviewLoading()
     const codeGenerateParams = {
+      timestamp: Date.now().toString(), // 時間戳記
+      classNamePrefix: `${hyphenToCamelCase(props.row.code)}`, // Entit 的類名
       fileName: props.row.code,
       camelName: kebabToCamel(props.row.code),
-      timestamp: Date.now().toString(), // 時間戳記
-      moduleSplitName: props.row.code.split('-'),
-      classNamePrefix: `${hyphenToCamelCase(props.row.code)}`, // Entit 的類名
+      splitName: props.row.code.split('-'),
       exampleData: formData.value,
       unitName: unitFormData.value.unitName,
       columns: formMap.value,

@@ -170,6 +170,95 @@ function validateLength(value: number | null | undefined, dataType: string, _row
   return null
 }
 
+// 驗證預設值
+function validateDefaultValue(value: string | null | undefined, dataType: string, _rowIndex: number): string | null {
+  // 如果沒有填寫預設值，則不需要驗證
+  if (!value || value.trim() === '') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  switch (dataType.toLowerCase()) {
+    // 整數類型
+    case 'tinyint':
+    case 'smallint':
+    case 'int':
+    case 'bigint':
+      if (!/^-?\d+$/.test(trimmedValue)) {
+        return '請輸入有效的整數'
+      }
+      break
+
+    // 浮點類型
+    case 'float':
+    case 'double':
+    case 'decimal':
+      if (!/^-?(?:\d+\.\d+|\d+|\.\d+)$/.test(trimmedValue)) {
+        return '請輸入有效的數字'
+      }
+      break
+
+    // 布爾類型
+    case 'bool':
+    case 'boolean':
+      if (!['true', 'false', '0', '1'].includes(trimmedValue.toLowerCase())) {
+        return '請輸入 true/false 或 0/1'
+      }
+      break
+
+    // 日期類型
+    case 'date':
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+        return '請輸入有效的日期格式 (YYYY-MM-DD)'
+      }
+      break
+
+    // 時間類型
+    case 'time':
+      if (!/^\d{2}:\d{2}:\d{2}$/.test(trimmedValue)) {
+        return '請輸入有效的時間格式 (HH:MM:SS)'
+      }
+      break
+
+    // 日期時間類型
+    case 'datetime':
+    case 'timestamp':
+      if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(trimmedValue)) {
+        return '請輸入有效的日期時間格式 (YYYY-MM-DD HH:MM:SS)'
+      }
+      break
+
+    // JSON 類型
+    case 'json':
+      try {
+        JSON.parse(trimmedValue)
+      }
+      catch {
+        return '請輸入有效的 JSON 格式'
+      }
+      break
+
+    // 字串類型 - 基本上不需要特殊驗證
+    case 'char':
+    case 'varchar':
+    case 'text':
+    case 'longtext':
+    case 'blob':
+      // 對於字串類型，我們可以檢查長度限制
+      if (dataType === 'char' || dataType === 'varchar') {
+        // 這裡可以根據需要添加長度檢查，但通常預設值不會太長
+      }
+      break
+
+    default:
+      // 未知類型，不做驗證
+      break
+  }
+
+  return null
+}
+
 // 設置驗證錯誤
 function setValidationError(rowIndex: number, field: string, error: string | null) {
   if (!validationErrors.value[rowIndex]) {
@@ -206,6 +295,8 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     render: (row: ColumnRow, rowIndex: number) => {
       const rowIdx = rowIndex as number
       const error = validationErrors.value[rowIdx]?.columnName
+      // 如果 columnName 是 'id'，則禁用欄位名稱輸入框
+      const isIdColumn = row.columnName === 'id'
 
       return (
         <div>
@@ -213,6 +304,7 @@ const columns = ref<DataTableColumns<ColumnRow>>([
             v-model:value={row.columnName}
             placeholder="請輸入欄位名稱"
             status={error ? 'error' : undefined}
+            disabled={isIdColumn}
             onUpdateValue={(value: string) => {
               row.columnName = value
               const validationError = validateColumnName(value, rowIdx)
@@ -234,11 +326,15 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     width: 140,
     render: (row: ColumnRow, rowIndex: number) => {
       const rowIdx = rowIndex as number
+      // 如果 columnName 是 'id'，則禁用數據類型選擇器
+      const isIdColumn = row.columnName === 'id'
+
       return (
         <n-select
           v-model:value={row.dataType}
           options={[...dataTypeOptions].sort((a, b) => a.label.localeCompare(b.label))}
           placeholder="選擇類型"
+          disabled={isIdColumn}
           onUpdateValue={(value: string) => {
             row.dataType = value
             // 如果切換到不需要長度的類型，清空長度值
@@ -248,6 +344,10 @@ const columns = ref<DataTableColumns<ColumnRow>>([
             // 重新驗證長度欄位
             const lengthError = validateLength(row.length, value, rowIdx)
             setValidationError(rowIdx, 'length', lengthError)
+
+            // 重新驗證預設值（因為數據類型變了）
+            const defaultValueError = validateDefaultValue(row.defaultValue, value, rowIdx)
+            setValidationError(rowIdx, 'defaultValue', defaultValueError)
 
             // 當選擇不可自增的類型時，關閉自增選項
             if (!canAutoIncrement(value) && row.isAutoIncrement === 1) {
@@ -276,7 +376,7 @@ const columns = ref<DataTableColumns<ColumnRow>>([
         <div>
           <n-input-number
             v-model:value={row.length}
-            placeholder={needLength ? '長度' : ''}
+            placeholder={needLength ? '請輸入長度' : ''}
             min={1}
             max={9999}
             show-button={false}
@@ -355,13 +455,15 @@ const columns = ref<DataTableColumns<ColumnRow>>([
       const hasOtherAutoIncrement = formData.value.some((r, idx) => idx !== rowIndex && r.isAutoIncrement === 1)
       // 檢查當前資料類型是否支援自增
       const canAuto = canAutoIncrement(row.dataType)
+      // 如果 columnName 是 'id'，則禁用自增開關
+      const isIdColumn = row.columnName === 'id'
 
       return (
         <n-switch
           v-model:value={row.isAutoIncrement}
           checked-value={1}
           unchecked-value={0}
-          disabled={hasOtherAutoIncrement || !canAuto}
+          disabled={hasOtherAutoIncrement || !canAuto || isIdColumn}
         />
       )
     },
@@ -388,8 +490,29 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     key: 'defaultValue',
     title: '預設值',
     width: 120,
-    render: (row: ColumnRow) => {
-      return <n-input v-model:value={row.defaultValue} placeholder="預設值" />
+    render: (row: ColumnRow, rowIndex: number) => {
+      const rowIdx = rowIndex as number
+      const error = validationErrors.value[rowIdx]?.defaultValue
+
+      return (
+        <div>
+          <n-input
+            v-model:value={row.defaultValue}
+            placeholder=""
+            status={error ? 'error' : undefined}
+            onUpdateValue={(value: string) => {
+              row.defaultValue = value
+              const validationError = validateDefaultValue(value, row.dataType, rowIdx)
+              setValidationError(rowIdx, 'defaultValue', validationError)
+            }}
+            onBlur={() => {
+              const validationError = validateDefaultValue(row.defaultValue, row.dataType, rowIdx)
+              setValidationError(rowIdx, 'defaultValue', validationError)
+            }}
+          />
+          {error && <div class="text-red-500 text-xs mt-1">{error}</div>}
+        </div>
+      )
     },
   },
   {
@@ -397,7 +520,7 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     title: '註釋',
     width: 150,
     render: (row: ColumnRow) => {
-      return <n-input v-model:value={row.comment} placeholder="欄位註釋" />
+      return <n-input v-model:value={row.comment} placeholder="" />
     },
   },
   {
@@ -405,6 +528,13 @@ const columns = ref<DataTableColumns<ColumnRow>>([
     title: '操作',
     width: 80,
     render: (row: ColumnRow, index: number) => {
+      // 如果 columnName 是 'id'，則隱藏刪除按鈕
+      const isIdColumn = row.columnName === 'id'
+
+      if (isIdColumn) {
+        return null
+      }
+
       return (
         <n-button
           size="small"
@@ -476,6 +606,15 @@ function validateAllFields(): boolean {
     if (lengthError) {
       isValid = false
     }
+
+    // 驗證預設值
+    const defaultValueError = validateDefaultValue(row.defaultValue, row.dataType, index)
+    // 設置驗證錯誤
+    setValidationError(index, 'defaultValue', defaultValueError)
+    // 如果預設值有錯誤，則設置驗證狀態為 false
+    if (defaultValueError) {
+      isValid = false
+    }
   })
   return isValid
 }
@@ -503,16 +642,26 @@ async function handleGeneratePreview() {
       splitName: (props.row.code).split('-'), // 分割名稱
       tableName: replaceDashToUnderscore(props.row.code), // 資料表的名稱
       // 資料表的欄位集合
-      tableColumns: formData.value.map(item => ({
-        columnNameUnderline: camelToSnakeCase(item.columnName), // 欄位名稱轉換為下劃線命名
-        jsDataType: mysqlTypeToJsDataType(item.dataType), // 資料類型轉換為 JavaScript 類型
-        ...item,
-      })),
+      tableColumns: formData.value.map((item) => {
+        // 對字串類型的屬性進行前後去空格處理
+        if (item.columnName)
+          item.columnName = item.columnName.trim()
+        if (item.comment)
+          item.comment = item.comment.trim()
+        if (item.dataType)
+          item.dataType = item.dataType.trim()
+        if (item.defaultValue)
+          item.defaultValue = item.defaultValue.trim()
+
+        return {
+          columnNameUnderline: camelToSnakeCase(item.columnName), // 欄位名稱轉換為下劃線命名
+          jsDataType: mysqlTypeToJsDataType(item.dataType), // 資料類型轉換為 JavaScript 類型
+          ...item,
+        }
+      }),
     }
     const { data: result } = await CodeGenerationApi.previewEntityCode(codeGenerateParams)
     codePreviewModalRef.value?.openModal(result.treeData, codeGenerateParams)
-
-    // codePreviewModalRef.value?.openModal([{ label: 'src', key: 'IAOaBr8e', type: 'folder', children: [{ label: 'modules', key: 'Vu5moTNi', type: 'folder', children: [{ label: 'demo', key: 'yqPCYC4B', type: 'folder', children: [{ label: 'student', key: 'AGIgCQgb', type: 'folder', children: [{ label: 'entity', key: 'C9v8P0FH', type: 'folder', children: [{ label: 'demo-student.entity.ts', key: 'H97KIVdE', type: 'file', code: 'import { Entity, Column, PrimaryGeneratedColumn } from \'typeorm\'\n\nimport { BaseEntity } from \'@/common/entities/base.entity\'\n\n@Entity(\'demo_student\')\nexport class DemoStudentEntity extends BaseEntity {\n  @PrimaryGeneratedColumn({\n    name: \'id\',\n    type: \'bigint\',\n    comment: \'id主鍵\'\n  })\n  id: number\n\n  @Column({\n    name: \'name\',\n    type: \'varchar\',\n    length: 55,\n    nullable: false,\n    comment: \'姓名\'\n  })\n  name: string\n\n  @Column({\n    name: \'age\',\n    type: \'int\',\n    comment: \'年齡\'\n  })\n  age: number\n\n  @Column({\n    name: \'id_card\',\n    type: \'varchar\',\n    length: 55,\n    comment: \'證件號碼\'\n  })\n  idCard: string\n\n}' }] }] }] }] }] }])
   }
   finally {
     endGeneratePreviewLoading()
