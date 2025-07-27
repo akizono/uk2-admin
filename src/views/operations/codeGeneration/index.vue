@@ -283,7 +283,8 @@ onMounted(async () => {
 <template>
   <NSpace vertical class="flex-1">
     <n-alert type="warning" closable>
-      只有在該頁面創建的模組會顯示在這此處，請務必將流程跑完再手動修改或操作代碼。
+      <div>只有在該頁面創建的模組會顯示在本頁，請務必將流程跑完再手動修改或操作代碼;</div>
+      <div>後端熱重載可能會導致生成代碼時無響應，建議操作前使用 <code>pnpm start:dev:no-watch</code> 啟動後端，而不是使用 <code>pnpm start:dev</code>;</div>
     </n-alert>
     <n-card>
       <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">

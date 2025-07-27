@@ -2,7 +2,8 @@
 import { NCode, NTree } from 'naive-ui'
 
 const props = defineProps<{
-  treeData: any[]
+  treeData: any[] // 文件樹
+  showDiffAlert?: boolean // 是否顯示diff的提示
 }>()
 
 // 當前選中的文件的key和完整label
@@ -72,6 +73,10 @@ onMounted(() => {
   <div class="flex h-full">
     <!-- 左側樹狀菜單 -->
     <div class="w-1/4 pr-4 border-r border-gray-200 overflow-y-auto h-[calc(80vh-120px)]">
+      <n-alert v-if="showDiffAlert" class="mb-4px" type="info">
+        .diff 是為了方便查看代碼差異。實際生成的代碼依然是.ts 文件。
+      </n-alert>
+
       <NTree
         :data="treeData" selectable :default-expand-all="true" :selected-keys="defaultSelectedKeys"
         @update:selected-keys="handleTreeSelect"

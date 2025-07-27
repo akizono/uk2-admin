@@ -78,7 +78,7 @@ function closeModal() {
     style="max-width: 1900px; height: 80vh;"
   >
     <n-spin :show="generateEntityLoading" size="large">
-      <CodePreview :tree-data="treeData" />
+      <CodePreview :tree-data="treeData" show-diff-alert />
     </n-spin>
     <template #action>
       <n-space justify="center">
