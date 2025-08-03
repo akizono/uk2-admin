@@ -123,7 +123,7 @@ onMounted(() => {
 <template>
   <div>
     <n-modal
-      v-model:show="modalVisible" :mask-closable="false" preset="card" title="創建模組" class="w-[95%]" :segmented="{
+      v-model:show="modalVisible" :mask-closable="false" preset="card" title="生成後端程式碼" class="w-[95%]" :segmented="{
         content: true,
         action: true,
       }" style="max-width: 2000px;"

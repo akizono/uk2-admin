@@ -25,7 +25,6 @@ const formRef = ref<FormInst | null>()
 const tableRef = ref<InstanceType<typeof NDataTable>>()
 const TableModalRef = ref()
 const total = ref(100)
-const queryParams = ref<Record<string, any>>({})
 const initQueryParams = {
   currentPage: 1,
   pageSize: 10,
@@ -33,6 +32,7 @@ const initQueryParams = {
   name: null,
   code: null,
 }
+const queryParams = ref<Record<string, any>>({ ...initQueryParams })
 const list = ref<CodeGenerationVO[]>([])
 const columns = ref<DataTableColumns<CodeGenerationVO>>([
   {

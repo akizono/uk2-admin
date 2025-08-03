@@ -3,8 +3,9 @@ import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 
 import { NButton, NCard, NSpace, NTag } from 'naive-ui'
 
-import GenerateBackendCode from './GenerateBackendCode/index.vue'
+import GenerateBackendCode from './GenerateBackendCodeModal/index.vue'
 import GenerateEntityModal from './GenerateEntityModal/index.vue'
+import GenerateWebCodeModal from './GenerateWebCodeModal/index.vue'
 
 const props = defineProps<{
   row: CodeGenerationVO
@@ -12,20 +13,28 @@ const props = defineProps<{
 
 const emit = defineEmits(['success'])
 
-const GenerateEntityModalRef = ref()
+const generateEntityModalRef = ref()
 function handleGenerateEntity() {
-  GenerateEntityModalRef.value.openModal()
+  generateEntityModalRef.value.openModal()
 }
 function handleGenerateEntitySuccess() {
   emit('success', 'isGenerateEntity')
 }
 
-const GenerateBackendCodeRef = ref()
+const generateBackendCodeRef = ref()
 function handleGenerateBackendCode() {
-  GenerateBackendCodeRef.value.openModal()
+  generateBackendCodeRef.value.openModal()
 }
 function handleGenerateBackendCodeSuccess() {
   emit('success', 'isGenerateBackendCode')
+}
+
+const generateWebCodeModalRef = ref()
+function handleGenerateWebCode() {
+  generateWebCodeModalRef.value.openModal()
+}
+function handleGenerateWebCodeSuccess() {
+  emit('success', 'isGenerateWebCode')
 }
 </script>
 
@@ -112,7 +121,13 @@ function handleGenerateBackendCodeSuccess() {
                 {{ row.isGenerateWebCode === 1 ? '前端代碼已生成' : '前端代碼未生成' }}
               </NTag>
             </div>
-            <NButton type="primary" size="small" class="action-button" :disabled="row.isGenerateBackendCode === 0">
+            <NButton
+              type="primary"
+              size="small"
+              class="action-button"
+              :disabled="row.isGenerateBackendCode === 0"
+              @click="handleGenerateWebCode"
+            >
               生成前端代碼
             </NButton>
           </div>
@@ -143,8 +158,9 @@ function handleGenerateBackendCodeSuccess() {
       </n-flex>
     </NSpace>
 
-    <GenerateEntityModal ref="GenerateEntityModalRef" :row="props.row" @success="handleGenerateEntitySuccess" />
-    <GenerateBackendCode ref="GenerateBackendCodeRef" :row="props.row" @success="handleGenerateBackendCodeSuccess" />
+    <GenerateEntityModal ref="generateEntityModalRef" :row="props.row" @success="handleGenerateEntitySuccess" />
+    <GenerateBackendCode ref="generateBackendCodeRef" :row="props.row" @success="handleGenerateBackendCodeSuccess" />
+    <GenerateWebCodeModal ref="generateWebCodeModalRef" :row="props.row" @success="handleGenerateWebCodeSuccess" />
   </NCard>
 </template>
 
