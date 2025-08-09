@@ -13,7 +13,7 @@ export interface DictDataVO extends BaseVO {
 
 export const DictDataApi = {
   /** 獲取字典數據分頁列表 */
-  getDictDataPage: async (params: PageParams): PageRes<DictDataVO> => {
+  getDictDataPage: async (params: PageParams & Partial<DictDataVO>): PageRes<DictDataVO> => {
     return await request.get({ url: '/system/dict-data/page', params })
   },
 

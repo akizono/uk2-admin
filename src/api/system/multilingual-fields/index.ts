@@ -17,7 +17,7 @@ export interface MultilingualFieldsVO extends BaseVO {
 
 export const MultilingualFieldsApi = {
   /** 獲取多語言欄位分頁列表 */
-  getMultilingualFieldsPage: async (params: PageParams): PageRes<MultilingualFieldsVO> => {
+  getMultilingualFieldsPage: async (params: PageParams & Partial<MultilingualFieldsVO>): PageRes<MultilingualFieldsVO> => {
     return await request.get({ url: '/system/multilingual-fields/page', params })
   },
 

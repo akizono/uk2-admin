@@ -14,7 +14,7 @@ export interface DeptVO extends BaseVO {
 
 export const DeptApi = {
   /** 獲取部門分頁列表 */
-  getDeptPage: async (params: PageParams): PageRes<DeptVO> => {
+  getDeptPage: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
     return await request.get({ url: '/system/dept/page', params })
   },
 

@@ -22,12 +22,12 @@ export interface MenuVO extends BaseVO {
 
 export const MenuApi = {
   /** 獲取選單分頁列表 */
-  getMenuPage: async (params: PageParams): PageRes<MenuVO> => {
+  getMenuPage: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
     return await request.get({ url: '/system/menu/page', params })
   },
 
   /** 獲取使用者有權限的菜單 */
-  getUserMenus: async (params: PageParams): PageRes<MenuVO> => {
+  getUserMenus: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
     return await request.get({ url: '/system/menu/user-menus', params })
   },
 

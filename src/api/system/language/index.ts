@@ -12,7 +12,7 @@ export interface LanguageVO extends BaseVO {
 
 export const LanguageApi = {
   /** 獲取語言分頁列表 */
-  getLanguagePage: async (params: PageParams): PageRes<LanguageVO> => {
+  getLanguagePage: async (params: PageParams & Partial<LanguageVO>): PageRes<LanguageVO> => {
     return await request.get({ url: '/system/language/page', params })
   },
 

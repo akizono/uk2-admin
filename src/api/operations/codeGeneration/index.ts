@@ -80,6 +80,8 @@ export interface CodeGenerateBackendParamsVO {
   columns: Record<string, { label: string, type: string, nullable: boolean }>
 }
 
+export type EntityAllFieldsVO = Record<string, { label: string, type: string, nullable: boolean }>
+
 export const CodeGenerationApi = {
   /** 獲取模組分頁列表 */
   getCodeGenerationPage: async (params: PageParams): PageRes<CodeGenerationVO> => {
@@ -135,4 +137,10 @@ export const CodeGenerationApi = {
   insertBackendCode: async (data: CodeGenerateBackendParamsVO) => {
     return await request.post({ url: '/operations/code-generation/insert-backend-code', data })
   },
+
+  // 獲取指定的Entity 中 所有欄位
+  getEntityAllFields: async (params: { splitName: string }): ApiResponse<EntityAllFieldsVO> => {
+    return await request.get({ url: '/operations/code-generation/get-entity-all-fields', params })
+  },
+
 }

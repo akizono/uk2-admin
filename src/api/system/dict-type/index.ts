@@ -11,7 +11,7 @@ export interface DictTypeVO extends BaseVO {
 
 export const DictTypeApi = {
   /** 獲取字典類型分頁列表 */
-  getDictTypePage: async (params: PageParams): PageRes<DictTypeVO> => {
+  getDictTypePage: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
     return await request.get({ url: '/system/dict-type/page', params })
   },
 

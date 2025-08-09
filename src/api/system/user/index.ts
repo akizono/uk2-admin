@@ -24,7 +24,7 @@ export interface UserVo extends BaseVO {
 
 export const UserApi = {
   /** 獲取使用者分頁列表 */
-  getUserPage: async (params: PageParams): PageRes<UserVo> => {
+  getUserPage: async (params: PageParams & Partial<UserVo>): PageRes<UserVo> => {
     return await request.get({ url: '/system/user/page', params })
   },
 
