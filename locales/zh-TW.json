@@ -239,9 +239,12 @@
     "backHome": "回到首頁",
     "getRouteError": "獲取路由失敗，請稍後再試",
     "layoutSetting": "布局設置",
-    "leftMenu": "左側選單",
-    "topMenu": "頂部選單",
-    "mixMenu": "混合選單"
+    "verticalLayout": "豎向布局",
+    "horizontalLayout": "橫向布局",
+    "twoColumnLayout": "雙欄布局",
+    "mixedTwoColumnLayout": "混合雙欄布局",
+    "sidebarLayout": "側邊欄布局",
+    "mixedSidebarLayout": "雙欄布局"
   },
   "components": {
     "iconSelector": {

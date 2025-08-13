@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type ECOption, useEcharts } from '@/hooks'
-// 折线图
+// 折線圖
 const lineOptions = ref<ECOption>({
   tooltip: {
     trigger: 'axis',

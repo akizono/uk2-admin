@@ -82,10 +82,10 @@ const option = ref<ECOption>({
     itemStyle: {
       color: new graphic.LinearGradient(0, 0, 0, 1, [{
         offset: 0,
-        color: '#00BD89', // 0% 处的颜色
+        color: '#00BD89', // 0% 處的顏色
       }, {
         offset: 1,
-        color: '#C9F9E1', // 100% 处的颜色
+        color: '#C9F9E1', // 100% 處的顏色
       }], false),
     },
   }],

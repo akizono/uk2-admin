@@ -26,6 +26,7 @@ function handleDropTabs(key: string, option: any) {
     :render-icon="renderDropTabsIcon"
     trigger="click"
     size="small"
+    key-field="fullPath"
     @select="handleDropTabs"
   >
     <CommonWrapper>

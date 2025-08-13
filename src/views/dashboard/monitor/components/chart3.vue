@@ -32,7 +32,7 @@ const option = ref<ECOption>({
     data: [
       {
         value: 335,
-        name: '直接访问',
+        name: '直接訪問',
       },
       {
         value: 77,
@@ -44,7 +44,7 @@ const option = ref<ECOption>({
       },
       {
         value: 421,
-        name: '小红书',
+        name: '小紅書',
       },
     ],
   },

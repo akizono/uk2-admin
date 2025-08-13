@@ -73,7 +73,7 @@ function handleSelect(key: string | number) {
   >
     <n-avatar
       round
-
+      class="cursor-pointer"
       :src="userInfo?.avatar"
     >
       <template #fallback>

@@ -1,20 +1,125 @@
 <script setup lang="ts">
-import { useAppStore } from '@/store/app'
+import { useAppStore, useRouteStore } from '@/store'
+import { ProLayout, useLayoutMenu } from 'pro-naive-ui'
 
-import { SettingDrawer } from './components'
-import leftMenu from './leftMenu.layout.vue'
-import mixMenu from './mixMenu.layout.vue'
-import topMenu from './topMenu.layout.vue'
+import {
+  BackTop,
+  Breadcrumb,
+  CollapaseButton,
+  FullScreen,
+  Logo,
+  MobileDrawer,
+  Notices,
+  Search,
+  Setting,
+  SettingDrawer,
+  TabBar,
+  UserCenter,
+} from './components'
+import Content from './Content.vue'
 
+const route = useRoute()
 const appStore = useAppStore()
-const layoutMap = {
-  leftMenu,
-  topMenu,
-  mixMenu,
-}
+const routeStore = useRouteStore()
+const { layoutMode } = storeToRefs(useAppStore())
+const {
+  layout,
+  activeKey,
+} = useLayoutMenu({
+  mode: layoutMode,
+  accordion: true,
+  menus: routeStore.menus,
+})
+
+watch(() => route.path, () => {
+  activeKey.value = routeStore.activeMenu
+}, { immediate: true })
+
+// 行動端抽屜控制
+const showMobileDrawer = ref(false)
+
+const sidebarWidth = ref(240)
+const sidebarCollapsedWidth = ref(64)
+const hasHorizontalMenu = computed(() => ['horizontal', 'mixed-two-column', 'mixed-sidebar'].includes(layoutMode.value))
+const hidenCollapaseButton = computed(() => ['horizontal'].includes(layoutMode.value) || appStore.isMobile)
 </script>
 
 <template>
   <SettingDrawer />
-  <component :is="layoutMap[appStore.layoutMode]" />
+  <ProLayout
+    v-model:collapsed="appStore.collapsed" :mode="layoutMode" :is-mobile="appStore.isMobile"
+    :show-logo="appStore.showLogo && !appStore.isMobile" :show-footer="appStore.showFooter"
+    :show-tabbar="appStore.showTabs" nav-fixed show-nav show-sidebar :nav-height="60" :tabbar-height="45"
+    :footer-height="40" :sidebar-width="sidebarWidth" :sidebar-collapsed-width="sidebarCollapsedWidth"
+  >
+    <template #logo>
+      <Logo />
+    </template>
+    <template #nav-left>
+      <template v-if="appStore.isMobile">
+        <Logo />
+      </template>
+
+      <template v-else>
+        <div v-if="!hasHorizontalMenu || !hidenCollapaseButton" class="h-full flex-y-center gap-1 p-x-sm">
+          <CollapaseButton v-if="!hidenCollapaseButton" />
+          <Breadcrumb v-if="!hasHorizontalMenu" />
+        </div>
+      </template>
+    </template>
+    <template #nav-center>
+      <div class="h-full flex-y-center gap-1">
+        <n-menu v-if="hasHorizontalMenu" v-bind="layout.horizontalMenuProps" />
+      </div>
+    </template>
+    <template #nav-right>
+      <div class="h-full flex-y-center gap-1 p-x-xl">
+        <!-- 行動端：只顯示菜單按鈕 -->
+        <template v-if="appStore.isMobile">
+          <n-button quaternary @click="showMobileDrawer = true">
+            <template #icon>
+              <n-icon size="18">
+                <icon-park-outline-hamburger-button />
+              </n-icon>
+            </template>
+          </n-button>
+        </template>
+
+        <!-- 桌面端：顯示完整功能組件 -->
+        <template v-else>
+          <Search />
+          <Notices />
+          <FullScreen />
+          <DarkModeSwitch />
+          <LangsSwitch />
+          <Setting />
+          <UserCenter />
+        </template>
+      </div>
+    </template>
+    <template #sidebar>
+      <n-menu v-bind="layout.verticalMenuProps" :collapsed-width="sidebarCollapsedWidth" />
+    </template>
+    <template #sidebar-extra>
+      <n-scrollbar class="flex-[1_0_0]">
+        <n-menu v-bind="layout.verticalExtraMenuProps" :collapsed-width="sidebarCollapsedWidth" />
+      </n-scrollbar>
+    </template>
+    <template #tabbar>
+      <TabBar />
+    </template>
+    <template #footer>
+      <div class="flex-center h-full">
+        {{ appStore.footerText }}
+      </div>
+    </template>
+    <Content />
+    <BackTop />
+    <SettingDrawer />
+
+    <!-- 行動端功能抽屜 -->
+    <MobileDrawer v-model:show="showMobileDrawer">
+      <n-menu v-bind="layout.verticalMenuProps" />
+    </MobileDrawer>
+  </ProLayout>
 </template>
