@@ -397,32 +397,8 @@ const initFormDataColumns = ref<DataTableColumns<InitFormData>>([
     },
   },
   {
-    key: 'multilingual',
-    title: '開啟多語言',
-    width: 60,
-    render: (row: InitFormData) => {
-      return (
-        <div>
-          <n-switch v-model:value={row.multilingual} />
-        </div>
-      )
-    },
-  },
-  {
-    key: 'hidden',
-    title: '隱藏',
-    width: 60,
-    render: (row: InitFormData) => {
-      return (
-        <div>
-          <n-switch v-model:value={row.hidden} />
-        </div>
-      )
-    },
-  },
-  {
     key: 'type',
-    title: 'type',
+    title: '輸入框類型',
     width: 150,
     render: (row: InitFormData) => {
       return (
@@ -448,9 +424,78 @@ const initFormDataColumns = ref<DataTableColumns<InitFormData>>([
     },
   },
   {
+    key: 'inputPrefix',
+    title: '輸入框前綴',
+    width: 150,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-input v-model:value={row.inputPrefix} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'inputSuffix',
+    title: '輸入框後綴',
+    width: 150,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-input v-model:value={row.inputSuffix} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'helpInfo',
+    title: '幫助提示',
+    width: 150,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-input v-model:value={row.helpInfo} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'placeholder',
+    title: '輸入框提示文字',
+    width: 150,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-input v-model:value={row.placeholder} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'rulesType',
+    title: 'rules.type',
+    width: 120,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-select
+            v-model:value={row.rulesType}
+            options={[
+              { label: 'string', value: 'string' },
+              { label: 'number', value: 'number' },
+              { label: 'boolean', value: 'boolean' },
+              { label: 'array', value: 'array' },
+              { label: 'object', value: 'object' },
+            ]}
+          />
+        </div>
+      )
+    },
+  },
+  {
     key: 'selectOptions',
     title: 'select配置',
-    width: 150,
+    width: 80,
     render: (row: InitFormData) => {
       return (
         <div>
@@ -499,6 +544,81 @@ const initFormDataColumns = ref<DataTableColumns<InitFormData>>([
           >
             編輯
           </n-button>
+        </div>
+      )
+    },
+  },
+  {
+    key: 'dictType',
+    title: '字典類型',
+    width: 250,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-select
+            v-model:value={row.dictType}
+            options={dictTypeOptions.value}
+          />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'hidden',
+    title: '隱藏',
+    width: 60,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-switch v-model:value={row.hidden} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'multilingual',
+    title: '開啟多語言',
+    width: 80,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-switch v-model:value={row.multilingual} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'disableUpdate',
+    title: '禁止該欄位進行更新',
+    width: 80,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-switch v-model:value={row.disableUpdate} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'disableEditInput',
+    title: '禁止該欄位進行編輯',
+    width: 80,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-switch v-model:value={row.disableEditInput} />
+        </div>
+      )
+    },
+  },
+  {
+    key: 'disableAddInput',
+    title: '禁止該欄位進行新增',
+    width: 80,
+    render: (row: InitFormData) => {
+      return (
+        <div>
+          <n-switch v-model:value={row.disableAddInput} />
         </div>
       )
     },
