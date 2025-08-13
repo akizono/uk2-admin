@@ -4,10 +4,8 @@ import { renderIcon } from '@/utils'
 
 const tabStore = useTabStore()
 
-const { t } = useI18n()
-
 function renderDropTabsLabel(option: any) {
-  return t(`route.${String(option.name)}`, option.meta.title)
+  return option.meta.title
 }
 function renderDropTabsIcon(option: any) {
   return renderIcon(option.meta.icon)!()

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import {
-  fetchGet,
-} from '@/service'
+import { fetchGet } from '@/api/demo/test'
 
 const emit = defineEmits<{
-  update: [data: any] // 具名元组语法
+  update: [data: any] // 具名元組語法
 }>()
 
 async function pinterEnv() {

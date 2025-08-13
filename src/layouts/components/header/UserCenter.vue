@@ -7,7 +7,7 @@ import IconUser from '~icons/icon-park-outline/user'
 
 const { t } = useI18n()
 
-const { userInfo, logout } = useAuthStore()
+const { user, logout } = useAuthStore()
 const router = useRouter()
 
 const options = computed(() => {
@@ -74,7 +74,7 @@ function handleSelect(key: string | number) {
     <n-avatar
       round
       class="cursor-pointer"
-      :src="userInfo?.avatar"
+      :src="user?.avatar"
     >
       <template #fallback>
         <div class="wh-full flex-center">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { UserVo } from '@/api/system/user'
 import type { FormRules } from 'naive-ui'
 
 import { UserApi } from '@/api/system/user'
@@ -13,12 +14,7 @@ const authStore = useAuthStore()
 
 const { user } = authStore
 const formRef = ref()
-const formValue = ref({
-  id: '',
-  nickname: '',
-  age: 33,
-  mobile: '',
-})
+const formValue = ref<Partial<UserVo>>({})
 const rules: FormRules = {
   nickname: {
     required: true,
@@ -43,7 +39,7 @@ function handleValidateClick() {
     if (errors)
       return window.$message.error('驗證不通過')
 
-    UserApi.updateUser(formValue.value).then(({ message }) => {
+    UserApi.updateUser(formValue.value as UserVo).then(({ message }) => {
       window.$message.success(message)
     })
   })
@@ -53,9 +49,9 @@ onMounted(() => {
   if (user) {
     formValue.value = {
       id: user.id!,
-      nickname: user.nickname ?? '',
-      age: user.age ?? 33,
-      mobile: user.mobile ?? '',
+      nickname: user.nickname,
+      age: user.age,
+      mobile: user.mobile,
     }
   }
 })

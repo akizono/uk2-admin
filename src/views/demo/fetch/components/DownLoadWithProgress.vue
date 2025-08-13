@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  downloadFile,
-} from '@/service'
-import { useRequest } from 'alova/client'
+import { downloadFile } from '@/api/demo/test'
 
 const emit = defineEmits<{
   update: [data: any]
@@ -10,21 +7,51 @@ const emit = defineEmits<{
 
 const filePath = ref('https://images.unsplash.com/photo-1663529628961-80aa6ebcd157?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80')
 
-const { downloading, abort, send, data } = useRequest(downloadFile(filePath.value), {
-  // 当immediate为false时，默认不发出
-  immediate: false,
+// axios 版本的狀態管理
+const downloading = ref({
+  loaded: 0,
+  total: 0,
 })
+const isDownloading = ref(false)
+const data = ref<Blob | null>(null)
 
 const downloadProcess = computed(() => {
-  if (!downloading.value.loaded)
+  if (!downloading.value.loaded || !downloading.value.total)
     return 0
   return Math.floor(downloading.value.loaded / downloading.value.total * 100)
 })
 
 async function handleDownloadFile() {
-  await send()
-  emit('update', 'fileOk')
-  downloadLink(data.value, 'fileOk')
+  try {
+    isDownloading.value = true
+    downloading.value = { loaded: 0, total: 0 }
+
+    // 進度回調函數
+    const onDownloadProgress = (progressEvent: any) => {
+      downloading.value = {
+        loaded: progressEvent.loaded || 0,
+        total: progressEvent.total || 0,
+      }
+    }
+
+    const result = await downloadFile(filePath.value, onDownloadProgress)
+    data.value = result as Blob
+
+    emit('update', 'fileOk')
+    downloadLink(data.value, 'fileOk')
+  }
+  catch (error) {
+    console.error('下載失敗:', error)
+  }
+  finally {
+    isDownloading.value = false
+  }
+}
+
+function abort() {
+  // axios 版本的中斷下載邏輯（簡化版）
+  isDownloading.value = false
+  downloading.value = { loaded: 0, total: 0 }
 }
 
 function downloadLink(data: Blob, name: string) {
@@ -40,18 +67,18 @@ function downloadLink(data: Blob, name: string) {
 </script>
 
 <template>
-  <n-card title="带进度的下载文件" size="small">
+  <n-card title="帶進度的下載文件" size="small">
     <n-space vertical>
       <n-input v-model:value="filePath" />
-      <div>文件大小：{{ downloading.total }}B</div>
-      <div>已下载：{{ downloading.loaded }}B</div>
+      <div>檔案大小：{{ downloading.total }}B</div>
+      <div>已下載：{{ downloading.loaded }}B</div>
       <n-progress type="line" indicator-placement="inside" :percentage="downloadProcess" />
       <n-space>
         <n-button strong secondary @click="handleDownloadFile">
-          开始下载
+          開始下載
         </n-button>
         <n-button strong secondary type="warning" @click="abort">
-          中断下载
+          中斷下載
         </n-button>
       </n-space>
     </n-space>

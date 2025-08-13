@@ -1,3 +1,5 @@
+import { useLanguageStore } from '@/store'
+
 import { convertUndefinedToNull, filterObjEmptyValues as filterEmpty } from '../tools/object'
 import { config } from './config'
 import { service } from './service'
@@ -42,6 +44,23 @@ function request(option: any) {
 export default {
   get: async <T = any>(option: any) => {
     const res = await request({ method: 'GET', ...option })
+    return res as unknown as T
+  },
+  getByLang: async <T = any>(option: any) => {
+    const res = await request({ method: 'GET', ...option })
+
+    if (
+      res.data.list
+      && res.data.list.length > 0
+      && res.data.list[0].multilingualFields
+    ) {
+      const { current } = useLanguageStore()
+      res.data.list.forEach((item: any) => {
+        Object.keys(item.multilingualFields).forEach((key) => {
+          item[key] = item.multilingualFields[key].find((item: any) => item.language === current)?.value
+        })
+      })
+    }
     return res as unknown as T
   },
   post: async <T = any>(option: any) => {

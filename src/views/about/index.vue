@@ -9,7 +9,7 @@ defineOptions({
 <template>
   <n-space vertical>
     <n-card title="關於">
-      Nova-admin是一款基於Vue3+vite+TypeScript+NaiveUI的後台管理模板，力求使用簡約的代碼實現完備功能，降低學習門檻和維護成本，讓大家能早點下班做自己的事情
+      UK2-admin是一款基於Vue3+vite+TypeScript+NaiveUI的後台管理模板，力求使用簡約的代碼實現完備功能，降低學習門檻和維護成本，讓大家能早點下班做自己的事情
     </n-card>
     <n-card title="資訊">
       <n-descriptions

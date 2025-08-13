@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { User } from '@/api/demo/system'
+
 interface Props {
   visible: boolean
   type?: ModalType
@@ -11,7 +13,7 @@ const {
 } = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
-const defaultFormModal: Entity.User = {
+const defaultFormModal: User = {
   userName: '',
   gender: 0,
   email: '',
@@ -37,8 +39,8 @@ function closeModal(visible = false) {
 type ModalType = 'add' | 'edit'
 const title = computed(() => {
   const titles: Record<ModalType, string> = {
-    add: '添加用户',
-    edit: '编辑用户',
+    add: '添加用戶',
+    edit: '編輯用戶',
   }
   return titles[type]
 })
@@ -78,13 +80,13 @@ watch(
   >
     <n-form label-placement="left" :model="formModel" label-align="left" :label-width="80">
       <n-grid :cols="24" :x-gap="18">
-        <n-form-item-grid-item :span="12" label="用户名" path="name">
+        <n-form-item-grid-item :span="12" label="使用者名稱" path="name">
           <n-input v-model:value="formModel.userName" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="年龄" path="age">
+        <n-form-item-grid-item :span="12" label="年齡" path="age">
           <n-input-number v-model:value="formModel.gender" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="性别" path="gender">
+        <n-form-item-grid-item :span="12" label="性別" path="gender">
           <n-radio-group v-model:value="formModel.gender">
             <n-space>
               <n-radio :value="1">
@@ -96,7 +98,7 @@ watch(
             </n-space>
           </n-radio-group>
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="邮箱" path="email">
+        <n-form-item-grid-item :span="12" label="信箱" path="email">
           <n-input v-model:value="formModel.email" />
         </n-form-item-grid-item>
       </n-grid>

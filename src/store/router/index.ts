@@ -239,7 +239,7 @@ export const useRouteStore = defineStore('route-store', {
 
         // 處理子節點
         if (item.children && item.children.length > 0) {
-          item.children.forEach(child => traverse(child, item))
+          item.children.forEach((child: any) => traverse(child, item))
         }
 
         return item

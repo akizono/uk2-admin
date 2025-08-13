@@ -15,6 +15,11 @@ export const DictTypeApi = {
     return await request.get({ url: '/system/dict-type/page', params })
   },
 
+  /** 獲取「當前系統語言」版本的「字典類型分頁列表」 */
+  getDictTypePageByLang: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
+    return await request.getByLang({ url: '/system/dict-type/page', params })
+  },
+
   /** 新增字典類型 */
   createDictType: async (data: DictTypeVO) => {
     return await request.post({ url: '/system/dict-type/create', data })

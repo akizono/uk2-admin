@@ -78,7 +78,7 @@ service.interceptors.response.use(
     if (status === 401) {
       // 如果是登入請求，直接回傳錯誤
       if (url === loginUrl) {
-        window.$message?.error(message)
+        window.$message?.error(t('account.accountOrPasswordError'))
         return Promise.reject(error)
       }
 

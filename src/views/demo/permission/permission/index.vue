@@ -12,7 +12,7 @@ const role = user?.role || []
 
 const roleList: Role[] = ['admin', 'common']
 
-function toggleUserRole(role: string) {
+async function toggleUserRole(role: string) {
   const loginConfig = {
     admin: {
       username: import.meta.env.VITE_TEST_SUPER_ADMIN_USERNAME,
@@ -25,7 +25,8 @@ function toggleUserRole(role: string) {
   }
 
   const config = loginConfig[role as keyof typeof loginConfig]
-  authStore.login(config.username, config.password)
+  await authStore.login(config.username, config.password)
+  window.location.reload()
 }
 </script>
 

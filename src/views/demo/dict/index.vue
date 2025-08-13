@@ -13,7 +13,7 @@ const loading = ref(false)
 async function getAlldict() {
   loading.value = true
   try {
-    const { data: result } = await DictTypeApi.getDictTypePage({
+    const { data: result } = await DictTypeApi.getDictTypePageByLang({
       currentPage: 1,
       pageSize: 5,
     })
@@ -110,9 +110,12 @@ const enumLabel = computed(() => {
         </n-button>
       </n-flex>
 
-      <pre class="bg-#eee:30">
-          {{ data }}
-        </pre>
+      <div class="bg-#eee:30 p-10px">
+        <NCode
+          :code="JSON.stringify(data, null, 2) || ''"
+          language="ts" show-line-numbers word-wrap
+        />
+      </div>
 
       <n-flex align="center">
         <n-input-number v-model:value="dictValue" :min="0" />

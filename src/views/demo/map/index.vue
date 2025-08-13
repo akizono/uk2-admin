@@ -1,30 +1,27 @@
-<script lang="ts">
-</script>
-
 <script setup lang="ts">
 import AMap from './components/AMap.vue'
 import BMap from './components/BMap.vue'
 
 defineOptions({
-  name: 'map',
+  name: 'DemoMap',
 })
 
 const maps = [
   {
     id: 'BMap',
-    label: '百度地图',
+    label: '百度地圖',
     component: BMap,
   },
   {
     id: 'AMap',
-    label: '高德地图',
+    label: '高德地圖',
     component: AMap,
   },
 ]
 </script>
 
 <template>
-  <n-card title="地图示例(keepalive缓存)">
+  <n-card title="地圖範例(keepalive快取)">
     <n-tabs
       type="line"
       animated

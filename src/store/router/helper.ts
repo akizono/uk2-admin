@@ -28,6 +28,7 @@ function standardizedRoutes(route: AppRoute.RowRoute[]) {
 
     if (item.link) {
       meta.href = item.link
+      item.path = `/this_is_an_external_link-${item.id}` // path可以是任何內容 因為必須有值才能識別這是個按鈕而不是目錄
     }
 
     const route = {

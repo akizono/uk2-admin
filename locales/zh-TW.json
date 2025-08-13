@@ -76,7 +76,8 @@
     "emailRule": "請填寫電子郵件",
     "mobileRule": "請填寫手機號碼",
     "ageRule": "請填寫年齡",
-    "user": "使用者"
+    "user": "使用者",
+    "accountOrPasswordError": "帳號或密碼錯誤"
   },
   "dictionary": {
     "dictName": "字典名稱",

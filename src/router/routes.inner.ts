@@ -60,7 +60,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     component: () => import('@/views/error/404/index.vue'),
-    name: '404',
+    name: 'notFound',
     meta: {
       title: '找不到頁面',
       icon: 'icon-park-outline:ghost',
