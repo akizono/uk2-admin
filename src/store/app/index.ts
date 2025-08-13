@@ -1,9 +1,11 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import type { ProLayoutMode } from 'pro-naive-ui'
 
+import { router } from '@/router'
 import { colord } from 'colord'
 import { set } from 'radash'
 
+import { useRouteStore } from '../router'
 import themeConfig from './theme.json'
 
 export type TransitionAnimation = '' | 'fade-slide' | 'fade-bottom' | 'fade-scale' | 'zoom-fade' | 'zoom-out'
@@ -106,6 +108,30 @@ export const useAppStore = defineStore('app-store', {
     async reloadPage(delay = 600) {
       this.loadFlag = false
       await nextTick()
+
+      // 獲取當前路由資訊
+      const currentRoute = router.currentRoute.value
+      const routeStore = useRouteStore()
+
+      // 臨時保存當前的緩存路由列表
+      const originalCacheRoutes = [...routeStore.cacheRoutes]
+
+      // 如果當前路由在緩存列表中，臨時從緩存列表中移除
+      if (currentRoute && currentRoute.name) {
+        const routeName = currentRoute.name.toString()
+
+        // 臨時修改緩存路由列表，強制組件重新創建
+        if (originalCacheRoutes.includes(routeName)) {
+          // 移除當前路由名稱
+          routeStore.cacheRoutes = originalCacheRoutes.filter(name => name !== routeName)
+
+          // 延遲後恢復緩存
+          setTimeout(() => {
+            routeStore.cacheRoutes = originalCacheRoutes
+          }, delay / 2)
+        }
+      }
+
       if (delay) {
         setTimeout(() => {
           this.loadFlag = true
