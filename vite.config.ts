@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from 'vite'
 
 import { createVitePlugins } from './build/plugins'
 import { createViteProxy } from './build/proxy'
-import { serviceConfig } from './service.config'
+import { serviceConfig } from './src/utils/request/proxy/service.config'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
