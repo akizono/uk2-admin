@@ -2,6 +2,7 @@ import UnoCSS from '@unocss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
+import ElementPlus from 'unplugin-element-plus/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 // https://github.com/antfu/unplugin-icons
 import IconsResolver from 'unplugin-icons/resolver'
@@ -12,8 +13,8 @@ import viteCompression from 'vite-plugin-compression'
 import VueDevTools from 'vite-plugin-vue-devtools'
 
 /**
- * @description: 设置vite插件配置
- * @param {*} env - 环境变量配置
+ * @description: 設置vite插件配置
+ * @param {*} env - 環境變數配置
  * @return {*}
  */
 export function createVitePlugins(env: ImportMetaEnv) {
@@ -78,12 +79,17 @@ export function createVitePlugins(env: ImportMetaEnv) {
         ),
       },
     }),
+
+    // support element-plus
+    ElementPlus({
+      useSource: false,
+    }),
   ]
   // use compression
   if (env.VITE_BUILD_COMPRESS === 'Y') {
     const { VITE_COMPRESS_TYPE = 'gzip' } = env
     plugins.push(viteCompression({
-      algorithm: VITE_COMPRESS_TYPE, // 压缩算法
+      algorithm: VITE_COMPRESS_TYPE, // 壓縮算法
     }))
   }
 

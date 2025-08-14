@@ -26,6 +26,11 @@ export const MenuApi = {
     return await request.get({ url: '/system/menu/page', params })
   },
 
+  /** 獲取「當前系統語言」版本的「選單分頁列表」 */
+  getMenuPageByLang: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
+    return await request.getByLang({ url: '/system/menu/page', params })
+  },
+
   /** 獲取使用者有權限的菜單 */
   getUserMenus: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
     return await request.get({ url: '/system/menu/user-menus', params })

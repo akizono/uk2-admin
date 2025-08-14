@@ -1,0 +1,154 @@
+<script setup lang="ts">
+import type { MenuVO } from '@/api/system/menu'
+import type { RoleVO } from '@/api/system/role'
+
+import { MenuApi } from '@/api/system/menu'
+import { RoleMenuApi } from '@/api/system/role-menu'
+import { arrayToTree, sortTreeData } from '@/utils/array'
+import { ElTree } from 'element-plus'
+
+const modalTitle = ref('')
+const modalVisible = ref(false)
+const rowData = ref({} as RoleVO)
+const loading = ref(true)
+
+/** 選項相關 */
+const treeRef = ref()
+const defaultProps = { children: 'children', label: 'title', value: 'id' }
+
+const treeList = ref<MenuVO[]>([])
+async function getTreeList() {
+  const { data: result } = await MenuApi.getMenuPageByLang({
+    pageSize: 0,
+  })
+  treeList.value = sortTreeData(arrayToTree(result.list))
+}
+
+/** 選中相關 */
+const checkedKeys = ref<string[]>([]) // 選中的數據
+const allChecked = ref(false) // 全部選中
+const menuExpand = ref(false) // 全部展開
+
+async function setChecked() {
+  const { data: result } = await RoleMenuApi.getRoleMenuPage({
+    pageSize: 0,
+    roleId: rowData.value.id,
+  })
+  checkedKeys.value = result.list.map(item => item.menuId)
+  checkedKeys.value.forEach((menuId) => {
+    treeRef.value.setChecked(menuId, true, false)
+  })
+}
+function handleAllCheckedChange(_value: boolean) {
+  treeRef.value.setCheckedNodes(allChecked.value ? treeList.value : [])
+}
+function handleMenuExpandChange(_value: boolean) {
+  const nodes = treeRef.value?.store.nodesMap
+  for (const node in nodes) {
+    if (nodes[node].expanded === menuExpand.value) {
+      continue
+    }
+    nodes[node].expanded = menuExpand.value
+  }
+}
+
+async function handleSubmit() {
+  try {
+    loading.value = true
+    const data = {
+      roleId: rowData.value.id,
+      menuIds: [
+        ...(treeRef.value.getCheckedKeys(false) as unknown as Array<string>), // 獲得當前選中節點
+        ...(treeRef.value.getHalfCheckedKeys() as unknown as Array<string>), // 獲得半選中的父節點
+      ],
+    }
+    await RoleMenuApi.batchUpdate(data)
+    window.$message.success('保存成功')
+  }
+  finally {
+    loading.value = false
+    modalVisible.value = false
+  }
+}
+
+defineExpose({
+  openModal: async (row: RoleVO) => {
+    try {
+      modalTitle.value = row.name // 設置模態框的標題
+      modalVisible.value = true // 打開模態框
+
+      rowData.value = row // 設置當前行數據
+
+      treeList.value = []
+      checkedKeys.value = []
+      allChecked.value = false
+
+      loading.value = true // 設置loading
+
+      await getTreeList() // 獲取樹形結構
+      await setChecked() // 獲取「選中」的數據
+    }
+    finally {
+      loading.value = false
+    }
+  },
+})
+</script>
+
+<template>
+  <n-modal
+    v-model:show="modalVisible"
+    :mask-closable="false"
+    preset="card"
+    :title="`${modalTitle} - 菜單&權限`"
+    class="max-w-600px w-100%"
+    :segmented="{
+      content: true,
+      action: true,
+    }"
+  >
+    <div class="flex justify-between ">
+      <div class="w-140px">
+        <n-form-item label="全部選中：" label-placement="left">
+          <n-switch v-model:value="allChecked" @change="handleAllCheckedChange" />
+        </n-form-item>
+        <n-form-item label="全部展開：" label-placement="left">
+          <n-switch v-model:value="menuExpand" @change="handleMenuExpandChange" />
+        </n-form-item>
+      </div>
+      <n-scrollbar class="border-l border-gray-200 h-[calc(100vh-260px)] flex-1">
+        <ElTree
+          ref="treeRef"
+          :data="treeList"
+          :props="defaultProps"
+          empty-text="載入中，請稍後..."
+          node-key="id"
+          show-checkbox
+        />
+      </n-scrollbar>
+    </div>
+
+    <template #action>
+      <n-space justify="center">
+        <n-button type="primary" :loading="loading" @click="handleSubmit">
+          保存
+        </n-button>
+        <n-button :disabled="loading" @click="modalVisible = false">
+          取消
+        </n-button>
+      </n-space>
+    </template>
+  </n-modal>
+</template>
+
+<style scoped lang="scss">
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+}
+
+:deep(.el-checkbox__input.is-indeterminate .el-checkbox__inner) {
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+}
+</style>

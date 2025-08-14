@@ -5,7 +5,9 @@ import type { InitFormData, InitQueryParams } from '@/components/common/DataTabl
 import { RoleApi } from '@/api/system/role'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
-import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NButton, NSwitch } from 'naive-ui'
+
+import AssignmentMenu from './components/assignment-menu/index.vue'
 
 defineOptions({
   name: 'Role Management',
@@ -15,6 +17,7 @@ const { hasPermi } = usePermi()
 const { t } = useI18n()
 
 const dataTableRef = ref()
+const assignmentMenuRef = ref()
 
 /** 權限配置 */
 const permission = {
@@ -76,6 +79,17 @@ const columns: DataTableColumns<RoleVO> = [
           value={row.status === 1}
           onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)}
         />
+      )
+    },
+  },
+  {
+    title: t('common.action'),
+    key: 'actions',
+    render: (row: RoleVO) => {
+      return (
+        <NButton size="small" onClick={() => assignmentMenuRef.value.openModal(row)}>
+          菜單&權限
+        </NButton>
       )
     },
   },
@@ -186,5 +200,9 @@ const options = {
 </script>
 
 <template>
-  <DataTable v-bind="options" />
+  <div>
+    <DataTable v-bind="options" />
+
+    <AssignmentMenu ref="assignmentMenuRef" />
+  </div>
 </template>
