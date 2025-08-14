@@ -4,6 +4,7 @@ import { i18n } from '@/modules/i18n'
 import { dateZhCN, dateZhTW, zhCN, zhTW } from 'naive-ui'
 
 export function setLocale(locale: string) {
+  // @ts-expect-error 忽略型別錯誤
   i18n.global.locale.value = locale.replace('-', '')
 }
 

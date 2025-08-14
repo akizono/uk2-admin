@@ -1,11 +1,9 @@
-import type { BaseVO } from '@/typings/base'
-
 import { useLanguageStore } from '@/store/model/language'
 import request from '@/utils/request'
 
 const languageStore = useLanguageStore()
 
-export interface MultilingualFieldsVO extends BaseVO {
+export interface MultilingualFieldsVO extends Api.BaseVO {
   id: string
   fieldId: string
   language: string

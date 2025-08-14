@@ -1,6 +1,5 @@
 declare namespace AppRoute {
 
-  type MenuType = 'dir' | 'page'
   /** 單個路由所攜帶的meta標識 */
   interface RouteMeta {
     /* 頁面標題，通常必選。 */
@@ -9,8 +8,6 @@ declare namespace AppRoute {
     icon?: string
     /* 是否需要登錄權限。 */
     requiresAuth?: boolean
-    /* 可以訪問的角色 */
-    roles?: Entity.RoleType[]
     /* 權限標識 */
     permission?: string
     /* 是否開啟頁面快取 */
@@ -50,8 +47,6 @@ declare namespace AppRoute {
       }>
     }
   }
-
-  type MetaKeys = keyof RouteMeta
 
   interface baseRoute {
     /** 路由名稱(路由唯一標識) */

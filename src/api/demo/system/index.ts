@@ -16,7 +16,7 @@ export interface User {
   /* 用户电话 */
   tel?: string
   /** 用户角色类型 */
-  role?: Entity.RoleType[]
+  role?: 'super' | 'admin' | 'user'[]
   /** 用户状态 */
   status?: 0 | 1
   /** 备注 */

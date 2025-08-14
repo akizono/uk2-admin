@@ -1,8 +1,6 @@
-import type { BaseVO } from '@/typings/base'
-
 import request from '@/utils/request'
 
-export interface CodeGenerationVO extends BaseVO {
+export interface CodeGenerationVO extends Api.BaseVO {
   id?: string
   name: string
   code: string

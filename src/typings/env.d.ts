@@ -4,13 +4,40 @@
  * - test: 後台測試環境
  * - prod: 後台生產環境
  */
- type ServiceEnvType = 'dev' | 'test' | 'prod'
+type ServiceEnvType = 'dev' | 'test' | 'prod'
 
 interface ImportMetaEnv {
-  /** 專案基本路徑 */
-  readonly VITE_BASE_PATH: string
+  /** 測試環境超級管理員用戶名 */
+  readonly VITE_TEST_SUPER_ADMIN_USERNAME: string
+  /** 測試環境超級管理員密碼 */
+  readonly VITE_TEST_SUPER_ADMIN_PASSWORD: string
+  /** 測試環境普通管理員用戶名 */
+  readonly VITE_TEST_COMMON_USERNAME: string
+  /** 測試環境普通管理員密碼 */
+  readonly VITE_TEST_COMMON_PASSWORD: string
+
   /** 專案標題 */
   readonly VITE_APP_NAME: string
+  /** API 請求基礎路徑 */
+  readonly VITE_BASE_URL: string
+  /** API 端點路徑 */
+  readonly VITE_API_URL: string
+  /** 預設分頁大小 */
+  readonly VITE_DEFAULT_PAGE_SIZE: number
+  /** 預設當前頁 */
+  readonly VITE_DEFAULT_CURRENT_PAGE: number
+  /** 專案打包輸出路徑 */
+  readonly VITE_BASE_PATH: string
+  /** Local Storage 金鑰前綴 */
+  readonly VITE_STORAGE_PREFIX: string
+  /** 路由模式 */
+  readonly VITE_ROUTE_MODE?: 'hash' | 'web'
+  /** 首次載入頁面 */
+  readonly VITE_HOME_PATH: string
+  /** 版權資訊 */
+  readonly VITE_COPYRIGHT_INFO: string
+  /** 預設語言 */
+  readonly VITE_DEFAULT_LANG: string
   /** 開啟請求代理 */
   readonly VITE_HTTP_PROXY?: 'Y' | 'N'
   /** 是否開啟打包壓縮 */
@@ -21,18 +48,6 @@ interface ImportMetaEnv {
     | 'brotliCompress'
     | 'deflate'
     | 'deflateRaw'
-  /** 路由模式 */
-  readonly VITE_ROUTE_MODE?: 'hash' | 'web'
-  /** 首次載入頁面 */
-  readonly VITE_HOME_PATH: string
-  /** 版權資訊 */
-  readonly VITE_COPYRIGHT_INFO: string
-  /** 是否自動更新token */
-  readonly VITE_AUTO_REFRESH_TOKEN: 'Y' | 'N'
-  /** 預設語言 */
-  readonly VITE_DEFAULT_LANG: App.lang
-  /** 後端服務的環境類型 */
-  readonly MODE: ServiceEnvType
 }
 
 interface ImportMeta {

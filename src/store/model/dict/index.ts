@@ -11,7 +11,7 @@ export interface DictItem {
 /**
  * 字典映射類型
  */
-type DictMap = Record<string, DictItem[]>
+export type DictMap = Record<string, DictItem[]>
 
 /**
  * 字典儲存模組

@@ -1,4 +1,9 @@
 import type { UserVo } from '@/api/system/user'
+
+interface DictMap {
+  [key: string]: import('@/store/model/dict').DictItem[]
+}
+
 /** 設定sessionStorage的類型 */
 interface Session {
   dict: DictMap

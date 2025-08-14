@@ -1,5 +1,3 @@
-import type { BaseVO } from '@/typings/base'
-
 import request from '@/utils/request'
 
 export interface Token {
@@ -7,7 +5,7 @@ export interface Token {
   refreshToken: string
 }
 
-export interface UserVo extends BaseVO {
+export interface UserVo extends Api.BaseVO {
   id?: string
   username?: string
   nickname?: string

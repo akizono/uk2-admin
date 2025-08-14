@@ -36,10 +36,6 @@ declare namespace App {
   }
 }
 
-interface DictMap {
-  [key: string]: import('@/store/model/dict').DictItem[]
-}
-
 // API 回應介面
 type ApiResponse<T = any> = Promise<{
   message: string

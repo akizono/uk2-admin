@@ -1,8 +1,6 @@
-import type { BaseVO } from '@/typings/base'
-
 import request from '@/utils/request'
 
-export interface LanguageVO extends BaseVO {
+export interface LanguageVO extends Api.BaseVO {
   id: string
   name: string
   code: string

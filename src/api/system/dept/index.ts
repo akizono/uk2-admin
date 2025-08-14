@@ -1,9 +1,8 @@
 import type { UserVo } from '../user'
-import type { BaseVO } from '@/typings/base'
 
 import request from '@/utils/request'
 
-export interface DeptVO extends BaseVO {
+export interface DeptVO extends Api.BaseVO {
   id: string
   parentId: string
   name: string
