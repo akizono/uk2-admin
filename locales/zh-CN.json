@@ -39,7 +39,7 @@
     "routePath": "路由路径",
     "componentPath": "元件路径",
     "routePermission": "路由权限",
-    "helpInfo": "控制器中定义的权限表示，如 ⓐHasPermission('system:user:create');未填写则对所有使用者开放",
+    "helpInfo": "控制器中定义的权限表示，如 ⓐHasPermission('system:user:create');",
     "externalLink": "外链",
     "isCache": "是否快取",
     "isShowTab": "是否显示Tab",

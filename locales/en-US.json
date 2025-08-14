@@ -39,7 +39,7 @@
     "routePath": "Route path",
     "componentPath": "Component path",
     "routePermission": "Route permission",
-    "helpInfo": "The permission defined in the controller, such as ⓐHasPermission('system:user:create');If not filled, it is open to all users",
+    "helpInfo": "The permission defined in the controller, such as ⓐHasPermission('system:user:create');",
     "externalLink": "External link",
     "isCache": "Is cache",
     "isShowTab": "Is show tab",
