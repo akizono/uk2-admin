@@ -7,7 +7,6 @@ import type { DataTableColumns, FormRules } from 'naive-ui'
 import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
-import CopyText from '@/components/custom/CopyText.vue'
 import { usePermi } from '@/hooks'
 import { createCopyableDialog } from '@/utils/dialog'
 import { NSwitch } from 'naive-ui'
@@ -126,21 +125,21 @@ const columns: DataTableColumns<UserVo> = [
     key: 'sex',
     dictType: 'system_user_sex',
   },
-  {
-    title: t('account.email'),
-    align: 'center',
-    key: 'email',
-  },
-  {
-    title: t('account.mobile'),
-    align: 'center',
-    key: 'mobile',
-    render: (row: UserVo) => {
-      return (
-        <CopyText value={row.mobile} />
-      )
-    },
-  },
+  // {
+  //   title: t('account.email'),
+  //   align: 'center',
+  //   key: 'email',
+  // },
+  // {
+  //   title: t('account.mobile'),
+  //   align: 'center',
+  //   key: 'mobile',
+  //   render: (row: UserVo) => {
+  //     return (
+  //       <CopyText value={row.mobile} />
+  //     )
+  //   },
+  // },
   {
     title: t('common.remark'),
     align: 'center',

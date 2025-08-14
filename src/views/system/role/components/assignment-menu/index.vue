@@ -26,8 +26,6 @@ async function getTreeList() {
 
 /** 選中相關 */
 const checkedKeys = ref<string[]>([]) // 選中的數據
-const allChecked = ref(false) // 全部選中
-const menuExpand = ref(false) // 全部展開
 
 async function setChecked() {
   const { data: result } = await RoleMenuApi.getRoleMenuPage({
@@ -39,24 +37,29 @@ async function setChecked() {
     treeRef.value.setChecked(menuId, true, false)
   })
 }
-function handleAllCheckedChange(_value: boolean) {
-  treeRef.value.setCheckedNodes(allChecked.value ? treeList.value : [])
+function handleAllCheckedChange(value: boolean) {
+  treeRef.value.setCheckedNodes(value ? treeList.value : [])
 }
-function handleMenuExpandChange(_value: boolean) {
+function handleMenuExpandChange(value: boolean) {
   const nodes = treeRef.value?.store.nodesMap
   for (const node in nodes) {
-    if (nodes[node].expanded === menuExpand.value) {
+    if (nodes[node].expanded === value) {
       continue
     }
-    nodes[node].expanded = menuExpand.value
+    nodes[node].expanded = value
   }
 }
 
 async function handleSubmit() {
+  const roleId = rowData.value.id
+  if (roleId === '1') {
+    return window.$message.error('「超級管理員」的權限禁止修改')
+  }
+
   try {
     loading.value = true
     const data = {
-      roleId: rowData.value.id,
+      roleId,
       menuIds: [
         ...(treeRef.value.getCheckedKeys(false) as unknown as Array<string>), // 獲得當前選中節點
         ...(treeRef.value.getHalfCheckedKeys() as unknown as Array<string>), // 獲得半選中的父節點
@@ -81,7 +84,6 @@ defineExpose({
 
       treeList.value = []
       checkedKeys.value = []
-      allChecked.value = false
 
       loading.value = true // 設置loading
 
@@ -101,20 +103,32 @@ defineExpose({
     :mask-closable="false"
     preset="card"
     :title="`${modalTitle} - 菜單&權限`"
-    class="max-w-600px w-100%"
+    class="max-w-680px w-100%"
     :segmented="{
       content: true,
       action: true,
     }"
   >
     <div class="flex justify-between ">
-      <div class="w-140px">
-        <n-form-item label="全部選中：" label-placement="left">
-          <n-switch v-model:value="allChecked" @change="handleAllCheckedChange" />
-        </n-form-item>
-        <n-form-item label="全部展開：" label-placement="left">
-          <n-switch v-model:value="menuExpand" @change="handleMenuExpandChange" />
-        </n-form-item>
+      <div class="w-180px">
+        <n-space>
+          <n-button-group size="small">
+            <n-button type="primary" round @click="handleAllCheckedChange(true)">
+              全部選中
+            </n-button>
+            <n-button type="warning" round @click="handleAllCheckedChange(false)">
+              全部取消
+            </n-button>
+          </n-button-group>
+          <n-button-group size="small">
+            <n-button type="primary" secondary round @click="handleMenuExpandChange(true)">
+              全部展開
+            </n-button>
+            <n-button type="warning" secondary round @click="handleMenuExpandChange(false)">
+              全部折疊
+            </n-button>
+          </n-button-group>
+        </n-space>
       </div>
       <n-scrollbar class="border-l border-gray-200 h-[calc(100vh-260px)] flex-1">
         <ElTree

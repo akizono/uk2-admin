@@ -21,9 +21,6 @@ const initialModel = {
 const model = ref({ ...initialModel })
 
 const formRef = ref<FormInst | null>()
-function sendMail(id?: number) {
-  window.$message.success(`刪除用戶id:${id}`)
-}
 const columns: DataTableColumns<User> = [
   {
     title: '姓名',
@@ -89,7 +86,7 @@ const columns: DataTableColumns<User> = [
           >
             編輯
           </NButton>
-          <NPopconfirm onPositiveClick={() => sendMail(row.id)}>
+          <NPopconfirm onPositiveClick={() => handleDelete(row.id)}>
             {{
               default: () => '確認刪除',
               trigger: () => <NButton size="small">刪除</NButton>,
@@ -124,8 +121,12 @@ function changePage(page: number, size: number) {
 function handleResetSearch() {
   model.value = { ...initialModel }
 }
+function handleDelete(id?: number) {
+  listData.value = listData.value.filter(item => item.id !== id)
+  window.$message.success(`刪除用戶id:${id}`)
+}
 
-  type ModalType = 'add' | 'edit'
+type ModalType = 'add' | 'edit'
 const modalType = ref<ModalType>('add')
 function setModalType(type: ModalType) {
   modalType.value = type

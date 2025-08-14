@@ -1,11 +1,44 @@
 import type { RouteLocationNormalized } from 'vue-router'
 
 import { router } from '@/router'
+import { useRouteStore } from '@/store'
 
 interface TabState {
   persistentTabs: RouteLocationNormalized[] // 常駐TAB欄
   tabs: RouteLocationNormalized[] // 動態TAB欄
   currentTabPath: string // 當前TAB欄路徑
+}
+
+/**
+ * 從快取中移除指定路由
+ * @param routeNames 要保留的路由名稱列表
+ */
+function updateCacheRoutes(routeNames: string[]) {
+  const routeStore = useRouteStore()
+  if (routeStore.cacheRoutes.length > 0) {
+    routeStore.cacheRoutes = routeStore.cacheRoutes.filter(name =>
+      routeNames.includes(name),
+    )
+  }
+}
+
+/**
+ * 清除所有快取路由
+ */
+function clearAllCacheRoutes() {
+  const routeStore = useRouteStore()
+  routeStore.cacheRoutes = []
+}
+
+/**
+ * 從標籤列表中提取路由名稱
+ * @param tabs 標籤列表
+ * @returns 路由名稱列表
+ */
+function extractRouteNames(tabs: RouteLocationNormalized[]): string[] {
+  return tabs
+    .map(tab => tab.name?.toString())
+    .filter(Boolean) as string[]
 }
 export const useTabStore = defineStore('tab-store', {
   state: (): TabState => {
@@ -51,10 +84,19 @@ export const useTabStore = defineStore('tab-store', {
           router.push(this.tabs[index - 1].fullPath)
         }
       }
+
       // 刪除標籤
-      this.tabs = this.tabs.filter((item) => {
-        return item.fullPath !== fullPath
-      })
+      const closedTab = this.tabs.find(item => item.fullPath === fullPath)
+      this.tabs = this.tabs.filter(item => item.fullPath !== fullPath)
+
+      // 清除頁面快取
+      if (closedTab?.name) {
+        // 獲取剩餘所有標籤的路由名稱
+        const remainingTabs = [...this.tabs, ...this.persistentTabs]
+        const remainingRouteNames = extractRouteNames(remainingTabs)
+        updateCacheRoutes(remainingRouteNames)
+      }
+
       // 刪除後如果清空了，就跳轉到默認首頁
       if (tabsLength - 1 === 0)
         router.push('/')
@@ -62,22 +104,56 @@ export const useTabStore = defineStore('tab-store', {
 
     closeOtherTabs(fullPath: string) {
       const index = this.getTabIndex(fullPath)
+      const currentTab = this.tabs[index]
+
+      // 只保留當前標籤
       this.tabs = this.tabs.filter((item, i) => i === index)
+
+      // 更新快取
+      if (currentTab?.name) {
+        const allTabs = [...this.tabs, ...this.persistentTabs]
+        const remainingRouteNames = extractRouteNames(allTabs)
+        updateCacheRoutes(remainingRouteNames)
+      }
     },
     closeLeftTabs(fullPath: string) {
       const index = this.getTabIndex(fullPath)
-      this.tabs = this.tabs.filter((item, i) => i >= index)
+      const remainingTabs = this.tabs.filter((item, i) => i >= index)
+
+      // 更新標籤列表
+      this.tabs = remainingTabs
+
+      // 更新快取
+      const allTabs = [...this.tabs, ...this.persistentTabs]
+      const remainingRouteNames = extractRouteNames(allTabs)
+      updateCacheRoutes(remainingRouteNames)
     },
     closeRightTabs(fullPath: string) {
       const index = this.getTabIndex(fullPath)
-      this.tabs = this.tabs.filter((item, i) => i <= index)
+      const remainingTabs = this.tabs.filter((item, i) => i <= index)
+
+      // 更新標籤列表
+      this.tabs = remainingTabs
+
+      // 更新快取
+      const allTabs = [...this.tabs, ...this.persistentTabs]
+      const remainingRouteNames = extractRouteNames(allTabs)
+      updateCacheRoutes(remainingRouteNames)
     },
     clearAllTabs() {
       this.tabs.length = 0
       this.persistentTabs.length = 0
+
+      // 清除所有頁面的快取
+      clearAllCacheRoutes()
     },
     closeAllTabs() {
       this.tabs.length = 0
+
+      // 清除動態頁面的快取，但保留常駐頁面的快取
+      const persistentRouteNames = extractRouteNames(this.persistentTabs)
+      updateCacheRoutes(persistentRouteNames)
+
       router.push('/')
     },
 
