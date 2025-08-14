@@ -82,15 +82,15 @@ export interface InitFormData {
   span?: number
   /** 顯示標籤文字 */
   label?: string
-  /**
-   * 欄位類型
-   * - input: 一般輸入框
-   * - textarea: 多行文字輸入框
-   * - input-number: 數字輸入框
-   * - switch: 開關
-   * - select: 下拉選單
-   */
-  type?: string
+  /** 欄位類型 */
+  type?:
+    'input' | // 一般輸入框
+    'textarea' | // 多行文字輸入框
+    'input-number' | // 數字輸入框
+    'switch' | // 開關
+    'select' | // 下拉選單
+    'radio' | // 單選框
+    'icon-select' // 圖標選擇器
   /** rules規則中的type屬性 */
   rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'
   /** 選單配置 */
