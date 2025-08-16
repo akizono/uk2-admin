@@ -79,7 +79,8 @@
     "user": "User",
     "accountOrPasswordError": "Account or password error",
     "role": "Role",
-    "roleRule": "Please select the role"
+    "roleRule": "Please select the role",
+    "rolePlaceholder": "Please select the role"
   },
   "dictionary": {
     "dictName": "Dictionary name",

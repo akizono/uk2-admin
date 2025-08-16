@@ -31,6 +31,22 @@ export interface InitQueryParams {
   dictType?: string | null
   /** 是否多語言 */
   multilingual?: boolean
+  /** 選單配置 */
+  selectOptions?: {
+    /** 選單 API */
+    api?: any
+    /** 選單 API 參數 */
+    selectParam?: string
+    /** 選單選項映射返回的數據 */
+    itemMapping?: {
+      label: string
+      value: string
+    }
+    /** 是否啟用懶載入 */
+    lazy?: boolean
+    /** 是否多選 */
+    multiple?: boolean
+  }
 }
 
 /** 條件運算符 */

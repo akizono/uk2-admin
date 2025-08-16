@@ -101,6 +101,20 @@ const initQueryParams: InitQueryParams[] = [
     inputType: 'select',
     dictType: 'common_status',
   },
+  {
+    name: 'roleIds',
+    value: undefined,
+    label: t('account.role'),
+    class: '!w-64',
+    placeholder: t('account.rolePlaceholder'),
+    inputType: 'select',
+    selectOptions: {
+      api: RoleApi.getRolePage,
+      selectParam: 'name',
+      itemMapping: { label: 'name', value: 'id' },
+      multiple: true,
+    },
+  },
 ]
 
 const columns: DataTableColumns<UserVo> = [

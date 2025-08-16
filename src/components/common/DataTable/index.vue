@@ -9,11 +9,20 @@ import { useBoolean, useThrottleAction } from '@/hooks'
 import { useDictStore, useLanguageStore } from '@/store'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { createIcon } from '@/utils/icon'
+import { useDebounceFn } from '@vueuse/core'
 import { NButton, NPopconfirm, NPopover, NSpace, useThemeVars } from 'naive-ui'
 import IconAttention from '~icons/icon-park-outline/attention'
 
 import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
+
+// 樹狀結構的節點
+interface TreeNode {
+  label: string
+  value: string | number
+  key: string | number
+  children?: TreeNode[]
+}
 
 const props = defineProps<{
   modalFormLabelWidth?: string // 模態框表單label的寬度（傳遞到 Modal）
@@ -111,9 +120,9 @@ function propsVerify() {
     return
   }
 
-  // initQueryParams中如果inputType是select的時候，必須包含dictType
+  // initQueryParams中如果inputType是select的時候，必須包含dictType或者selectOptions
   const hasSelectCarryDictType = !props.initQueryParams?.some((item: InitQueryParams) =>
-    item.inputType === 'select' && !item.dictType,
+    item.inputType === 'select' && (!item.dictType && !item.selectOptions),
   )
   if (!hasSelectCarryDictType) {
     propsVerifyErrorMsg.value = t('dataTable.initQueryParamsSelectError')
@@ -328,6 +337,150 @@ const queryParamsMapping = ref<Record<string, InitQueryParams>>({})
 const dictOptionsMap = ref<Record<string, any>>({})
 // 為每個 select 添加獨立的 loading 狀態
 const selectLoadingMap = ref<Record<string, boolean>>({})
+// 為每個帶選項的欄位創建獨立的儲存區域
+const selectOptionsMap = ref<Record<string, any[]>>({})
+
+// 設置選項的共用函數，使用 nextTick 確保 DOM 更新
+async function setOptionsWithNextTick(
+  fieldName: string,
+  list: any[],
+  labelKey: string,
+  valueKey: string,
+) {
+  // 先設置為空數組，強制更新
+  selectOptionsMap.value[fieldName] = []
+  // 使用 nextTick 確保 DOM 已更新
+  await nextTick()
+
+  // 檢查是否包含 parentId
+  const hasParentId = list.length > 0 && 'parentId' in list[0]
+  // 檢查是否包含 sort
+  const hasSort = list.length > 0 && 'sort' in list[0]
+
+  // 如果有 sort 欄位，先進行排序
+  if (hasSort) {
+    list.sort((a, b) => (a.sort || 0) - (b.sort || 0))
+  }
+
+  // 獲取已經打開了 multilingual 的欄位
+  const yesMultilingualFields = Object.values(queryParamsMapping.value).filter(item => item.multilingual)
+  const isMultilingual = yesMultilingualFields.some(item => item.name === fieldName)
+
+  //  如果list的某些數據已經打開了「多語言」且存在「multilingualFields」屬性，則將該條數據的「labelKey」屬性值進行替換
+  list.forEach((item) => {
+    if (isMultilingual && item.multilingualFields) {
+      if (item.multilingualFields[labelKey]) {
+        item[labelKey] = item.multilingualFields[labelKey].find((field: MultilingualFieldsVO) => field.language === languageStore.current)?.value
+      }
+    }
+  })
+
+  if (hasParentId) {
+    // 先建立所有節點
+    const nodeMap = new Map<string | number, TreeNode>()
+
+    // 第一次遍歷：建立所有節點
+    list.forEach((item: any) => {
+      const node: TreeNode = {
+        label: item[labelKey],
+        value: item[valueKey],
+        key: item[valueKey],
+      }
+      nodeMap.set(item[valueKey], node)
+    })
+
+    // 第二次遍歷：建立父子關係
+    list.forEach((item: any) => {
+      if (item.parentId) {
+        const parentNode = nodeMap.get(item.parentId)
+        const currentNode = nodeMap.get(item[valueKey])
+        if (parentNode && currentNode) {
+          if (!parentNode.children) {
+            parentNode.children = []
+          }
+          parentNode.children.push(currentNode)
+          // 如果有 sort 欄位，對子節點進行排序
+          if (hasSort && parentNode.children.length > 1) {
+            parentNode.children.sort((a, b) => {
+              const aItem = list.find(i => i[valueKey] === a.value)
+              const bItem = list.find(i => i[valueKey] === b.value)
+              return (aItem?.sort || 0) - (bItem?.sort || 0)
+            })
+          }
+        }
+      }
+    })
+
+    // 找出所有根節點（沒有 parentId 的節點）
+    const treeData = list
+      .filter(item => !item.parentId)
+      .map(item => nodeMap.get(item[valueKey]))
+      .filter((node): node is TreeNode => node !== undefined)
+
+    // 如果有 sort 欄位，對根節點進行排序
+    if (hasSort) {
+      treeData.sort((a, b) => {
+        const aItem = list.find(i => i[valueKey] === a.value)
+        const bItem = list.find(i => i[valueKey] === b.value)
+        return (aItem?.sort || 0) - (bItem?.sort || 0)
+      })
+    }
+
+    selectOptionsMap.value[fieldName] = treeData
+  }
+  else {
+    // 原有的扁平結構處理
+    selectOptionsMap.value[fieldName] = list.map((resultItem: any) => ({
+      label: resultItem[labelKey],
+      value: resultItem[valueKey],
+      sort: resultItem.sort, // 保留 sort 欄位用於排序
+    }))
+
+    // 如果有 sort 欄位，進行排序
+    if (hasSort) {
+      selectOptionsMap.value[fieldName].sort((a, b) => (a.sort || 0) - (b.sort || 0))
+    }
+  }
+}
+
+// 搜索下拉框選項
+const handleSearch = useDebounceFn(async (query: string, item: InitQueryParams) => {
+  const fieldName = item.name
+
+  // 如果搜索內容為空，清空選項並返回
+  if (!query) {
+    selectOptionsMap.value[fieldName] = []
+    return
+  }
+
+  // 設置 loading 狀態為 true
+  selectLoadingMap.value[fieldName] = true
+
+  if (item.selectOptions?.api) {
+    try {
+      const { data: result } = await item.selectOptions.api({ [item.selectOptions.selectParam!]: query })
+      if (result.list.length > 0) {
+        await setOptionsWithNextTick(
+          fieldName,
+          result.list,
+          item.selectOptions.itemMapping!.label,
+          item.selectOptions.itemMapping!.value,
+        )
+      }
+      else {
+        selectOptionsMap.value[fieldName] = []
+      }
+    }
+    finally {
+      selectLoadingMap.value[fieldName] = false
+    }
+  }
+  else {
+    // 如果沒有 API，也要設置 loading 狀態為 false
+    selectLoadingMap.value[fieldName] = false
+  }
+}, 300)
+
 function handleResetSearch() {
   try {
     startQueryLoading()
@@ -350,6 +503,35 @@ function handleResetSearch() {
         // 如果是 select 類型且有 dictType，則獲取字典選項
         if (item.inputType === 'select' && item.dictType) {
           await getDictOptions(item.dictType)
+        }
+
+        // 如果選單類型 且有 selectOptions
+        else if (item.inputType === 'select' && item.selectOptions) {
+          selectLoadingMap.value[item.name] = true
+
+          // 初始化為空數組
+          selectOptionsMap.value[item.name] = []
+
+          // 如果有 API，載入選項
+          if (item.selectOptions.api) {
+            try {
+              const { data: result } = await item.selectOptions.api({ pageSize: 0, currentPage: 1 })
+              if (result.list.length > 0) {
+                await setOptionsWithNextTick(
+                  item.name,
+                  result.list,
+                  item.selectOptions.itemMapping!.label,
+                  item.selectOptions.itemMapping!.value,
+                )
+              }
+            }
+            finally {
+              selectLoadingMap.value[item.name] = false
+            }
+          }
+          else {
+            selectLoadingMap.value[item.name] = false
+          }
         }
       })
     }
@@ -1469,6 +1651,41 @@ onMounted(async () => {
                     :placeholder="item.placeholder || t('common.selectPlaceholder')"
                     :loading="selectLoadingMap[item.dictType]"
                     clearable
+                    @update:value="getList"
+                  />
+                  <!-- 如果數據中包含 children，使用樹狀選擇器 -->
+                  <n-tree-select
+                    v-else-if="item.inputType === 'select' && item.selectOptions && selectOptionsMap[item.name]?.some(option => option.children)"
+                    v-model:value="queryParams[item.name]"
+                    :options="selectOptionsMap[item.name]"
+                    filterable
+                    remote
+                    :loading="selectLoadingMap[item.name]"
+                    :clear-filter-after-select="false"
+                    :placeholder="item.placeholder || t('dataTable.searchPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    key-field="key"
+                    label-field="label"
+                    children-field="children"
+                    clearable
+                    :multiple="item.selectOptions?.multiple"
+                    @search="(query: string) => handleSearch(query, item)"
+                    @update:value="getList"
+                  />
+                  <!-- 否則使用普通選擇器 -->
+                  <n-select
+                    v-else-if="item.inputType === 'select' && item.selectOptions"
+                    v-model:value="queryParams[item.name]"
+                    :options="selectOptionsMap[item.name]"
+                    filterable
+                    remote
+                    :loading="selectLoadingMap[item.name]"
+                    :clear-filter-after-select="false"
+                    :placeholder="item.placeholder || t('common.selectPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    clearable
+                    :multiple="item.selectOptions?.multiple"
+                    @search="(query: string) => handleSearch(query, item)"
                     @update:value="getList"
                   />
                 </n-form-item>
