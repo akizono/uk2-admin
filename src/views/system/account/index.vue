@@ -288,6 +288,12 @@ const rules: FormRules = {
     message: t('account.mobileRule'),
     trigger: ['blur', 'input'],
   },
+  roleIds: {
+    required: true,
+    type: 'array',
+    message: t('account.roleRule'),
+    trigger: ['blur', 'input'],
+  },
 }
 
 /** 元件的配置 */

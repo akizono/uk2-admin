@@ -78,7 +78,8 @@
     "ageRule": "Please fill in the age",
     "user": "User",
     "accountOrPasswordError": "Account or password error",
-    "role": "Role"
+    "role": "Role",
+    "roleRule": "Please select the role"
   },
   "dictionary": {
     "dictName": "Dictionary name",
