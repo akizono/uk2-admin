@@ -38,7 +38,7 @@ const { user } = useAuthStore()
               <n-thing>
                 <template #avatar>
                   <n-el>
-                    <n-icon-wrapper :size="46" color="var(--success-color)" :border-radius="999">
+                    <n-icon-wrapper :size="46" color="var(--primary-color)" :border-radius="999">
                       <nova-icon :size="26" icon="icon-park-outline:user" />
                     </n-icon-wrapper>
                   </n-el>
@@ -56,7 +56,7 @@ const { user } = useAuthStore()
               <n-thing>
                 <template #avatar>
                   <n-el>
-                    <n-icon-wrapper :size="46" color="var(--success-color)" :border-radius="999">
+                    <n-icon-wrapper :size="46" color="var(--primary-color)" :border-radius="999">
                       <nova-icon :size="26" icon="icon-park-outline:every-user" />
                     </n-icon-wrapper>
                   </n-el>
@@ -74,7 +74,7 @@ const { user } = useAuthStore()
               <n-thing>
                 <template #avatar>
                   <n-el>
-                    <n-icon-wrapper :size="46" color="var(--success-color)" :border-radius="999">
+                    <n-icon-wrapper :size="46" color="var(--primary-color)" :border-radius="999">
                       <nova-icon :size="26" icon="icon-park-outline:preview-open" />
                     </n-icon-wrapper>
                   </n-el>
@@ -92,7 +92,7 @@ const { user } = useAuthStore()
               <n-thing>
                 <template #avatar>
                   <n-el>
-                    <n-icon-wrapper :size="46" color="var(--success-color)" :border-radius="999">
+                    <n-icon-wrapper :size="46" color="var(--primary-color)" :border-radius="999">
                       <nova-icon :size="26" icon="icon-park-outline:star" />
                     </n-icon-wrapper>
                   </n-el>

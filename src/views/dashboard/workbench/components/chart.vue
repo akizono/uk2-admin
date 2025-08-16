@@ -38,7 +38,7 @@ const lineOptions = ref<ECOption>({
   },
   series: [
     {
-      color: '#37a2da',
+      color: '#d13050',
       name: 'Email',
       type: 'line',
       smooth: true,
@@ -53,7 +53,7 @@ const lineOptions = ref<ECOption>({
           colorStops: [
             {
               offset: 0.25,
-              color: '#37a2da',
+              color: '#d13050',
             },
             {
               offset: 1,
@@ -68,7 +68,7 @@ const lineOptions = ref<ECOption>({
       data: [120, 132, 101, 134, 90, 230, 210],
     },
     {
-      color: '#9fe6b8',
+      color: '#20a6b3',
       name: 'Union Ads',
       type: 'line',
       smooth: true,
@@ -83,7 +83,7 @@ const lineOptions = ref<ECOption>({
           colorStops: [
             {
               offset: 0.25,
-              color: '#9fe6b8',
+              color: '#20a6b3',
             },
             {
               offset: 1,

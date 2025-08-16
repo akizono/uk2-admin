@@ -1,16 +1,16 @@
 {
   "common": {
-    "primaryColor": "#22a6b3",
-    "primaryColorHover": "#47bfc9",
-    "primaryColorPressed": "#0c7a43",
-    "primaryColorSuppl": "#36ad6a",
+    "primaryColor": "#20a6b3",
+    "primaryColorHover": "#24b4c1",
+    "primaryColorPressed": "#1c929d",
+    "primaryColorSuppl": "#20a6b3",
 
     "infoColor": "#2080f0",
     "infoColorHover": "#4098fc",
     "infoColorPressed": "#1060c9",
     "infoColorSuppl": "#4098fc",
 
-    "successColor": "#22a6b3",
+    "successColor": "#18a058",
     "successColorHover": "#36ad6a",
     "successColorPressed": "#0c7a43",
     "successColorSuppl": "#36ad6a",
