@@ -183,6 +183,7 @@
     "404": "The requested resource does not exist",
     "405": "Not allowed to use the request method",
     "408": "Request timeout, please try again later",
+    "409": "Request conflict",
     "420": "Account or password error",
     "500": "Server error",
     "501": "Server does not support this function",

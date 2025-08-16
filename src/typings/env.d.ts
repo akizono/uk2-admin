@@ -7,11 +7,16 @@
 type ServiceEnvType = 'dev' | 'test' | 'prod'
 
 interface ImportMetaEnv {
-  /** 測試環境超級管理員用戶名 */
+  /** 登錄界面 - 默認帳號 */
+  readonly VITE_LOGIN_DEFAULT_USERNAME: string
+  /** 登錄界面 - 默認密碼 */
+  readonly VITE_LOGIN_DEFAULT_PASSWORD: string
+
+  /** 測試環境超級管理員使用者名稱 */
   readonly VITE_TEST_SUPER_ADMIN_USERNAME: string
   /** 測試環境超級管理員密碼 */
   readonly VITE_TEST_SUPER_ADMIN_PASSWORD: string
-  /** 測試環境普通管理員用戶名 */
+  /** 測試環境普通管理員使用者名稱 */
   readonly VITE_TEST_COMMON_USERNAME: string
   /** 測試環境普通管理員密碼 */
   readonly VITE_TEST_COMMON_PASSWORD: string
@@ -43,11 +48,7 @@ interface ImportMetaEnv {
   /** 是否開啟打包壓縮 */
   readonly VITE_BUILD_COMPRESS?: 'Y' | 'N'
   /** 壓縮演算法類型 */
-  readonly VITE_COMPRESS_TYPE?:
-    | 'gzip'
-    | 'brotliCompress'
-    | 'deflate'
-    | 'deflateRaw'
+  readonly VITE_COMPRESS_TYPE?: 'gzip' | 'brotliCompress' | 'deflate' | 'deflateRaw'
 }
 
 interface ImportMeta {

@@ -69,11 +69,11 @@ async function handleSubmit() {
       ],
     }
     await RoleMenuApi.batchUpdate(data)
+    modalVisible.value = false
     window.$message.success('保存成功')
   }
   finally {
     loading.value = false
-    modalVisible.value = false
   }
 }
 

@@ -85,6 +85,7 @@ const columns: DataTableColumns<RoleVO> = [
   {
     title: t('common.action'),
     key: 'actions',
+    width: '400px',
     render: (row: RoleVO) => {
       return (
         <NButton size="small" onClick={() => assignmentMenuRef.value.openModal(row)}>

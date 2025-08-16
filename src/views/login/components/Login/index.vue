@@ -28,8 +28,8 @@ const rules = computed(() => {
   }
 })
 const formValue = ref({
-  account: 'admin',
-  password: '123456',
+  account: import.meta.env.VITE_LOGIN_DEFAULT_USERNAME,
+  password: import.meta.env.VITE_LOGIN_DEFAULT_PASSWORD,
 })
 const isRemember = ref(false)
 const isLoading = ref(false)

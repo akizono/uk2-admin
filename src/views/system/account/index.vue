@@ -109,6 +109,7 @@ const columns: DataTableColumns<UserVo> = [
     align: 'center',
     key: 'username',
     // fixed: 'left',
+    copy: true,
   },
   {
     title: t('account.nickname'),
@@ -309,7 +310,7 @@ const options = {
 
   /** 表格配置 */
   columns, // 表格欄位的定義
-  viewEntranceColumns: ['username'], // 點擊後能進入「查看視窗」的欄位
+  viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
   getFunction: UserApi.getUserPage, // 獲取表格數據的 API
   deleteFunction: UserApi.deleteUser, // 刪除表格數據的 API

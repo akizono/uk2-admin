@@ -585,17 +585,18 @@ const columns = computed(() => {
     return newColumn
   })
 
-  // 外部的 actions 列
+  // 外部傳遞進來的 actions 列
   const externalActionsColumn = props.columns.find((column): column is (typeof column & { key: 'actions', render?: (row: any) => VNode }) =>
     'key' in column && column.key === 'actions',
   )
 
+  // 操作列  - 內部的 actions 和 externalActionsColumn 合併
   const operateColumn = [
     {
       title: t('common.action'),
       align: 'center',
       key: 'actions',
-      width: 280,
+      width: externalActionsColumn?.width || 280,
       render: (row: TableRow) => {
         return (
           <NSpace justify="center">
