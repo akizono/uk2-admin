@@ -1443,17 +1443,6 @@ onMounted(async () => {
   />
 
   <n-flex v-else>
-    <n-card v-if="showMenu" class="w-70">
-      <n-tree
-        v-model:selected-keys="selectedMenuKeys"
-        block-line
-        :data="menuTreeData"
-        key-field="id"
-        label-field="name"
-        selectable
-      />
-    </n-card>
-
     <NSpace vertical class="flex-1">
       <n-card v-if="search && initQueryParams">
         <n-spin :show="queryLoading" size="large">
@@ -1522,24 +1511,36 @@ onMounted(async () => {
             </div>
           </n-flex>
         </template>
-        <NSpace vertical>
-          <n-data-table
-            ref="tableRef"
-            v-model:checked-row-keys="checkedRowKeys"
-            v-model:expanded-row-keys="expandedRowKeys"
-            :columns="columns"
-            :data="list"
-            :loading="tableLoading"
-            :row-key="row => row.id"
-          />
-          <template v-if="pagination">
-            <Pagination
-              v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
-              :current-page="queryParams.currentPage" @change="changePage"
+        <n-flex>
+          <n-card v-if="showMenu" class="w-70">
+            <n-tree
+              v-model:selected-keys="selectedMenuKeys"
+              block-line
+              :data="menuTreeData"
+              key-field="id"
+              label-field="name"
+              selectable
             />
-            <Pagination v-else :total="total" @change="changePage" />
-          </template>
-        </NSpace>
+          </n-card>
+          <NSpace vertical class="flex-1">
+            <n-data-table
+              ref="tableRef"
+              v-model:checked-row-keys="checkedRowKeys"
+              v-model:expanded-row-keys="expandedRowKeys"
+              :columns="columns"
+              :data="list"
+              :loading="tableLoading"
+              :row-key="row => row.id"
+            />
+            <template v-if="pagination">
+              <Pagination
+                v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
+                :current-page="queryParams.currentPage" @change="changePage"
+              />
+              <Pagination v-else :total="total" @change="changePage" />
+            </template>
+          </NSpace>
+        </n-flex>
       </n-card>
 
       <TableModal
