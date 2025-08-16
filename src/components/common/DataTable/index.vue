@@ -388,13 +388,19 @@ async function getDictOptions(dictType: string) {
 /** 菜單 */
 const selectedMenuKeys = ref<string[]>([])
 const selectedMenuId = computed(() => selectedMenuKeys.value[0] || undefined) // 選中的菜單 ID
+watch(selectedMenuId, () => {
+  getList()
+})
 
 const menuTreeData = ref<menuTreeNode[]>([])
 // 獲取菜單數據
 async function getMenuData() {
   if (props.getMenuDataFunction) {
     try {
-      const { data: result } = await props.getMenuDataFunction()
+      const { data: result } = await props.getMenuDataFunction({
+        status: 1,
+        pageSize: 0,
+      })
 
       // 系統當前語言
       const languageCurrent = languageStore.current
@@ -1200,6 +1206,11 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
       needReposition = true
     }
 
+    // 如果 currentParentId 和 parentId 都為 null/undefined，則不需要重新定位
+    if (!currentParentId && !parentId) {
+      needReposition = false
+    }
+
     if (needReposition) {
       // 先找到並移除當前項
       let removedItem: TableRow | null = null
@@ -1402,8 +1413,11 @@ async function tableModalSuccess(params: { modalType: ModalType, password?: stri
 
 // 處理重新排序
 function handleResort() {
-  if (list.value) {
-    list.value = sortBySort([...list.value])
+  if (list.value && list.value.length > 0) {
+    const existSort = list.value.some(item => item.sort)
+    if (existSort) {
+      list.value = sortBySort([...list.value])
+    }
   }
 }
 

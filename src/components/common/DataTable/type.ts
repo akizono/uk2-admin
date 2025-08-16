@@ -90,7 +90,7 @@ export interface InitFormData {
     'switch' | // 開關
     'select' | // 下拉選單
     'radio' | // 單選框
-    'icon-select' // 圖標選擇器
+    'icon-select' // 圖示選擇器
   /** rules規則中的type屬性 */
   rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'
   /** 選單配置 */
@@ -106,6 +106,8 @@ export interface InitFormData {
     }
     /** 是否啟用懶載入 */
     lazy?: boolean
+    /** 是否多選 */
+    multiple?: boolean
   }
   /** 禁止該欄位進行更新（請求中不會攜帶該欄位） */
   disableUpdate?: boolean

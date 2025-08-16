@@ -5,6 +5,7 @@ import type { InitFormData, InitQueryParams, TableRow } from '@/components/commo
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DeptApi } from '@/api/system/dept'
+import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
@@ -229,6 +230,19 @@ const initFormData: InitFormData[] = [
     multilingual: true,
   },
   {
+    name: 'roleIds',
+    value: undefined,
+    span: 2,
+    label: t('account.role'),
+    type: 'select',
+    selectOptions: {
+      api: RoleApi.getRolePage,
+      selectParam: 'name',
+      itemMapping: { label: 'name', value: 'id' },
+      multiple: true,
+    },
+  },
+  {
     name: 'remark',
     value: undefined,
     span: 2,
@@ -270,7 +284,6 @@ const rules: FormRules = {
     trigger: ['blur', 'input'],
   },
   mobile: {
-    pattern: /^[\d\s+]{1,20}$/,
     message: t('account.mobileRule'),
     trigger: ['blur', 'input'],
   },

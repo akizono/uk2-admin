@@ -77,7 +77,8 @@
     "mobileRule": "Please fill in the mobile",
     "ageRule": "Please fill in the age",
     "user": "User",
-    "accountOrPasswordError": "Account or password error"
+    "accountOrPasswordError": "Account or password error",
+    "role": "Role"
   },
   "dictionary": {
     "dictName": "Dictionary name",

@@ -797,8 +797,8 @@ function closeModal() {
       <!-- <div class="mb-15px">
         <div>formData:</div>
         <div>{{ formData }}</div>
-      </div>
-      <div class="mb-15px">
+      </div> -->
+      <!-- <div class="mb-15px">
         <div>multilingualFields:</div>
         <div v-for="item in Object.keys(multilingualFields)" :key="item" class="border-1px border-gray-200 rounded-md p-3px">
           <div>{{ item }}</div>
@@ -878,6 +878,7 @@ function closeModal() {
                     :placeholder="item.placeholder"
                     :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
                     clearable
+                    :multiple="item.selectOptions?.multiple"
                     @search="(query: string) => handleSearch(query, item)"
                   />
                 </template>

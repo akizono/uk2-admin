@@ -4,8 +4,11 @@ import type { RoleVO } from '@/api/system/role'
 
 import { MenuApi } from '@/api/system/menu'
 import { RoleMenuApi } from '@/api/system/role-menu'
+import { useAppStore } from '@/store/'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { ElTree } from 'element-plus'
+
+const appStore = useAppStore()
 
 const modalTitle = ref('')
 const modalVisible = ref(false)
@@ -130,7 +133,7 @@ defineExpose({
           </n-button-group>
         </n-space>
       </div>
-      <n-scrollbar class="border-l border-gray-200 h-[calc(100vh-260px)] flex-1">
+      <n-scrollbar class="h-[calc(100vh-260px)] flex-1">
         <ElTree
           ref="treeRef"
           :data="treeList"
@@ -138,6 +141,7 @@ defineExpose({
           empty-text="載入中，請稍後..."
           node-key="id"
           show-checkbox
+          :class="appStore.colorMode === 'dark' ? 'el-tree-dark' : 'el-tree-light'"
         />
       </n-scrollbar>
     </div>
@@ -156,13 +160,5 @@ defineExpose({
 </template>
 
 <style scoped lang="scss">
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #20a6b3 !important;
-  border-color: #20a6b3 !important;
-}
 
-:deep(.el-checkbox__input.is-indeterminate .el-checkbox__inner) {
-  background-color: #20a6b3 !important;
-  border-color: #20a6b3 !important;
-}
 </style>

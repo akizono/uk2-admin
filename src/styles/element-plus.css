@@ -1,0 +1,43 @@
+/* ----------- el-tree - 日間模式 -------------------------------------------------------- */
+
+.el-tree-light {
+  background: rgba(255, 255, 255, 0) !important;
+}
+
+.el-tree-light .el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+}
+
+.el-tree-light .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+}
+
+/* ----------- el-tree - 夜間模式 -------------------------------------------------------- */
+.el-tree-dark {
+  /* el-tree 的背景顏色 */
+  background: rgba(0, 0, 0, 0) !important;
+}
+
+.el-tree-dark .el-tree-node__content:hover{
+  /* 節點hover時的背景色 */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.el-tree-dark .el-text {
+  /* 文字顏色 */
+  color:#eaeaeb !important ;
+}
+
+.el-tree-dark .el-checkbox__input.is-checked .el-checkbox__inner {
+  /* 複選框選中時的背景色 */
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+}
+
+.el-tree-dark .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  /* 複選框半選時的背景顏色 */
+  background-color: #20a6b3 !important;
+  border-color: #20a6b3 !important;
+} 

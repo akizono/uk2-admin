@@ -1,6 +1,7 @@
 @import './reset.css';
 @import './transition.css';
 @import './naive.css';
+@import './element-plus.css';
 
 html,
 body,
