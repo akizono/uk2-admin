@@ -74,7 +74,6 @@ export const useLanguageStore = defineStore('language-store', {
     async getLanguageList() {
       const { data: result } = await LanguageApi.getLanguagePage({
         pageSize: 0,
-        // @ts-expect-error 只獲取啟用狀態的語言
         status: 1,
       })
 

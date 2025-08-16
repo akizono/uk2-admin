@@ -15,6 +15,11 @@ export const DictDataApi = {
     return await request.get({ url: '/system/dict-data/page', params })
   },
 
+  /** 獲取「當前系統語言」版本的「字典數據分頁列表」 */
+  getDictDataPageByLang: async (params: PageParams & Partial<DictDataVO>): PageRes<DictDataVO> => {
+    return await request.getByLang({ url: '/system/dict-data/page', params })
+  },
+
   /** 新增字典數據 */
   createDictData: async (data: DictDataVO) => {
     return await request.post({ url: '/system/dict-data/create', data })

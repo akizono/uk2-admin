@@ -60,7 +60,7 @@ const columns: DataTableColumns<MenuVO> = [
     align: 'left',
     key: 'title',
     multilingual: true,
-    copy: true,
+    copy: false,
     fixed: 'left',
   },
   {

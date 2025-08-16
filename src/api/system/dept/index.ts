@@ -17,6 +17,11 @@ export const DeptApi = {
     return await request.get({ url: '/system/dept/page', params })
   },
 
+  /** 獲取「當前系統語言」版本的「部門分頁列表」 */
+  getDeptPageByLang: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
+    return await request.getByLang({ url: '/system/dept/page', params })
+  },
+
   /** 新增部門 */
   createDept: async (data: DeptVO) => {
     return await request.post({ url: '/system/dept/create', data })
