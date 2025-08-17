@@ -253,6 +253,20 @@
     "sidebarLayout": "Sidebar layout",
     "mixedSidebarLayout": "Mixed sidebar layout"
   },
+  "components": {
+    "iconSelector": {
+      "inputPlaceholder": "Select target icon",
+      "searchPlaceholder": "Search icon",
+      "clearIcon": "Clear icon",
+      "selectorTitle": "Icon selection"
+    },
+    "copyText": {
+      "message": "Copied successfully",
+      "tooltip": "Copy",
+      "unsupportedError": "Your browser does not support Clipboard API",
+      "unpermittedError": "Crrently not permitted to use Clipboard API"
+    }
+  },
   "login": {
     "signInTitle": "Login",
     "accountRuleTip": "Please enter account",
@@ -285,7 +299,12 @@
     "selectVerifyMethodTip": "Please select a verification method",
     "emailSentSuccess": "Verification code has been sent to your email",
     "mobileSentSuccess": "Verification code has been sent to your phone",
-    "resetPasswordSuccess": "Password reset successful, please login again"
+    "resetPasswordSuccess": "Password reset successful, please login again",
+    "checkAccountError": "Please check the account",
+    "verifyCodeError": "Verification code error",
+    "resetByEmailTitle": "Reset password via email verification code",
+    "resetByMobileTitle": "Reset password via mobile verification code",
+    "operationTooFrequent": "Operation too frequent, please try again later"
   },
   "route": {
     "appRoot": "Home",
@@ -331,19 +350,5 @@
     "accountSetting": "User settings",
     "cascader": "Administrative region selection",
     "dict": "Dictionary example"
-  },
-  "components": {
-    "iconSelector": {
-      "inputPlaceholder": "Select target icon",
-      "searchPlaceholder": "Search icon",
-      "clearIcon": "Clear icon",
-      "selectorTitle": "Icon selection"
-    },
-    "copyText": {
-      "message": "Copied successfully",
-      "tooltip": "Copy",
-      "unsupportedError": "Your browser does not support Clipboard API",
-      "unpermittedError": "Crrently not permitted to use Clipboard API"
-    }
   }
 }

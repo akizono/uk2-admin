@@ -2,6 +2,7 @@
 import type { FormInst } from 'naive-ui'
 
 import { checkUserHasMobileOrEmail, sendResetPasswordEmail, sendResetPasswordMobile, updatePassword } from '@/api/system/auth'
+import { onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
@@ -39,6 +40,9 @@ const formValue = ref({
 const formRef = ref<FormInst | null>(null)
 const currentStep = ref<'account' | 'verify' | 'reset'>('account')
 const loading = ref(false)
+const sendCodeLoading = ref(false)
+const countdown = ref(0)
+const countdownTimer = ref<NodeJS.Timeout | null>(null)
 const userInfo = ref<{
   hasMobile: boolean
   hasEmail: boolean
@@ -48,38 +52,43 @@ const userInfo = ref<{
 })
 
 async function checkAccount() {
-  formRef.value?.validate(async (errors) => {
-    if (errors)
+  await formRef.value?.validate()
+
+  loading.value = true
+  try {
+    const res = await checkUserHasMobileOrEmail({ username: formValue.value.account })
+    userInfo.value = res.data
+
+    if (!userInfo.value.hasMobile && !userInfo.value.hasEmail) {
+      window.$message.error(t('login.noVerifyMethodError'))
       return
-
-    loading.value = true
-    try {
-      const res = await checkUserHasMobileOrEmail({ username: formValue.value.account })
-      userInfo.value = res.data
-
-      if (!userInfo.value.hasMobile && !userInfo.value.hasEmail) {
-        window.$message.error(t('login.noVerifyMethodError'))
-        return
-      }
-
-      currentStep.value = 'verify'
     }
-    catch (error) {
-      console.error(error)
+
+    currentStep.value = 'verify'
+  }
+  catch (error: any) {
+    if (error.status === 409) {
+      window.$message.error(t('login.checkAccountError'))
     }
-    finally {
-      loading.value = false
-    }
-  })
+  }
+  finally {
+    loading.value = false
+  }
 }
 
-async function sendVerifyCode() {
+function goToResetStep() {
   if (!formValue.value.verifyCodeType) {
     window.$message.warning(t('login.selectVerifyMethodTip'))
     return
   }
+  currentStep.value = 'reset'
+}
 
-  loading.value = true
+async function sendVerifyCode() {
+  if (countdown.value > 0)
+    return
+
+  sendCodeLoading.value = true
   try {
     if (formValue.value.verifyCodeType === 'email') {
       await sendResetPasswordEmail({ username: formValue.value.account })
@@ -89,15 +98,34 @@ async function sendVerifyCode() {
       await sendResetPasswordMobile({ username: formValue.value.account })
       window.$message.success(t('login.mobileSentSuccess'))
     }
-    currentStep.value = 'reset'
+
+    // 開始倒數計時
+    countdown.value = 60
+    countdownTimer.value = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0 && countdownTimer.value) {
+        clearInterval(countdownTimer.value)
+        countdownTimer.value = null
+      }
+    }, 1000)
   }
-  catch (error) {
-    console.error(error)
+  catch (error: any) {
+    if (error.status === 400) {
+      window.$message.error(t('login.operationTooFrequent'))
+    }
   }
   finally {
-    loading.value = false
+    sendCodeLoading.value = false
   }
 }
+
+// 組件銷毀時清理定時器
+onBeforeUnmount(() => {
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value)
+    countdownTimer.value = null
+  }
+})
 
 async function handleResetPassword() {
   formRef.value?.validate(async (errors) => {
@@ -116,8 +144,10 @@ async function handleResetPassword() {
       window.$message.success(t('login.resetPasswordSuccess'))
       toLogin()
     }
-    catch (error) {
-      console.error(error)
+    catch (error: any) {
+      if (error.status === 400) {
+        window.$message.error(t('login.verifyCodeError'))
+      }
     }
     finally {
       loading.value = false
@@ -131,43 +161,20 @@ async function handleResetPassword() {
     <n-h2 depth="3" class="text-center">
       {{ $t('login.resetPasswordTitle') }}
     </n-h2>
-    <n-form
-      ref="formRef"
-      :rules="rules"
-      :model="formValue"
-      :show-label="false"
-      size="large"
-    >
+    <n-form ref="formRef" :rules="rules" :model="formValue" :show-label="false" size="large">
       <!-- 步驟一：輸入帳號 -->
       <template v-if="currentStep === 'account'">
         <n-form-item path="account">
-          <n-input
-            v-model:value="formValue.account"
-            clearable
-            :placeholder="$t('login.accountPlaceholder')"
-          />
+          <n-input v-model:value="formValue.account" clearable :placeholder="$t('login.accountPlaceholder')" />
         </n-form-item>
         <n-form-item>
-          <n-space
-            vertical
-            :size="20"
-            class="w-full"
-          >
-            <n-button
-              block
-              type="primary"
-              :loading="loading"
-              @click="checkAccount"
-            >
+          <n-space vertical :size="20" class="w-full">
+            <n-button block type="primary" :loading="loading" @click="checkAccount">
               {{ $t('common.next') }}
             </n-button>
             <n-flex justify="center">
               <n-text>{{ $t('login.haveAccountText') }}</n-text>
-              <n-button
-                text
-                type="primary"
-                @click="toLogin"
-              >
+              <n-button text type="primary" @click="toLogin">
                 {{ $t('login.signIn') }}
               </n-button>
             </n-flex>
@@ -191,18 +198,10 @@ async function handleResetPassword() {
           </n-radio-group>
 
           <n-space vertical :size="20" class="w-full">
-            <n-button
-              block
-              type="primary"
-              :loading="loading"
-              @click="sendVerifyCode"
-            >
-              {{ $t('login.sendVerifyCode') }}
+            <n-button block type="primary" @click="goToResetStep">
+              {{ $t('common.next') }}
             </n-button>
-            <n-button
-              block
-              @click="currentStep = 'account'"
-            >
+            <n-button block @click="currentStep = 'account'">
               {{ $t('common.back') }}
             </n-button>
           </n-space>
@@ -211,39 +210,36 @@ async function handleResetPassword() {
 
       <!-- 步驟三：輸入驗證碼和新密碼 -->
       <template v-else-if="currentStep === 'reset'">
+        <!-- 顯示當前驗證方式 -->
+        <n-alert
+          type="info"
+          :title="formValue.verifyCodeType === 'email' ? $t('login.resetByEmailTitle') : $t('login.resetByMobileTitle')"
+          style="margin-bottom: 16px"
+        />
+
         <n-form-item path="verifyCode">
-          <n-input
-            v-model:value="formValue.verifyCode"
-            clearable
-            :placeholder="$t('login.verifyCodePlaceholder')"
-          />
+          <n-input-group>
+            <n-input v-model:value="formValue.verifyCode" clearable :placeholder="$t('login.verifyCodePlaceholder')" />
+            <n-button
+              :loading="sendCodeLoading" :disabled="countdown > 0" class="min-w-[70px]!"
+              @click="sendVerifyCode"
+            >
+              {{ countdown > 0 ? `${countdown}s` : $t('login.sendVerifyCode') }}
+            </n-button>
+          </n-input-group>
         </n-form-item>
         <n-form-item path="password">
           <n-input
-            v-model:value="formValue.password"
-            type="password"
-            show-password-on="click"
+            v-model:value="formValue.password" type="password" show-password-on="click"
             :placeholder="$t('login.newPasswordPlaceholder')"
           />
         </n-form-item>
         <n-form-item>
-          <n-space
-            vertical
-            :size="20"
-            class="w-full"
-          >
-            <n-button
-              block
-              type="primary"
-              :loading="loading"
-              @click="handleResetPassword"
-            >
+          <n-space vertical :size="20" class="w-full">
+            <n-button block type="primary" :loading="loading" @click="handleResetPassword">
               {{ $t('login.resetPassword') }}
             </n-button>
-            <n-button
-              block
-              @click="currentStep = 'verify'"
-            >
+            <n-button block @click="currentStep = 'verify'">
               {{ $t('common.back') }}
             </n-button>
           </n-space>

@@ -299,7 +299,12 @@
     "selectVerifyMethodTip": "請選擇驗證方式",
     "emailSentSuccess": "驗證碼已發送到您的信箱",
     "mobileSentSuccess": "驗證碼已發送到您的手機",
-    "resetPasswordSuccess": "密碼重設成功，請重新登入"
+    "resetPasswordSuccess": "密碼重設成功，請重新登入",
+    "checkAccountError": "請檢查帳號是否正確",
+    "verifyCodeError": "驗證碼錯誤",
+    "resetByEmailTitle": "通過信箱驗證碼重設密碼",
+    "resetByMobileTitle": "通過手機驗證碼重設密碼",
+    "operationTooFrequent": "操作頻繁，請稍後再試"
   },
   "route": {
     "appRoot": "首頁",
