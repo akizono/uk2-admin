@@ -35,3 +35,28 @@ export function refreshTokenMethod(): ApiResponse<RefreshTokenVO> {
     },
   })
 }
+
+// 檢查使用者是否擁有手機號碼或者信箱
+export function checkUserHasMobileOrEmail(params: { username: string }): ApiResponse<{ hasMobile: boolean, hasEmail: boolean }> {
+  return request.get({ url: '/system/auth/check-user-has-mobile-or-email', params })
+}
+
+// 發送「驗證碼」到使用者信箱
+export function sendResetPasswordEmail(data: { username: string }) {
+  return request.post({ url: '/system/auth/send-reset-password-email', data })
+}
+
+// 發送「驗證碼」到使用者手機
+export function sendResetPasswordMobile(data: { username: string }) {
+  return request.post({ url: '/system/auth/send-reset-password-mobile', data })
+}
+
+// 修改密碼
+export function updatePassword(data: {
+  username: string
+  password: string
+  verifyCode: string
+  verifyCodeType: 'email' | 'mobile'
+}) {
+  return request.post({ url: '/system/auth/update-password', data })
+}

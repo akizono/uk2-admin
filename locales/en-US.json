@@ -27,7 +27,9 @@
     "choose": "Choose",
     "navigate": "Switch",
     "inputPlaceholder": "Please enter",
-    "selectPlaceholder": "Please select"
+    "selectPlaceholder": "Please select",
+    "next": "Next",
+    "back": "Back"
   },
   "menu": {
     "menu": "Menu",
@@ -270,9 +272,20 @@
     "registerTitle": "Register",
     "userAgreement": "User Agreement",
     "resetPassword": "Reset password",
-    "resetPasswordPlaceholder": "Enter account/mobile phone number",
-    "resetPasswordRuleTip": "Please enter your account/mobile phone number",
-    "resetPasswordTitle": "Reset"
+    "resetPasswordRuleTip": "Please enter your account",
+    "resetPasswordTitle": "Reset Password",
+    "verifyCodeRuleTip": "Please enter verification code",
+    "verifyCodePlaceholder": "Please enter verification code",
+    "newPasswordPlaceholder": "Please enter new password",
+    "verifyMethodTitle": "Please select verification method",
+    "verifyByEmail": "Reset via email verification code",
+    "verifyByMobile": "Reset via SMS verification code",
+    "sendVerifyCode": "Send verification code",
+    "noVerifyMethodError": "Your account is not linked to a phone or email, please contact the administrator",
+    "selectVerifyMethodTip": "Please select a verification method",
+    "emailSentSuccess": "Verification code has been sent to your email",
+    "mobileSentSuccess": "Verification code has been sent to your phone",
+    "resetPasswordSuccess": "Password reset successful, please login again"
   },
   "route": {
     "appRoot": "Home",
