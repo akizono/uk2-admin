@@ -156,7 +156,31 @@ export function createMenus(userRoutes: AppRoute.RowRoute[]) {
   // 過濾不需要顯示的選單
   const visibleMenus = resultMenus.filter(route => !filteredIds.has(route.id))
 
-  return arrayToTree(transformAuthRoutesToMenus(visibleMenus))
+  // 轉換為樹狀結構
+  const menuTree = arrayToTree(transformAuthRoutesToMenus(visibleMenus))
+  // 過濾掉沒有子項目的目錄（type === 0）
+  function filterEmptyDirectories(menus: any[]): any[] {
+    return menus.filter((menu) => {
+      // 如果有子項目，先遞迴處理子項目
+      if (menu.children && menu.children.length > 0) {
+        menu.children = filterEmptyDirectories(menu.children)
+      }
+
+      // 找到對應的路由項目以檢查 type
+      const routeItem = visibleMenus.find(route => route.id === menu.id)
+
+      // 如果是目錄（type === 0）
+      if (routeItem && routeItem.meta.type === 0) {
+        // 目錄必須有子項目才保留，沒有子項目就過濾掉
+        return menu.children && menu.children.length > 0
+      }
+
+      // 其他情況保留（菜單項目 type === 1 或其他類型）
+      return true
+    })
+  }
+
+  return filterEmptyDirectories(menuTree)
 }
 
 // 將返回的路由表渲染為側邊選單
