@@ -77,6 +77,7 @@
     "nicknameRule": "請填寫暱稱",
     "sexRule": "請選擇性別",
     "emailRule": "請填寫電子郵件",
+    "emailFormatRule": "請輸入正確的電子郵件格式",
     "mobileRule": "請填寫手機號碼",
     "ageRule": "請填寫年齡",
     "user": "使用者",

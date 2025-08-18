@@ -2,6 +2,7 @@
 import type { FormInst, FormRules } from 'naive-ui'
 
 import { register, sendRegisterEmail, sendRegisterMobile } from '@/api/system/auth'
+import { Regex } from '@/constants/Regex'
 import countryCallingCodes from '@/utils/constant/country-calling-codes'
 import { computed, onBeforeUnmount } from 'vue'
 
@@ -41,11 +42,18 @@ const rules = computed<FormRules>(() => {
 
   // 根據註冊類型動態添加規則
   if (registerType.value === 'email') {
-    baseRules.email = {
-      required: true,
-      trigger: 'blur',
-      message: t('account.emailRule'),
-    }
+    baseRules.email = [
+      {
+        required: true,
+        trigger: 'blur',
+        message: t('account.emailRule'),
+      },
+      {
+        pattern: new RegExp(Regex.Email),
+        trigger: 'blur',
+        message: t('account.emailFormatRule'),
+      },
+    ]
   }
   else {
     baseRules.mobile = {
