@@ -283,6 +283,7 @@
     "haveAccountText": "Do you have an account?",
     "passwordPlaceholder": "Enter password",
     "readAndAgree": "I have read and agree",
+    "pleaseAgree": "Please agree to the user agreement",
     "registerTitle": "Register",
     "userAgreement": "User Agreement",
     "resetPassword": "Reset password",

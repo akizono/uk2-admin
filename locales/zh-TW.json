@@ -285,6 +285,7 @@
     "checkPasswordPlaceholder": "請再次輸入密碼",
     "readAndAgree": "我已閱讀並同意",
     "userAgreement": "使用者協議",
+    "pleaseAgree": "請先同意使用者協議",
     "resetPasswordTitle": "重設密碼",
     "resetPasswordRuleTip": "請輸入帳號",
     "resetPassword": "重設密碼",

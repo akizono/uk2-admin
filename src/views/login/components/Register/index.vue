@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
 async function handleRegister() {
   // 檢查是否同意用戶協議
   if (!isRead.value) {
-    window.$message.warning(t('login.readAndAgree'))
+    window.$message.warning(t('login.pleaseAgree'))
     return
   }
 
