@@ -123,7 +123,19 @@ service.interceptors.response.use(
     }
 
     else {
-      window.$message?.error(message)
+      // 檢查是否需要跳過特定錯誤碼的訊息顯示
+      const skipSpecifiedErrorMessage = error.config?.headers?.['skip-specified-error-message']
+
+      // 如果有設定跳過特定錯誤碼且當前狀態碼在跳過清單中，則不顯示錯誤訊息
+      const shouldSkipErrorMessage = skipSpecifiedErrorMessage
+        && (Array.isArray(skipSpecifiedErrorMessage)
+          ? skipSpecifiedErrorMessage.some(code => String(code) === String(status))
+          : String(skipSpecifiedErrorMessage) === String(status))
+
+      if (!shouldSkipErrorMessage) {
+        window.$message?.error(message)
+      }
+
       return Promise.reject(error)
     }
   },

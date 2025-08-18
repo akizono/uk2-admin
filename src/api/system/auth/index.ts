@@ -48,17 +48,35 @@ export function refreshTokenMethod(): ApiResponse<RefreshTokenVO> {
 
 // 發送註冊的「驗證碼」到使用者信箱
 export function sendRegisterEmail(data: { email: string }) {
-  return request.post({ url: '/system/auth/send-register-email', data })
+  return request.post({
+    url: '/system/auth/send-register-email',
+    data,
+    headers: {
+      'skip-specified-error-message': [400, 409],
+    },
+  })
 }
 
 // 發送註冊的「驗證碼」到使用者手機
 export function sendRegisterMobile(data: { mobile: string }) {
-  return request.post({ url: '/system/auth/send-register-mobile', data })
+  return request.post({
+    url: '/system/auth/send-register-mobile',
+    data,
+    headers: {
+      'skip-specified-error-message': [400, 409],
+    },
+  })
 }
 
 // 註冊
 export function register(data: RegisterVO) {
-  return request.post({ url: '/system/auth/register', data })
+  return request.post({
+    url: '/system/auth/register',
+    data,
+    headers: {
+      'skip-specified-error-message': [400],
+    },
+  })
 }
 
 // ------------------------------------------------------------
@@ -67,17 +85,35 @@ export function register(data: RegisterVO) {
 
 // 檢查使用者是否擁有手機號碼或者信箱
 export function checkUserHasMobileOrEmail(params: { username: string }): ApiResponse<{ hasMobile: boolean, hasEmail: boolean }> {
-  return request.get({ url: '/system/auth/check-user-has-mobile-or-email', params })
+  return request.get({
+    url: '/system/auth/check-user-has-mobile-or-email',
+    params,
+    headers: {
+      'skip-specified-error-message': [409],
+    },
+  })
 }
 
 // 發送找回密碼的「驗證碼」到使用者信箱
 export function sendResetPasswordEmail(data: { username: string }) {
-  return request.post({ url: '/system/auth/send-reset-password-email', data })
+  return request.post({
+    url: '/system/auth/send-reset-password-email',
+    data,
+    headers: {
+      'skip-specified-error-message': [400],
+    },
+  })
 }
 
 // 發送找回密碼的「驗證碼」到使用者手機
 export function sendResetPasswordMobile(data: { username: string }) {
-  return request.post({ url: '/system/auth/send-reset-password-mobile', data })
+  return request.post({
+    url: '/system/auth/send-reset-password-mobile',
+    data,
+    headers: {
+      'skip-specified-error-message': [400],
+    },
+  })
 }
 
 // 修改密碼
@@ -87,5 +123,11 @@ export function updatePassword(data: {
   verifyCode: string
   verifyCodeType: 'email' | 'mobile'
 }) {
-  return request.post({ url: '/system/auth/update-password', data })
+  return request.post({
+    url: '/system/auth/update-password',
+    data,
+    headers: {
+      'skip-specified-error-message': [400],
+    },
+  })
 }
