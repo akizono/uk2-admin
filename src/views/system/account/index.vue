@@ -230,6 +230,8 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: t('account.mobile'),
     type: 'input',
+    placeholder: '+886912345678',
+    helpInfo: '需要填寫完整的號碼，包含「+」和「國碼」',
   },
   {
     name: 'deptId',

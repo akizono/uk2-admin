@@ -2,7 +2,8 @@
 import type { FormInst, FormRules } from 'naive-ui'
 
 import { register, sendRegisterEmail, sendRegisterMobile } from '@/api/system/auth'
-import { onBeforeUnmount } from 'vue'
+import countryCallingCodes from '@/utils/constant/country-calling-codes'
+import { computed, onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
@@ -65,7 +66,15 @@ const formValue = ref({
   email: '',
   mobile: '',
   verifyCode: '',
+  selectedCountry: 'Taiwan', // 預設選擇台灣
 })
+
+// 國家選項
+const countryOptions = computed(() => Object.keys(countryCallingCodes).map((country: string) => ({
+  label: t(`country.${country}`),
+  value: country,
+  rawName: country, // 保存原始名稱，用於顯示
+})))
 
 const isRead = ref(false)
 const formRef = ref<FormInst | null>(null)
@@ -96,7 +105,10 @@ async function sendVerifyCode() {
       window.$message.success(t('login.emailSentSuccess'))
     }
     else {
-      await sendRegisterMobile({ mobile: formValue.value.mobile })
+      // 添加國家區號前綴
+      const countryCode = countryCallingCodes[formValue.value.selectedCountry as keyof typeof countryCallingCodes]
+      const mobileWithCode = `+${countryCode}${formValue.value.mobile}`
+      await sendRegisterMobile({ mobile: mobileWithCode })
       window.$message.success(t('login.mobileSentSuccess'))
     }
 
@@ -159,7 +171,9 @@ async function handleRegister() {
         registerData.email = formValue.value.email
       }
       else {
-        registerData.mobile = formValue.value.mobile
+        // 添加國家區號前綴
+        const countryCode = countryCallingCodes[formValue.value.selectedCountry as keyof typeof countryCallingCodes]
+        registerData.mobile = `+${countryCode}${formValue.value.mobile}`
       }
 
       await register(registerData)
@@ -245,11 +259,23 @@ async function handleRegister() {
 
       <!-- 手機號碼 (當註冊方式為手機時顯示) -->
       <n-form-item v-if="registerType === 'mobile'" path="mobile">
-        <n-input
-          v-model:value="formValue.mobile"
-          clearable
-          :placeholder="$t('account.mobilePlaceholder')"
-        />
+        <n-input-group>
+          <n-select
+            v-model:value="formValue.selectedCountry"
+            class="w-250px"
+            :options="countryOptions"
+            :render-label="(option: {label: string, value: string, rawName: string}) => `${option.label} (+${countryCallingCodes[option.value as keyof typeof countryCallingCodes]})`"
+            filterable
+          />
+          <n-input
+            v-model:value="formValue.mobile"
+            clearable
+            :placeholder="$t('account.mobilePlaceholder')"
+          />
+        </n-input-group>
+        <template #help>
+          <span>{{ $t('account.mobileHelpInfo') }}</span>
+        </template>
       </n-form-item>
 
       <!-- 驗證碼 -->

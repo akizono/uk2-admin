@@ -19,7 +19,7 @@ const appName = import.meta.env.VITE_APP_NAME
       <LangsSwitch />
     </div>
     <div
-      class="p-4xl w-full sm:w-450px sm:min-h-700px"
+      class="p-4xl w-full sm:w-650px sm:min-h-700px"
       style="background: var(--card-color);box-shadow: var(--box-shadow-1);"
     >
       <div class="w-full flex flex-col items-center">
