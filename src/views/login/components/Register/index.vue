@@ -136,7 +136,7 @@ async function sendVerifyCode() {
       window.$message.error(t('login.operationTooFrequent'))
     }
     else if (error.status === 409) {
-      window.$message.error(`${registerType.value === 'email' ? '信箱' : '手機號碼'}已存在`)
+      window.$message.error(`${registerType.value === 'email' ? t('account.emailExist') : t('account.mobileExist')}`)
     }
   }
   finally {
