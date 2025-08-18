@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { setdialog } from '@/utils/dialog'
-import { useDialog, useLoadingBar, useMessage, useNotification } from 'naive-ui'
+import { useDialog, useLoadingBar, useMessage, useModal, useNotification } from 'naive-ui'
 
 // 掛載naive元件的方法至window, 以便在路由鉤子函數和請求函數裡面調用
 function registerNaiveTools() {
@@ -15,6 +15,7 @@ function registerNaiveTools() {
 
   window.$message = useMessage()
   window.$notification = useNotification()
+  window.$modal = useModal()
 }
 
 const NaiveProviderContent = defineComponent({
@@ -33,8 +34,10 @@ const NaiveProviderContent = defineComponent({
     <n-dialog-provider>
       <n-notification-provider>
         <n-message-provider>
-          <slot />
-          <NaiveProviderContent />
+          <n-modal-provider>
+            <slot />
+            <NaiveProviderContent />
+          </n-modal-provider>
         </n-message-provider>
       </n-notification-provider>
     </n-dialog-provider>

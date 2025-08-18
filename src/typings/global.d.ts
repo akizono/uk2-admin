@@ -12,6 +12,7 @@ interface Window {
   $dialog: import('naive-ui').DialogApi
   $message: import('naive-ui').MessageApi
   $notification: import('naive-ui').NotificationApi
+  $modal: import('naive-ui').ModalApi
 }
 
 declare const AMap: any

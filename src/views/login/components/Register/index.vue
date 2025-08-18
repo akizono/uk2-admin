@@ -4,7 +4,8 @@ import type { FormInst, FormRules } from 'naive-ui'
 import { register, sendRegisterEmail, sendRegisterMobile } from '@/api/system/auth'
 import { Regex } from '@/constants/Regex'
 import countryCallingCodes from '@/utils/constant/country-calling-codes'
-import { computed, onBeforeUnmount } from 'vue'
+import userAgreement from '@/utils/constant/user-agreement'
+// import { computed, h, onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
@@ -152,6 +153,18 @@ onBeforeUnmount(() => {
 })
 
 // 處理註冊
+// 顯示用戶協議
+function showUserAgreement() {
+  window.$dialog.info({
+    title: t('login.userAgreement'),
+    content: () => h('div', { innerHTML: userAgreement.replace(/\n/g, '<br>') }),
+    positiveText: t('common.back'),
+    onPositiveClick: () => {
+      // 關閉彈出視窗
+    },
+  })
+}
+
 async function handleRegister() {
   // 檢查是否同意用戶協議
   if (!isRead.value) {
@@ -312,9 +325,11 @@ async function handleRegister() {
           class="w-full"
         >
           <n-checkbox v-model:checked="isRead">
-            {{ $t('login.readAndAgree') }} <n-button
+            {{ $t('login.readAndAgree') }}
+            <n-button
               type="primary"
               text
+              @click.stop="showUserAgreement"
             >
               {{ $t('login.userAgreement') }}
             </n-button>
