@@ -25,6 +25,7 @@ const treeList = ref<MenuVO[]>([])
 async function getTreeList() {
   const { data: result } = await MenuApi.getMenuPageByLang({
     pageSize: 0,
+    status: 1,
   })
   treeList.value = sortTreeData(arrayToTree(result.list))
 }
