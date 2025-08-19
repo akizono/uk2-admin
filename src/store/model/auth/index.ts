@@ -1,6 +1,5 @@
-import type { Token, UserVo } from '@/api/system/user'
-
 import { login } from '@/api/system/auth'
+import { type Token, UserApi, type UserVo } from '@/api/system/user'
 import { router } from '@/router'
 import { local } from '@/utils'
 
@@ -86,6 +85,16 @@ export const useAuthStore = defineStore('auth-store', {
       local.set('accessToken', token.accessToken)
       local.set('refreshToken', token.refreshToken)
       this.accessToken = token.accessToken
+    },
+
+    /** 獲取個人資訊 */
+    async updatePersonalInfo() {
+      const { data: result } = await UserApi.getPersonalInfo()
+      if (result) {
+        Object.keys(result).forEach((key) => {
+          (this.user as any)[key] = (result as any)[key]
+        })
+      }
     },
   },
 })

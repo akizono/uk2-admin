@@ -76,4 +76,9 @@ export const UserApi = {
   updatePersonalInfo: async (data: Partial<Omit<UserVo, keyof Api.BaseVO | 'id' | 'username' | 'email' | 'mobile' | 'role' | 'roleIds' | 'roleNames' | 'token'>>) => {
     return await request.put({ url: '/system/user/update-personal-info', data })
   },
+
+  /** 獲取個人資訊 */
+  getPersonalInfo: async (): ApiResponse<UserVo> => {
+    return await request.get({ url: '/system/user/get-personal-info' })
+  },
 }

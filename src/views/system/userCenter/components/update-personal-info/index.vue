@@ -3,6 +3,7 @@ import type { UserVo } from '@/api/system/user'
 import type { FormRules } from 'naive-ui'
 
 import { UserApi } from '@/api/system/user'
+import { useAuthStore } from '@/store/model/auth'
 import { getDictData } from '@/utils'
 
 const props = withDefaults(defineProps<{
@@ -18,6 +19,8 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
+const authStore = useAuthStore()
+
 const formRef = ref()
 const formValue = ref<Partial<UserVo>>({})
 const sexOptions = getDictData('system_user_sex')
@@ -32,6 +35,10 @@ async function handleValidateClick() {
     loading.value = true
     await UserApi.updatePersonalInfo(formValue.value)
     window.$message.success('修改成功')
+
+    // 更新個人資訊
+    authStore.updatePersonalInfo()
+
     emit('success')
     emit('update:show', false)
   }
