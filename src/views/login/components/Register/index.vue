@@ -14,7 +14,7 @@ function toLogin() {
 const { t } = useI18n()
 
 // 註冊方式
-const registerType = ref<'email' | 'mobile'>('email')
+const registerType = ref<VerifyCodeType>('email')
 
 // 表單規則
 const rules = computed<FormRules>(() => {

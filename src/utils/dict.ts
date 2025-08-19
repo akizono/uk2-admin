@@ -55,7 +55,11 @@ export function getDictLabel(dictType: string, value: any) {
   return computed(() => {
     if (!dictCache.value[dictType])
       return ''
-    const item = dictCache.value[dictType].find(item => item.value === value) // 使用非嚴格相等以處理不同類型的比較
+    const item = dictCache.value[dictType].find((item) => {
+      // eslint-disable-next-line eqeqeq
+      return item.value == value
+    })
+    // 使用非嚴格相等以處理不同類型的比較
     return item?.label || ''
   })
 }

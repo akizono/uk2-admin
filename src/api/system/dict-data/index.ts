@@ -16,7 +16,7 @@ export const DictDataApi = {
   },
 
   /** 獲取「當前系統語言」版本的「字典數據分頁列表」 */
-  getDictDataPageByLang: async (params: PageParams & Partial<DictDataVO>): PageRes<DictDataVO> => {
+  getDictDataPageByLang: async (params: PageParams & Partial<DictDataVO> & { dictTypeStatus?: number }): PageRes<DictDataVO> => {
     return await request.getByLang({ url: '/system/dict-data/page', params })
   },
 

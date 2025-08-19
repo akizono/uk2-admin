@@ -51,4 +51,29 @@ export const UserApi = {
   unblockUser: async (id: string) => {
     return await request.put({ url: `/system/user/unblock/${id}` })
   },
+
+  /** 發送用於綁定信箱的「驗證碼」到使用者信箱 */
+  sendBindEmail: async (data: { email: string }) => {
+    return await request.post({ url: '/system/user/send-bind-email', data })
+  },
+
+  /** 發送用於綁定手機號碼的「驗證碼」到使用者手機 */
+  sendBindMobile: async (data: { mobile: string }) => {
+    return await request.post({ url: '/system/user/send-bind-mobile', data })
+  },
+
+  /** 綁定信箱或者手機 */
+  bindEmailOrMobile: async (data: {
+    verifyCode: string
+    verifyCodeType: VerifyCodeType
+    email?: string
+    mobile?: string
+  }) => {
+    return await request.post({ url: '/system/user/bind-email-or-mobile', data })
+  },
+
+  /** 修改個人資訊 */
+  updatePersonalInfo: async (data: Partial<Omit<UserVo, keyof Api.BaseVO | 'id' | 'username' | 'email' | 'mobile' | 'role' | 'roleIds' | 'roleNames' | 'token'>>) => {
+    return await request.put({ url: '/system/user/update-personal-info', data })
+  },
 }

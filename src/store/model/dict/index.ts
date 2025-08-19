@@ -108,6 +108,7 @@ export const useDictStore = defineStore('dict-store', {
           pageSize: 0,
           currentPage: 1,
           dictType: type,
+          dictTypeStatus: 1,
         })
 
         for (const item of result.list) {

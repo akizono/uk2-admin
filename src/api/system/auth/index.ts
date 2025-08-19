@@ -15,7 +15,7 @@ export interface RefreshTokenVO {
 
 interface RegisterVO extends UserVo {
   verifyCode: string
-  verifyCodeType: 'email' | 'mobile'
+  verifyCodeType: VerifyCodeType
   password: string
 }
 
@@ -121,7 +121,7 @@ export function updatePassword(data: {
   username: string
   password: string
   verifyCode: string
-  verifyCodeType: 'email' | 'mobile'
+  verifyCodeType: VerifyCodeType
 }) {
   return request.post({
     url: '/system/auth/update-password',

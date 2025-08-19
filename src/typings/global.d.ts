@@ -30,30 +30,33 @@ declare namespace NaiveUI {
 }
 
 declare namespace App {
-  // 選項的通用型別
+  /** 選項的通用型別 */
   interface SelectOption {
     value: string
     label: string
   }
 }
 
-// API 回應介面
+/** API 回應介面 */
 type ApiResponse<T = any> = Promise<{
   message: string
   data: T
 }>
 
-// 分頁回應介面
+/** 分頁回應介面 */
 type PageRes<T> = ApiResponse<{
   total: number
   list: T[]
 }>
 
-// 分頁參數介面
+/** 分頁參數介面 */
 interface PageParams {
   pageSize?: number
   currentPage?: number
 }
 
-// 彈出視窗類型
+/** 彈出視窗類型 */
 type ModalType = 'add' | 'view' | 'edit'
+
+/** 驗證碼類型 */
+type VerifyCodeType = 'email' | 'mobile'

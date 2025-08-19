@@ -34,7 +34,7 @@ const formValue = ref({
   account: '',
   verifyCode: '',
   password: '',
-  verifyCodeType: '' as 'email' | 'mobile',
+  verifyCodeType: '' as VerifyCodeType,
 })
 
 const formRef = ref<FormInst | null>(null)

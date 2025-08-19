@@ -21,37 +21,23 @@ const emit = defineEmits<{
 const formRef = ref()
 const formValue = ref<Partial<UserVo>>({})
 const sexOptions = getDictData('system_user_sex')
+const loading = ref(false)
 
-const rules: FormRules = {
-  nickname: {
-    required: true,
-    message: '請輸入姓名',
-    trigger: 'blur',
-  },
-  age: {
-    required: true,
-    type: 'number',
-    message: '請輸入年齡',
-    trigger: ['input', 'blur'],
-  },
-  mobile: {
-    required: true,
-    message: '請輸入手機號碼',
-    trigger: ['input'],
-  },
-}
+const rules: FormRules = {}
 
-function handleValidateClick() {
-  formRef.value?.validate(async (errors: any) => {
-    if (errors)
-      return window.$message.error('驗證不通過')
+async function handleValidateClick() {
+  try {
+    await formRef.value?.validate
 
-    UserApi.updateUser(formValue.value as UserVo).then(({ message }) => {
-      window.$message.success(message)
-      emit('success')
-      emit('update:show', false)
-    })
-  })
+    loading.value = true
+    await UserApi.updatePersonalInfo(formValue.value)
+    window.$message.success('修改成功')
+    emit('success')
+    emit('update:show', false)
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 function handleCancel() {
@@ -80,30 +66,32 @@ watch(() => props.show, (newVal) => {
     @update:show="emit('update:show', $event)"
   >
     <template #default>
-      <n-form
-        ref="formRef"
-        :label-width="80"
-        :model="formValue"
-        :rules="rules"
-        label-placement="left"
-      >
-        <n-form-item label="暱稱" path="nickname">
-          <n-input v-model:value="formValue.nickname" placeholder="輸入暱稱" />
-        </n-form-item>
-        <n-form-item label="年齡" path="age">
-          <n-input-number v-model:value="formValue.age" placeholder="輸入年齡" class="w-full" />
-        </n-form-item>
-        <n-form-item label="性別" path="sex">
-          <n-select v-model:value="formValue.sex" placeholder="輸入性別" :options="sexOptions" />
-        </n-form-item>
-        <n-form-item label="頭像地址" path="avatar">
-          <n-input v-model:value="formValue.avatar" />
-        </n-form-item>
-      </n-form>
+      <n-spin :show="loading">
+        <n-form
+          ref="formRef"
+          :label-width="80"
+          :model="formValue"
+          :rules="rules"
+          label-placement="left"
+        >
+          <n-form-item label="暱稱" path="nickname">
+            <n-input v-model:value="formValue.nickname" placeholder="輸入暱稱" />
+          </n-form-item>
+          <n-form-item label="年齡" path="age">
+            <n-input-number v-model:value="formValue.age" placeholder="輸入年齡" class="w-full" />
+          </n-form-item>
+          <n-form-item label="性別" path="sex">
+            <n-select v-model:value="formValue.sex" placeholder="輸入性別" :options="sexOptions" />
+          </n-form-item>
+          <n-form-item label="頭像地址" path="avatar">
+            <n-input v-model:value="formValue.avatar" />
+          </n-form-item>
+        </n-form>
+      </n-spin>
     </template>
     <template #action>
       <n-flex justify="center">
-        <n-button type="primary" @click="handleValidateClick">
+        <n-button type="primary" :loading="loading" @click="handleValidateClick">
           確認修改
         </n-button>
         <n-button @click="handleCancel">
