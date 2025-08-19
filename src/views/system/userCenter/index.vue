@@ -78,7 +78,7 @@ onMounted(() => {
             {{ user?.nickname }}
           </n-descriptions-item>
           <n-descriptions-item label="角色">
-            {{ user!.role!.join('、 ') }}
+            {{ user!.roleNames!.join('、 ') }}
           </n-descriptions-item>
         </n-descriptions>
       </n-space>

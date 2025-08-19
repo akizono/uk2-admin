@@ -64,6 +64,11 @@ const columns: DataTableColumns<RoleVO> = [
     key: 'name',
   },
   {
+    title: '備注',
+    align: 'left',
+    key: 'remark',
+  },
+  {
     title: t('common.sort'),
     align: 'center',
     key: 'sort',
@@ -88,7 +93,7 @@ const columns: DataTableColumns<RoleVO> = [
     width: '400px',
     render: (row: RoleVO) => {
       return (
-        <NButton size="small" onClick={() => assignmentMenuRef.value.openModal(row)}>
+        <NButton disabled={row.status === 0} size="small" onClick={() => assignmentMenuRef.value.openModal(row)}>
           菜單&權限
         </NButton>
       )

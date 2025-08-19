@@ -17,6 +17,7 @@ export interface UserVo extends Api.BaseVO {
 
   role?: string[]
   roleIds?: string[]
+  roleNames?: string[]
   token?: Token
 }
 
