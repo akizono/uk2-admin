@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { UserVo } from '@/api/system/user'
-import type { FormRules } from 'naive-ui'
-
-import { UserApi } from '@/api/system/user'
 import { useAuthStore } from '@/store'
-import { onMounted } from 'vue'
+import { getDictLabel } from '@/utils'
+
+import UpdatePersonalInfo from './components/update-personal-info/index.vue'
 
 defineOptions({
   name: 'Personal Center',
@@ -13,56 +11,30 @@ defineOptions({
 const authStore = useAuthStore()
 
 const { user } = authStore
-const formRef = ref()
-const formValue = ref<Partial<UserVo>>({})
-const rules: FormRules = {
-  nickname: {
-    required: true,
-    message: '請輸入姓名',
-    trigger: 'blur',
-  },
-  age: {
-    required: true,
-    type: 'number',
-    message: '請輸入年齡',
-    trigger: ['input', 'blur'],
-  },
-  mobile: {
-    required: true,
-    message: '請輸入手機號碼',
-    trigger: ['input'],
-  },
+const showUpdateModal = ref(false)
+
+function handleEditClick() {
+  showUpdateModal.value = true
 }
 
-function handleValidateClick() {
-  formRef.value?.validate(async (errors: any) => {
-    if (errors)
-      return window.$message.error('驗證不通過')
-
-    UserApi.updateUser(formValue.value as UserVo).then(({ message }) => {
-      window.$message.success(message)
-    })
-  })
+function handleUpdateSuccess() {
+  // 更新成功後的處理邏輯
 }
-
-onMounted(() => {
-  if (user) {
-    formValue.value = {
-      id: user.id!,
-      nickname: user.nickname,
-      age: user.age,
-      mobile: user.mobile,
-    }
-  }
-})
 </script>
 
 <template>
   <n-space vertical>
-    <n-card title="個人資訊">
+    <n-card>
+      <template #header>
+        <n-button text icon-placement="right" strong @click="handleEditClick">
+          <template #icon>
+            <icon-park-outline-edit />
+          </template>
+          個人資訊
+        </n-button>
+      </template>
       <n-space size="large">
         <n-avatar round :size="128" :src="user?.avatar || ''" />
-
         <n-descriptions
           label-placement="left"
           :column="2"
@@ -77,31 +49,30 @@ onMounted(() => {
           <n-descriptions-item label="暱稱">
             {{ user?.nickname }}
           </n-descriptions-item>
+          <n-descriptions-item label="年齡">
+            {{ user?.age }}
+          </n-descriptions-item>
+          <n-descriptions-item label="性別">
+            {{ getDictLabel('system_user_sex', user?.sex) }}
+          </n-descriptions-item>
           <n-descriptions-item label="角色">
             {{ user!.roleNames!.join('、 ') }}
+          </n-descriptions-item>
+          <n-descriptions-item :span="2" label="手機號碼">
+            {{ user?.mobile }}
+          </n-descriptions-item>
+          <n-descriptions-item :span="2" label="電子郵件">
+            {{ user?.email }}
           </n-descriptions-item>
         </n-descriptions>
       </n-space>
     </n-card>
-    <n-card title="資訊修改">
-      <n-space justify="center">
-        <n-form ref="formRef" class="w-500px" :label-width="80" :model="formValue" :rules="rules">
-          <n-form-item label="暱稱" path="nickname">
-            <n-input v-model:value="formValue.nickname" placeholder="輸入暱稱" />
-          </n-form-item>
-          <n-form-item label="年齡" path="age">
-            <n-input-number v-model:value="formValue.age" placeholder="輸入年齡" />
-          </n-form-item>
-          <n-form-item label="手機號碼" path="mobile">
-            <n-input v-model:value="formValue.mobile" placeholder="手機號碼" />
-          </n-form-item>
-          <n-form-item>
-            <n-button type="primary" attr-type="button" block @click="handleValidateClick">
-              驗證
-            </n-button>
-          </n-form-item>
-        </n-form>
-      </n-space>
-    </n-card>
+
+    <!-- 資訊修改彈出視窗 -->
+    <UpdatePersonalInfo
+      v-model:show="showUpdateModal"
+      :user="user || undefined"
+      @success="handleUpdateSuccess"
+    />
   </n-space>
 </template>

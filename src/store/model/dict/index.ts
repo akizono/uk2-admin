@@ -23,6 +23,8 @@ export const useDictStore = defineStore('dict-store', {
       dictMap: {} as DictMap,
       /** 正在進行中的請求映射，用於防止重複請求 */
       pendingRequests: new Map<string, Promise<DictItem[]>>(),
+      /** 失敗的字典類型，避免無限重試 */
+      failedTypes: new Set<string>(),
     }
   },
   actions: {
@@ -61,6 +63,11 @@ export const useDictStore = defineStore('dict-store', {
         return this.dictMap[type]
       }
 
+      // 如果之前載入失敗，返回空數組而不是重試
+      if (this.failedTypes.has(type)) {
+        return []
+      }
+
       // 檢查是否有正在進行的請求
       const pendingRequest = this.pendingRequests.get(type)
       if (pendingRequest) {
@@ -73,7 +80,15 @@ export const useDictStore = defineStore('dict-store', {
 
       try {
         const result = await promise
+        // 載入成功，從失敗列表中移除
+        this.failedTypes.delete(type)
         return result
+      }
+      catch {
+        // 載入失敗，加入失敗列表
+        this.failedTypes.add(type)
+        // 返回空數組而不是拋出錯誤
+        return []
       }
       finally {
         // 請求完成後，刪除 pending 狀態
@@ -124,8 +139,9 @@ export const useDictStore = defineStore('dict-store', {
         session.set('dict', this.dictMap)
         return result.list
       }
-      catch {
-        throw new Error(`Failed to get ${type} dictionary from network, check ${type} field or network`)
+      catch (error) {
+        console.warn(`無法載入字典數據 ${type}:`, error)
+        throw error
       }
     },
 
@@ -136,6 +152,22 @@ export const useDictStore = defineStore('dict-store', {
       const dict = session.get('dict')
       if (dict) {
         Object.assign(this.dictMap, dict)
+      }
+    },
+
+    /**
+     * 重設字典錯誤狀態，允許重新載入失敗的字典
+     * @param type 字典類型，如果不提供則重設所有失敗狀態
+     */
+    resetFailedTypes(type?: string) {
+      if (type) {
+        this.failedTypes.delete(type)
+        // 也清除對應的快取，以便重新載入
+        delete this.dictMap[type]
+      }
+      else {
+        this.failedTypes.clear()
+        this.dictMap = {}
       }
     },
   },

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { DictTypeApi } from '@/api/system/dict-type'
-import { useDictStore } from '@/store'
-
-const { dict } = useDictStore()
+import { getValueMap as _getValueMap, getDictData, getDictEnum, getLabelMap as getDictLabelMap } from '@/utils/dict'
 
 const dictKey = ref('')
 const options = ref()
 const subOptions = ref()
-const currentDict = ref()
 const loading = ref(false)
+
+const data = ref()
 
 async function getAlldict() {
   loading.value = true
@@ -28,45 +27,45 @@ async function getAlldict() {
     loading.value = false
   }
 }
+
 function changeSelect(type: string) {
-  dict(type).then((data) => {
-    currentDict.value = data
-    subOptions.value = data.data()
-  })
+  if (type) {
+    subOptions.value = getDictData(type).value
+    data.value = subOptions.value
+  }
 }
 
 onMounted(() => {
   getAlldict()
 })
 
-const data = ref()
-
-// 字典檢查
-function withDictCheck(fn: (dict: any) => any) {
-  return async function () {
-    if (!currentDict.value) {
-      return window.$message.warning('字典還未成功讀取，請稍候')
-    }
-    return fn(currentDict.value)
+function getDict() {
+  if (!dictKey.value) {
+    return window.$message.warning('請先選擇字典類型')
   }
+  data.value = getDictData(dictKey.value).value
 }
 
-const getDict = withDictCheck((dict) => {
-  data.value = dict.data()
-  console.log(data.value)
-})
+function getEnum() {
+  if (!dictKey.value) {
+    return window.$message.warning('請先選擇字典類型')
+  }
+  data.value = getDictEnum(dictKey.value).value
+}
 
-const getEnum = withDictCheck((dict) => {
-  data.value = dict.enum()
-})
+function getValueMap() {
+  if (!dictKey.value) {
+    return window.$message.warning('請先選擇字典類型')
+  }
+  data.value = _getValueMap(dictKey.value).value
+}
 
-const getValueMap = withDictCheck((dict) => {
-  data.value = dict.valueMap()
-})
-
-const getLabelMap = withDictCheck((dict) => {
-  data.value = dict.labelMap()
-})
+function getLabelMap() {
+  if (!dictKey.value) {
+    return window.$message.warning('請先選擇字典類型')
+  }
+  data.value = getDictLabelMap(dictKey.value).value
+}
 
 const dictValue = ref()
 

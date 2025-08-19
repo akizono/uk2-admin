@@ -7,8 +7,10 @@ import { RoleMenuApi } from '@/api/system/role-menu'
 import { useAppStore } from '@/store/'
 import { arrayToTree, sortTreeData } from '@/utils/array'
 import { ElTree } from 'element-plus'
+import { useDialog } from 'naive-ui'
 
 const appStore = useAppStore()
+const dialog = useDialog()
 
 const modalTitle = ref('')
 const modalVisible = ref(false)
@@ -54,13 +56,14 @@ function handleMenuExpandChange(value: boolean) {
 }
 
 async function handleSubmit() {
-  const roleId = rowData.value.id
-  if (roleId === '1') {
-    return window.$message.error('「超級管理員」的權限禁止修改')
-  }
-
   try {
+    const roleId = rowData.value.id
+    if (roleId === '1') {
+      return window.$message.error('「超級管理員」的權限禁止修改')
+    }
+
     loading.value = true
+
     const data = {
       roleId,
       menuIds: [
@@ -68,6 +71,24 @@ async function handleSubmit() {
         ...(treeRef.value.getHalfCheckedKeys() as unknown as Array<string>), // 獲得半選中的父節點
       ],
     }
+
+    if (data.menuIds.length === 0) {
+      return dialog.warning({
+        title: '警告',
+        content: '目前為角色分配的菜單為空，將會導致該角色無法使用任何功能，包括無法正常登入系統，確定要繼續嗎？',
+        positiveText: '確定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: async () => {
+          await RoleMenuApi.batchUpdate(data)
+          modalVisible.value = false
+          window.$message.success('保存成功')
+        },
+        onNegativeClick: () => {
+        },
+      })
+    }
+
     await RoleMenuApi.batchUpdate(data)
     modalVisible.value = false
     window.$message.success('保存成功')

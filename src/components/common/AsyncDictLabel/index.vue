@@ -11,10 +11,17 @@ const label = ref<string>('')
 
 // 獲取字典標籤
 async function getLabel() {
-  const dictData = await dict(props.dictType)
-  const valueMap = dictData.valueMap()
-  if (props.value !== undefined && props.value !== null && valueMap[props.value]) {
-    label.value = valueMap[props.value].label
+  try {
+    const dictData = await dict(props.dictType)
+    const valueMap = dictData.valueMap()
+    if (props.value !== undefined && props.value !== null && valueMap[props.value]) {
+      label.value = valueMap[props.value].label
+    }
+  }
+  catch (error) {
+    console.warn(`無法載入字典標籤 ${props.dictType}:`, error)
+    // 發生錯誤時，顯示原始值或空字串
+    label.value = props.value?.toString() || ''
   }
 }
 
