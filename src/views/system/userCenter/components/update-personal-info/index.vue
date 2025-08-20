@@ -26,11 +26,30 @@ const formValue = ref<Partial<UserVo>>({})
 const sexOptions = getDictData('system_user_sex')
 const loading = ref(false)
 
-const rules: FormRules = {}
+const rules: FormRules = {
+  age: [
+    {
+      required: true,
+      validator: (rule, value) => {
+        if (value === null || value === undefined) {
+          return new Error('請輸入年齡')
+        }
+        if (value < 0) {
+          return new Error('年齡不能小於0歲')
+        }
+        if (value > 127) {
+          return new Error('年齡不能超過127歲')
+        }
+        return true
+      },
+      trigger: ['input', 'blur'],
+    },
+  ],
+}
 
 async function handleValidateClick() {
   try {
-    await formRef.value?.validate
+    await formRef.value?.validate()
 
     loading.value = true
     await UserApi.updatePersonalInfo(formValue.value)

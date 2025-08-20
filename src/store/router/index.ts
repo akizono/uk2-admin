@@ -245,7 +245,7 @@ export const useRouteStore = defineStore('route-store', {
         return item
       }
       const fixedRoutes = fixRoutes(routes)
-      console.log('路由列表', fixedRoutes)
+      // console.log('路由列表', fixedRoutes)
 
       router.addRoute(fixedRoutes)
 

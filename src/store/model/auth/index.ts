@@ -9,7 +9,7 @@ import { useTabStore } from '../tab'
 export const useAuthStore = defineStore('auth-store', {
   state: () => {
     return {
-      user: local.get('user'),
+      user: local.get('user') as UserVo,
       accessToken: local.get('accessToken') || '',
     }
   },
@@ -52,7 +52,6 @@ export const useAuthStore = defineStore('auth-store', {
     /** 處理使用者登入 */
     async login(username: string, password: string) {
       const { data: result } = await login({ username, password })
-      console.log('result', result)
 
       // 處理登入資訊
       await this.handleLoginInfo(result)
@@ -60,7 +59,6 @@ export const useAuthStore = defineStore('auth-store', {
 
     /** 處理登入後的資料 */
     async handleLoginInfo(user: UserVo) {
-      console.log('user', user)
       // 儲存 Token 和使用者資訊
       local.set('user', user)
       local.set('accessToken', user.token!.accessToken)
@@ -90,11 +88,13 @@ export const useAuthStore = defineStore('auth-store', {
     /** 獲取個人資訊 */
     async updatePersonalInfo() {
       const { data: result } = await UserApi.getPersonalInfo()
+
       if (result) {
         Object.keys(result).forEach((key) => {
           (this.user as any)[key] = (result as any)[key]
         })
       }
+      local.set('user', this.user)
     },
   },
 })

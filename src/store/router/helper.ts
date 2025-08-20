@@ -1,10 +1,11 @@
 import type { MenuOption } from 'naive-ui'
 import type { RouteRecordRaw } from 'vue-router'
 
-import Layout from '@/layouts/index.vue'
-import { arrayToTree, renderIcon } from '@/utils'
 import { clone, min } from 'radash'
 import { RouterLink } from 'vue-router'
+
+import Layout from '@/layouts/index.vue'
+import { arrayToTree, renderIcon } from '@/utils'
 
 function standardizedRoutes(route: AppRoute.RowRoute[]) {
   return clone(route).map((item: any) => {
@@ -98,7 +99,7 @@ export function generateCacheRoutes(routes: AppRoute.RowRoute[]) {
     })
 
   // 輸出最終快取的路由名稱列表
-  console.log('需要快取的路由列表:', cacheRoutes)
+  // console.log('需要快取的路由列表:', cacheRoutes)
   return cacheRoutes
 }
 
