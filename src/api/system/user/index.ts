@@ -58,7 +58,10 @@ export const UserApi = {
       url: '/system/user/send-bind-email',
       data,
       headers: {
-        'skip-specified-error-message': [409],
+        'specify-error-message': [
+          { code: 400, message: '操作過於頻繁，請稍後再試' },
+          { code: 409, message: '該電子郵件已被使用' },
+        ],
       },
     })
   },
@@ -69,7 +72,10 @@ export const UserApi = {
       url: '/system/user/send-bind-mobile',
       data,
       headers: {
-        'skip-specified-error-message': [409],
+        'specify-error-message': [
+          { code: 400, message: '操作過於頻繁，請稍後再試' },
+          { code: 409, message: '該手機號碼已被使用' },
+        ],
       },
     })
   },
@@ -85,7 +91,9 @@ export const UserApi = {
       url: '/system/user/bind-email-or-mobile',
       data,
       headers: {
-        'skip-specified-error-message': [400],
+        'specify-error-message': [
+          { code: 400, message: '驗證碼錯誤或已過期' },
+        ],
       },
     })
   },

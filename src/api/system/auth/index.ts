@@ -1,7 +1,10 @@
 import type { UserVo } from '../user/'
 
+import { i18n } from '@/modules/i18n'
 import { local } from '@/utils'
 import request from '@/utils/request'
+
+const t = i18n.global.t
 
 export interface LoginVO {
   username: string
@@ -52,7 +55,10 @@ export function sendRegisterEmail(data: { email: string }) {
     url: '/system/auth/send-register-email',
     data,
     headers: {
-      'skip-specified-error-message': [400, 409],
+      'specify-error-message': [
+        { code: 400, message: t('login.operationTooFrequent') },
+        { code: 409, message: t('account.mobileOrEmailExist') },
+      ],
     },
   })
 }
@@ -63,7 +69,10 @@ export function sendRegisterMobile(data: { mobile: string }) {
     url: '/system/auth/send-register-mobile',
     data,
     headers: {
-      'skip-specified-error-message': [400, 409],
+      'specify-error-message': [
+        { code: 400, message: t('login.operationTooFrequent') },
+        { code: 409, message: t('account.mobileOrEmailExist') },
+      ],
     },
   })
 }
@@ -74,7 +83,9 @@ export function register(data: RegisterVO) {
     url: '/system/auth/register',
     data,
     headers: {
-      'skip-specified-error-message': [400],
+      'specify-error-message': [
+        { code: 400, message: t('login.verifyCodeError') },
+      ],
     },
   })
 }
@@ -89,7 +100,9 @@ export function checkUserHasMobileOrEmail(params: { username: string }): ApiResp
     url: '/system/auth/check-user-has-mobile-or-email',
     params,
     headers: {
-      'skip-specified-error-message': [409],
+      'specify-error-message': [
+        { code: 409, message: t('account.mobileOrEmailExist') },
+      ],
     },
   })
 }
@@ -100,7 +113,9 @@ export function sendResetPasswordEmail(data: { username: string }) {
     url: '/system/auth/send-reset-password-email',
     data,
     headers: {
-      'skip-specified-error-message': [400],
+      'specify-error-message': [
+        { code: 400, message: t('login.operationTooFrequent') },
+      ],
     },
   })
 }
@@ -111,7 +126,9 @@ export function sendResetPasswordMobile(data: { username: string }) {
     url: '/system/auth/send-reset-password-mobile',
     data,
     headers: {
-      'skip-specified-error-message': [400],
+      'specify-error-message': [
+        { code: 400, message: t('login.operationTooFrequent') },
+      ],
     },
   })
 }
@@ -127,7 +144,9 @@ export function updatePassword(data: {
     url: '/system/auth/update-password',
     data,
     headers: {
-      'skip-specified-error-message': [400],
+      'specify-error-message': [
+        { code: 400, message: t('login.verifyCodeError') },
+      ],
     },
   })
 }

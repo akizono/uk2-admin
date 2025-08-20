@@ -105,14 +105,6 @@ async function sendVerifyCode() {
       }
     }, 1000)
   }
-  catch (error: any) {
-    if (error.status === 400) {
-      window.$message.error('操作過於頻繁，請稍後再試')
-    }
-    else if (error.status === 409) {
-      window.$message.error(props.type === 'email' ? '該電子郵件已被使用' : '該手機號碼已被使用')
-    }
-  }
   finally {
     sendCodeLoading.value = false
   }
@@ -157,11 +149,6 @@ async function handleSubmit() {
 
       emit('success')
       emit('update:show', false)
-    }
-    catch (error: any) {
-      if (error.status === 400) {
-        window.$message.error('驗證碼錯誤或已過期')
-      }
     }
     finally {
       loading.value = false

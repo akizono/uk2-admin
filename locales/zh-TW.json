@@ -63,6 +63,7 @@
     "mobile": "手機號碼",
     "mobileExist": "手機號碼已存在",
     "emailExist": "電子郵件已存在",
+    "mobileOrEmailExist": "手機號碼或電子郵件已存在",
     "usernamePlaceholder": "請填寫使用者名稱",
     "nicknamePlaceholder": "請填寫暱稱",
     "sexPlaceholder": "請選擇性別",

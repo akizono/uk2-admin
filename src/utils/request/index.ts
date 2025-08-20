@@ -20,8 +20,7 @@ function request(option: any) {
         : filterEmpty(option.data)
     }
   }
-
-  // 將所有 undefined 值轉換為 null
+  // 不移除空值則將所有 undefined 值轉換為 null
   else {
     if (option.params)
       option.params = convertUndefinedToNull(option.params)
@@ -32,6 +31,17 @@ function request(option: any) {
   }
 
   const { headersType, headers, ...otherOption } = option
+  // 將headers中非字串的值轉換為字串
+  if (headers) {
+    for (const key in headers) {
+      if (typeof headers[key] !== 'string') {
+        const json = JSON.stringify(headers[key])
+        const encodedJson = encodeURIComponent(json)
+        headers[key] = encodedJson
+      }
+    }
+  }
+
   return service({
     ...otherOption,
     headers: {

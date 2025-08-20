@@ -1,11 +1,12 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
+import axios from 'axios'
+import qs from 'qs'
+
 import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/system/auth'
 import { i18n } from '@/modules/i18n'
 import { useAuthStore } from '@/store'
 import { local } from '@/utils'
-import axios from 'axios'
-import qs from 'qs'
 
 import { config } from './config'
 import * as handle from './handle'
@@ -75,6 +76,7 @@ service.interceptors.response.use(
       return handle.handleUnauthorized()
     }
 
+    // 如果是未授權的請求，則進行重新整理 Token 操作
     if (status === 401) {
       // 如果是登入請求，直接回傳錯誤
       if (url === loginUrl) {
@@ -122,17 +124,34 @@ service.interceptors.response.use(
       }
     }
 
+    // 非401錯誤，則正常顯示錯誤訊息
     else {
-      // 檢查是否需要跳過特定錯誤碼的訊息顯示
-      const skipSpecifiedErrorMessage = error.config?.headers?.['skip-specified-error-message']
+      /*
+       * 如果該介面存在需要指定的錯誤訊息，
+       * 例如400時顯示的錯誤訊息是「驗證碼錯誤或已過期」、409時顯示的錯誤訊息是「信箱或手機號碼已被綁定」
+      */
+      const specifyErrorMessageEncode = error.config?.headers?.['specify-error-message']
+      if (specifyErrorMessageEncode) {
+        // 先對指定的錯誤訊息進行解碼
+        const specifyErrorMessage = JSON.parse(decodeURIComponent(specifyErrorMessageEncode))
 
-      // 如果有設定跳過特定錯誤碼且當前狀態碼在跳過清單中，則不顯示錯誤訊息
-      const shouldSkipErrorMessage = skipSpecifiedErrorMessage
-        && (Array.isArray(skipSpecifiedErrorMessage)
-          ? skipSpecifiedErrorMessage.some(code => String(code) === String(status))
-          : String(skipSpecifiedErrorMessage) === String(status))
+        // 如果當前的錯誤狀態碼在指定的錯誤訊息中，則顯示指定的錯誤訊息
+        const currentStatus = error.response?.status
+        const foundErrorMessage = Array.isArray(specifyErrorMessage)
+          ? specifyErrorMessage.find(item => item.code === currentStatus)?.message
+          : null
 
-      if (!shouldSkipErrorMessage) {
+        // 如果找到了指定的錯誤訊息，則顯示指定的錯誤訊息
+        if (foundErrorMessage) {
+          window.$message?.error(foundErrorMessage)
+        }
+        // 否則直接顯示系統預設的錯誤訊息
+        else {
+          window.$message?.error(message)
+        }
+      }
+      // 沒有指定錯誤訊息時，顯示預設錯誤訊息
+      else {
         window.$message?.error(message)
       }
 

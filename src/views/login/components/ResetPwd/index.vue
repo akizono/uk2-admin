@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { FormInst } from 'naive-ui'
 
-import { checkUserHasMobileOrEmail, sendResetPasswordEmail, sendResetPasswordMobile, updatePassword } from '@/api/system/auth'
 import { onBeforeUnmount } from 'vue'
+
+import { checkUserHasMobileOrEmail, sendResetPasswordEmail, sendResetPasswordMobile, updatePassword } from '@/api/system/auth'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
@@ -66,11 +67,6 @@ async function checkAccount() {
 
     currentStep.value = 'verify'
   }
-  catch (error: any) {
-    if (error.status === 409) {
-      window.$message.error(t('login.checkAccountError'))
-    }
-  }
   finally {
     loading.value = false
   }
@@ -109,11 +105,6 @@ async function sendVerifyCode() {
       }
     }, 1000)
   }
-  catch (error: any) {
-    if (error.status === 400) {
-      window.$message.error(t('login.operationTooFrequent'))
-    }
-  }
   finally {
     sendCodeLoading.value = false
   }
@@ -143,11 +134,6 @@ async function handleResetPassword() {
 
       window.$message.success(t('login.resetPasswordSuccess'))
       toLogin()
-    }
-    catch (error: any) {
-      if (error.status === 400) {
-        window.$message.error(t('login.verifyCodeError'))
-      }
     }
     finally {
       loading.value = false

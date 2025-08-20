@@ -131,14 +131,6 @@ async function sendVerifyCode() {
       }
     }, 1000)
   }
-  catch (error: any) {
-    if (error.status === 400) {
-      window.$message.error(t('login.operationTooFrequent'))
-    }
-    else if (error.status === 409) {
-      window.$message.error(`${registerType.value === 'email' ? t('account.emailExist') : t('account.mobileExist')}`)
-    }
-  }
   finally {
     sendCodeLoading.value = false
   }
@@ -201,11 +193,6 @@ async function handleRegister() {
 
       window.$message.success(t('login.signUp') + t('dataTable.addSuccess'))
       toLogin()
-    }
-    catch (error: any) {
-      if (error.status === 400) {
-        window.$message.error(t('login.verifyCodeError'))
-      }
     }
     finally {
       loading.value = false

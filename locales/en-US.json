@@ -63,6 +63,7 @@
     "mobile": "Mobile",
     "mobileExist": "Mobile number already exists",
     "emailExist": "Email already exists",
+    "mobileOrEmailExist": "Mobile number or email already exists",
     "usernamePlaceholder": "Please fill in the username",
     "nicknamePlaceholder": "Please fill in the nickname",
     "sexPlaceholder": "Please select the sex",
