@@ -2,6 +2,7 @@
 import { useAuthStore } from '@/store'
 import { getDictLabel } from '@/utils'
 
+import UpdateEmailOrMobile from './components/update-email-or-mobile/index.vue'
 import UpdatePersonalInfo from './components/update-personal-info/index.vue'
 
 defineOptions({
@@ -12,6 +13,8 @@ const authStore = useAuthStore()
 
 const { user } = authStore
 const showUpdateModal = ref(false)
+const showEmailModal = ref(false)
+const showMobileModal = ref(false)
 
 function handleEditClick() {
   showUpdateModal.value = true
@@ -19,6 +22,14 @@ function handleEditClick() {
 
 function handleUpdateSuccess() {
   // 更新成功後的處理邏輯
+}
+
+function handleEditEmail() {
+  showEmailModal.value = true
+}
+
+function handleEditMobile() {
+  showMobileModal.value = true
 }
 </script>
 
@@ -59,10 +70,20 @@ function handleUpdateSuccess() {
             {{ user!.roleNames!.join('、 ') }}
           </n-descriptions-item>
           <n-descriptions-item :span="2" label="手機號碼">
-            {{ user?.mobile }}
+            {{ user?.mobile || '未綁定' }}
+            <n-button text icon-placement="right" strong @click="handleEditMobile">
+              <template #icon>
+                <icon-park-outline-edit />
+              </template>
+            </n-button>
           </n-descriptions-item>
           <n-descriptions-item :span="2" label="電子郵件">
-            {{ user?.email }}
+            {{ user?.email || '未綁定' }}
+            <n-button text icon-placement="right" strong @click="handleEditEmail">
+              <template #icon>
+                <icon-park-outline-edit />
+              </template>
+            </n-button>
           </n-descriptions-item>
         </n-descriptions>
       </n-space>
@@ -72,6 +93,22 @@ function handleUpdateSuccess() {
     <UpdatePersonalInfo
       v-model:show="showUpdateModal"
       :user="user || undefined"
+      @success="handleUpdateSuccess"
+    />
+
+    <!-- 電子郵件修改彈出視窗 -->
+    <UpdateEmailOrMobile
+      v-model:show="showEmailModal"
+      type="email"
+      :current-value="user?.email"
+      @success="handleUpdateSuccess"
+    />
+
+    <!-- 手機號碼修改彈出視窗 -->
+    <UpdateEmailOrMobile
+      v-model:show="showMobileModal"
+      type="mobile"
+      :current-value="user?.mobile"
       @success="handleUpdateSuccess"
     />
   </n-space>

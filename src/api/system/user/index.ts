@@ -54,12 +54,24 @@ export const UserApi = {
 
   /** 發送用於綁定信箱的「驗證碼」到使用者信箱 */
   sendBindEmail: async (data: { email: string }) => {
-    return await request.post({ url: '/system/user/send-bind-email', data })
+    return await request.post({
+      url: '/system/user/send-bind-email',
+      data,
+      headers: {
+        'skip-specified-error-message': [409],
+      },
+    })
   },
 
   /** 發送用於綁定手機號碼的「驗證碼」到使用者手機 */
   sendBindMobile: async (data: { mobile: string }) => {
-    return await request.post({ url: '/system/user/send-bind-mobile', data })
+    return await request.post({
+      url: '/system/user/send-bind-mobile',
+      data,
+      headers: {
+        'skip-specified-error-message': [409],
+      },
+    })
   },
 
   /** 綁定信箱或者手機 */
@@ -69,7 +81,13 @@ export const UserApi = {
     email?: string
     mobile?: string
   }) => {
-    return await request.post({ url: '/system/user/bind-email-or-mobile', data })
+    return await request.put({
+      url: '/system/user/bind-email-or-mobile',
+      data,
+      headers: {
+        'skip-specified-error-message': [400],
+      },
+    })
   },
 
   /** 修改個人資訊 */
