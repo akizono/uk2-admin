@@ -2,9 +2,7 @@
 import type { FormInst, FormRules } from 'naive-ui'
 
 import { register, sendRegisterEmail, sendRegisterMobile } from '@/api/system/auth'
-import { Regex } from '@/constants/Regex'
-import countryCallingCodes from '@/utils/constant/country-calling-codes'
-import userAgreement from '@/utils/constant/user-agreement'
+import { CountryCallingCodes, Regex, UserAgreement } from '@/constants/'
 // import { computed, h, onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
@@ -79,7 +77,7 @@ const formValue = ref({
 })
 
 // 國家選項
-const countryOptions = computed(() => Object.keys(countryCallingCodes).map((country: string) => ({
+const countryOptions = computed(() => Object.keys(CountryCallingCodes).map((country: string) => ({
   label: t(`country.${country}`),
   value: country,
   rawName: country, // 保存原始名稱，用於顯示
@@ -115,7 +113,7 @@ async function sendVerifyCode() {
     }
     else {
       // 添加國家區號前綴
-      const countryCode = countryCallingCodes[formValue.value.selectedCountry as keyof typeof countryCallingCodes]
+      const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
       const mobileWithCode = `+${countryCode}${formValue.value.mobile}`
       await sendRegisterMobile({ mobile: mobileWithCode })
       window.$message.success(t('login.mobileSentSuccess'))
@@ -149,7 +147,7 @@ onBeforeUnmount(() => {
 function showUserAgreement() {
   window.$dialog.info({
     title: t('login.userAgreement'),
-    content: () => h('div', { innerHTML: userAgreement.replace(/\n/g, '<br>') }),
+    content: () => h('div', { innerHTML: UserAgreement.replace(/\n/g, '<br>') }),
     positiveText: t('common.back'),
     onPositiveClick: () => {
       // 關閉彈出視窗
@@ -185,7 +183,7 @@ async function handleRegister() {
       }
       else {
         // 添加國家區號前綴
-        const countryCode = countryCallingCodes[formValue.value.selectedCountry as keyof typeof countryCallingCodes]
+        const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
         registerData.mobile = `+${countryCode}${formValue.value.mobile}`
       }
 
@@ -272,7 +270,7 @@ async function handleRegister() {
             v-model:value="formValue.selectedCountry"
             class="w-250px"
             :options="countryOptions"
-            :render-label="(option: {label: string, value: string, rawName: string}) => `${option.label} (+${countryCallingCodes[option.value as keyof typeof countryCallingCodes]})`"
+            :render-label="(option: {label: string, value: string, rawName: string}) => `${option.label} (+${CountryCallingCodes[option.value as keyof typeof CountryCallingCodes]})`"
             filterable
           />
           <n-input

@@ -1,4 +1,4 @@
-export default {
+export const CountryCallingCodes = {
   'Taiwan': '886',
   'Hong Kong': '852',
   'China': '86',
