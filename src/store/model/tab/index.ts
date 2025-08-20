@@ -193,6 +193,15 @@ export const useTabStore = defineStore('tab-store', {
     },
   },
   persist: {
-    storage: sessionStorage,
+    storage: {
+      getItem: (key: string) => {
+        const STORAGE_PREFIX = import.meta.env.VITE_STORAGE_PREFIX
+        return window.sessionStorage.getItem(`${STORAGE_PREFIX}${key}`)
+      },
+      setItem: (key: string, value: string) => {
+        const STORAGE_PREFIX = import.meta.env.VITE_STORAGE_PREFIX
+        return window.sessionStorage.setItem(`${STORAGE_PREFIX}${key}`, value)
+      },
+    },
   },
 })

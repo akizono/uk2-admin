@@ -1,9 +1,10 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import type { ProLayoutMode } from 'pro-naive-ui'
 
-import { router } from '@/router'
 import { colord } from 'colord'
 import { set } from 'radash'
+
+import { router } from '@/router'
 
 import { useRouteStore } from '../router'
 import themeConfig from './theme.json'
@@ -153,7 +154,17 @@ export const useAppStore = defineStore('app-store', {
     },
 
   },
+
   persist: {
-    storage: localStorage,
+    storage: {
+      getItem: (key: string) => {
+        const STORAGE_PREFIX = import.meta.env.VITE_STORAGE_PREFIX
+        return window.localStorage.getItem(`${STORAGE_PREFIX}${key}`)
+      },
+      setItem: (key: string, value: string) => {
+        const STORAGE_PREFIX = import.meta.env.VITE_STORAGE_PREFIX
+        return window.localStorage.setItem(`${STORAGE_PREFIX}${key}`, value)
+      },
+    },
   },
 })
