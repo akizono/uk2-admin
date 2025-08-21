@@ -7,6 +7,7 @@ import { UserApi } from '@/api/system/user'
 import { CountryCallingCodes } from '@/constants'
 import { Regex } from '@/constants/Regex'
 import { useAuthStore } from '@/store/model/auth'
+import { local } from '@/utils'
 
 const props = withDefaults(defineProps<{
   show: boolean
@@ -154,6 +155,12 @@ async function handleSubmit() {
 
       // 更新個人資訊
       authStore.updatePersonalInfo()
+
+      // 不再提示綁定信箱或手機
+      const noPromptToBindMobilePhoneOrEmail = local.get('noPromptToBindMobilePhoneOrEmail')
+      if (noPromptToBindMobilePhoneOrEmail) {
+        local.set('noPromptToBindMobilePhoneOrEmail', noPromptToBindMobilePhoneOrEmail.filter(item => item.userId !== authStore.user.id))
+      }
 
       emit('success')
       emit('update:show', false)

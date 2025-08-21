@@ -1,3 +1,5 @@
+import { createDiscreteApi } from 'naive-ui'
+
 import { login } from '@/api/system/auth'
 import { type Token, UserApi, type UserVo } from '@/api/system/user'
 import { router } from '@/router'
@@ -5,6 +7,8 @@ import { local } from '@/utils'
 
 import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
+
+const { dialog } = createDiscreteApi(['dialog'])
 
 export const useAuthStore = defineStore('auth-store', {
   state: () => {
@@ -53,8 +57,8 @@ export const useAuthStore = defineStore('auth-store', {
     async login(username: string, password: string) {
       const { data: result } = await login({ username, password })
 
-      // 處理登入資訊
       await this.handleLoginInfo(result)
+      this.tipsBindEmailOrMobile(result)
     },
 
     /** 處理登入後的資料 */
@@ -83,6 +87,42 @@ export const useAuthStore = defineStore('auth-store', {
       local.set('accessToken', token.accessToken)
       local.set('refreshToken', token.refreshToken)
       this.accessToken = token.accessToken
+    },
+
+    /** 提示使用者綁定信箱或者手機 */
+    tipsBindEmailOrMobile(user: UserVo) {
+      if (!user.email && !user.mobile) {
+        // 檢查是否已經忽略提示
+        const noPromptToBindMobilePhoneOrEmail = local.get('noPromptToBindMobilePhoneOrEmail')
+        if (noPromptToBindMobilePhoneOrEmail && noPromptToBindMobilePhoneOrEmail.find(item => item.userId === user.id)?.value) {
+          return
+        }
+
+        setTimeout(() => {
+          dialog.warning({
+            title: '提示',
+            content: `為了更方便地找回密碼，建議您先綁定信箱或手機喔！`,
+            positiveText: '前往綁定',
+            negativeText: '不再提示',
+            maskClosable: false,
+            // 前往綁定
+            onPositiveClick: () => {
+              router.push('/system/userCenter')
+            },
+            // 不再提示
+            onNegativeClick: () => {
+              if (noPromptToBindMobilePhoneOrEmail) {
+                noPromptToBindMobilePhoneOrEmail.filter(item => item.userId !== user.id)
+                noPromptToBindMobilePhoneOrEmail.push({ userId: user.id!, value: true })
+                local.set('noPromptToBindMobilePhoneOrEmail', noPromptToBindMobilePhoneOrEmail)
+              }
+              else {
+                local.set('noPromptToBindMobilePhoneOrEmail', [{ userId: user.id!, value: true }])
+              }
+            },
+          })
+        }, 700)
+      }
     },
 
     /** 獲取個人資訊 */

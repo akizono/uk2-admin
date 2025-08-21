@@ -22,6 +22,8 @@ interface Local {
   loginAccount: any
   /* 儲存當前語言 */
   languageCurrent: string
+  /* 下次登入時是否提示「綁定信箱或手機」 */
+  noPromptToBindMobilePhoneOrEmail: { userId: string, value: boolean }[]
 }
 
 /** 設定storage的前綴 */
