@@ -44,7 +44,7 @@
     "postcss"
   ],
   "i18n-ally.sourceLanguage": "zh-TW",
-  "i18n-ally.displayLanguage": "zh_CN",
+  "i18n-ally.displayLanguage": "zh-TW",
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.editor.preferEditor": true,
   "i18n-ally.keystyle": "nested",
