@@ -87,7 +87,15 @@
     "accountOrPasswordError": "Account or password error",
     "role": "Role",
     "roleRule": "Please select the role",
-    "rolePlaceholder": "Please select the role"
+    "rolePlaceholder": "Please select the role",
+    "ageRuleTip": "Age cannot be less than 0 years",
+    "ageRuleTip2": "Age cannot be greater than 127 years",
+    "mobileRuleTip": "Mobile number must start with \"+\"",
+    "mobileRuleTip2": "The \"+\" sign must be followed by a number (country code)",
+    "mobileRuleTip3": "The country code must be followed by a space",
+    "mobileRuleTip4": "The space must be followed by a number",
+    "mobileRuleTip5": "The mobile number cannot have consecutive spaces",
+    "mobileRuleTip6": "The mobile number can only contain numbers or spaces"
   },
   "dictionary": {
     "dictName": "Dictionary name",

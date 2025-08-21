@@ -114,7 +114,7 @@ async function sendVerifyCode() {
     else {
       // 添加國家區號前綴
       const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
-      const mobileWithCode = `+${countryCode}${formValue.value.mobile}`
+      const mobileWithCode = `+${countryCode} ${formValue.value.mobile}`
       await sendRegisterMobile({ mobile: mobileWithCode })
       window.$message.success(t('login.mobileSentSuccess'))
     }
@@ -141,6 +141,32 @@ onBeforeUnmount(() => {
     countdownTimer.value = null
   }
 })
+
+// 驗證手機號碼輸入，只允許數字和空格
+function validateMobileInput(value: string) {
+  // 移除非數字和空格的字元
+  const sanitizedValue = value.replace(/[^0-9\s]/g, '')
+
+  // 確保第一個字元是數字
+  if (sanitizedValue.length > 0 && !/^\d/.test(sanitizedValue)) {
+    formValue.value.mobile = ''
+    return
+  }
+
+  // 如果輸入已被清理，更新輸入框的值
+  if (sanitizedValue !== value) {
+    formValue.value.mobile = sanitizedValue
+  }
+}
+
+// 防止輸入非數字和空格的字元
+function preventNonNumericInput(event: KeyboardEvent) {
+  // 允許數字、空格、退格、方向鍵等控制鍵
+  if (!/[0-9\s]/.test(event.key)
+    && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)) {
+    event.preventDefault()
+  }
+}
 
 // 處理註冊
 // 顯示用戶協議
@@ -184,7 +210,7 @@ async function handleRegister() {
       else {
         // 添加國家區號前綴
         const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
-        registerData.mobile = `+${countryCode}${formValue.value.mobile}`
+        registerData.mobile = `+${countryCode} ${formValue.value.mobile}`
       }
 
       await register(registerData)
@@ -277,6 +303,8 @@ async function handleRegister() {
             v-model:value="formValue.mobile"
             clearable
             :placeholder="$t('account.mobilePlaceholder')"
+            @input="validateMobileInput"
+            @keydown="preventNonNumericInput"
           />
         </n-input-group>
         <template #help>

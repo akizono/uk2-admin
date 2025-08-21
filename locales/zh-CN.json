@@ -87,7 +87,15 @@
     "accountOrPasswordError": "账号或密码错误",
     "role": "角色",
     "roleRule": "请选择角色",
-    "rolePlaceholder": "请选择角色"
+    "rolePlaceholder": "请选择角色",
+    "ageRuleTip": "年龄不能小于0岁",
+    "ageRuleTip2": "年龄不能超过127岁",
+    "mobileRuleTip": "手机号必须以「+」加号开头",
+    "mobileRuleTip2": "「+」加号后面必须紧跟数字（国码）",
+    "mobileRuleTip3": "国码后面必须紧跟着一个空格",
+    "mobileRuleTip4": "空格后必须紧跟数字",
+    "mobileRuleTip5": "手机号码中不能有连续的空格",
+    "mobileRuleTip6": "手机号码只能包含数字或空格"
   },
   "dictionary": {
     "dictName": "字典名称",

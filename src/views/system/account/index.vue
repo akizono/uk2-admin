@@ -4,13 +4,14 @@ import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
+import { NSwitch } from 'naive-ui'
+
 import { DeptApi } from '@/api/system/dept'
 import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { createCopyableDialog } from '@/utils/dialog'
-import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'User Management',
@@ -230,8 +231,8 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: t('account.mobile'),
     type: 'input',
-    placeholder: '+886912345678',
-    helpInfo: '需要填寫完整的號碼，包含「+」和「國碼」',
+    placeholder: '+886 912345678',
+    helpInfo: t('account.mobileHelpInfo'),
   },
   {
     name: 'deptId',
@@ -285,11 +286,20 @@ const rules: FormRules = {
     message: t('account.nicknameRule'),
     trigger: ['blur', 'input'],
   },
-  age: {
-    type: 'number',
-    message: t('account.ageRule'),
-    trigger: ['blur', 'input'],
-  },
+  age: [
+    {
+      validator: (rule, value) => {
+        if (value < 0) {
+          return new Error(t('account.ageRuleTip'))
+        }
+        if (value > 127) {
+          return new Error(t('account.ageRuleTip2'))
+        }
+        return true
+      },
+      trigger: ['input', 'blur'],
+    },
+  ],
   sex: {
     type: 'number',
     message: t('account.sexRule'),
@@ -301,7 +311,30 @@ const rules: FormRules = {
     trigger: ['blur', 'input'],
   },
   mobile: {
-    message: t('account.mobileRule'),
+    validator: (rule: any, value: string) => {
+      if (!value)
+        return true
+
+      if (!/^\+/.test(value))
+        return new Error(t('account.mobileRuleTip'))
+
+      if (!/^\+\d+/.test(value))
+        return new Error(t('account.mobileRuleTip2'))
+
+      if (!/^\+\d+ /.test(value))
+        return new Error(t('account.mobileRuleTip3'))
+
+      if (!/^\+\d+ \d/.test(value))
+        return new Error(t('account.mobileRuleTip4'))
+
+      if (/ {2}/.test(value))
+        return new Error(t('account.mobileRuleTip5'))
+
+      if (!/^\+\d+ [\d ]+$/.test(value))
+        return new Error(t('account.mobileRuleTip6'))
+
+      return true
+    },
     trigger: ['blur', 'input'],
   },
   roleIds: {
@@ -347,6 +380,7 @@ const options = {
   initFormData, // 初始化表單數據
 
   /** 其他配置 */
+  modalWidth: '1000px',
   modalName: t('account.user'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置

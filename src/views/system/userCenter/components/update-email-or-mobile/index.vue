@@ -4,6 +4,7 @@ import type { FormInst } from 'naive-ui'
 import { onBeforeUnmount } from 'vue'
 
 import { UserApi } from '@/api/system/user'
+import { CountryCallingCodes } from '@/constants'
 import { Regex } from '@/constants/Regex'
 import { useAuthStore } from '@/store/model/auth'
 
@@ -11,7 +12,6 @@ const props = withDefaults(defineProps<{
   show: boolean
   type: VerifyCodeType
   currentValue?: string
-
 }>(), {
   show: false,
   type: 'email',
@@ -24,12 +24,13 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-// const { t } = useI18n()
+const { t } = useI18n()
 
 const formRef = ref<FormInst | null>(null)
 const formValue = ref({
   value: '',
   verifyCode: '',
+  selectedCountry: 'Taiwan', // 預設選擇台灣
 })
 
 const loading = ref(false)
@@ -91,7 +92,10 @@ async function sendVerifyCode() {
       window.$message.success('驗證碼已發送至您的電子郵件')
     }
     else {
-      await UserApi.sendBindMobile({ mobile: formValue.value.value })
+      // 添加國家區號前綴
+      const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
+      const mobileWithCode = `+${countryCode} ${formValue.value.value}`
+      await UserApi.sendBindMobile({ mobile: mobileWithCode })
       window.$message.success('驗證碼已發送至您的手機')
     }
 
@@ -135,10 +139,14 @@ async function handleSubmit() {
         verifyCodeType: props.type as VerifyCodeType,
       }
 
-      if (props.type === 'email')
+      if (props.type === 'email') {
         data.email = formValue.value.value
-      else
-        data.mobile = formValue.value.value
+      }
+      else {
+        // 添加國家區號前綴
+        const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
+        data.mobile = `+${countryCode} ${formValue.value.value}`
+      }
 
       await UserApi.bindEmailOrMobile(data)
 
@@ -160,12 +168,46 @@ function handleCancel() {
   emit('update:show', false)
 }
 
+// 驗證手機號碼輸入，只允許數字和空格
+function validateMobileInput(value: string) {
+  // 移除非數字和空格的字元
+  const sanitizedValue = value.replace(/[^0-9\s]/g, '')
+
+  // 確保第一個字元是數字
+  if (sanitizedValue.length > 0 && !/^\d/.test(sanitizedValue)) {
+    formValue.value.value = ''
+    return
+  }
+
+  // 如果輸入已被清理，更新輸入框的值
+  if (sanitizedValue !== value) {
+    formValue.value.value = sanitizedValue
+  }
+}
+
+// 防止輸入非數字和空格的字元
+function preventNonNumericInput(event: KeyboardEvent) {
+  // 允許數字、空格、退格、方向鍵等控制鍵
+  if (!/[0-9\s]/.test(event.key)
+    && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)) {
+    event.preventDefault()
+  }
+}
+
+// 國家選項
+const countryOptions = computed(() => Object.keys(CountryCallingCodes).map((country: string) => ({
+  label: t(`country.${country}`),
+  value: country,
+  rawName: country, // 保存原始名稱，用於顯示
+})))
+
 // 初始化表單數據
 watch(() => props.show, (newVal) => {
   if (newVal) {
     formValue.value = {
       value: '',
       verifyCode: '',
+      selectedCountry: 'Taiwan', // 預設選擇台灣
     }
   }
 }, { immediate: true })
@@ -193,9 +235,27 @@ watch(() => props.show, (newVal) => {
           </n-form-item>
           <n-form-item :label="type === 'email' ? '新電子郵件' : '新手機號碼'" path="value">
             <n-input
+              v-if="type === 'email'"
               v-model:value="formValue.value"
-              :placeholder="type === 'email' ? '請輸入新電子郵件' : '請輸入新手機號碼'"
+              placeholder="請輸入新電子郵件"
             />
+            <div v-else>
+              <n-input-group>
+                <n-select
+                  v-model:value="formValue.selectedCountry"
+                  class="w-350px"
+                  :options="countryOptions"
+                  :render-label="(option: {label: string, value: string, rawName: string}) => `${option.label} (+${CountryCallingCodes[option.value as keyof typeof CountryCallingCodes]})`"
+                  filterable
+                />
+                <n-input
+                  v-model:value="formValue.value"
+                  placeholder="請輸入新手機號碼"
+                  @input="validateMobileInput"
+                  @keydown="preventNonNumericInput"
+                />
+              </n-input-group>
+            </div>
           </n-form-item>
           <n-form-item label="驗證碼" path="verifyCode">
             <n-input-group>
