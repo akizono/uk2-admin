@@ -107,4 +107,17 @@ export const UserApi = {
   getPersonalInfo: async (): ApiResponse<UserVo> => {
     return await request.get({ url: '/system/user/get-personal-info' })
   },
+
+  /** 修改個人密碼 */
+  updatePersonalPassword: async (data: { oldPassword: string, newPassword: string }) => {
+    return await request.put({
+      url: '/system/user/update-personal-password',
+      data,
+      headers: {
+        'specify-error-message': [
+          { code: 400, message: '舊密碼錯誤' },
+        ],
+      },
+    })
+  },
 }

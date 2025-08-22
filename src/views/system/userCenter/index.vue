@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store'
 import { getDictLabel } from '@/utils'
 
 import UpdateEmailOrMobile from './components/update-email-or-mobile/index.vue'
+import UpdatePassword from './components/update-password/index.vue'
 import UpdatePersonalInfo from './components/update-personal-info/index.vue'
 
 defineOptions({
@@ -15,6 +16,7 @@ const { user } = authStore
 const showUpdateModal = ref(false)
 const showEmailModal = ref(false)
 const showMobileModal = ref(false)
+const showPasswordModal = ref(false)
 
 function handleEditClick() {
   showUpdateModal.value = true
@@ -30,6 +32,10 @@ function handleEditEmail() {
 
 function handleEditMobile() {
   showMobileModal.value = true
+}
+
+function handleEditPassword() {
+  showPasswordModal.value = true
 }
 </script>
 
@@ -85,6 +91,14 @@ function handleEditMobile() {
               </template>
             </n-button>
           </n-descriptions-item>
+          <n-descriptions-item :span="2" label="登錄密碼">
+            已設置
+            <n-button text icon-placement="right" strong @click="handleEditPassword">
+              <template #icon>
+                <icon-park-outline-edit />
+              </template>
+            </n-button>
+          </n-descriptions-item>
         </n-descriptions>
       </n-space>
     </n-card>
@@ -109,6 +123,12 @@ function handleEditMobile() {
       v-model:show="showMobileModal"
       type="mobile"
       :current-value="user?.mobile"
+      @success="handleUpdateSuccess"
+    />
+
+    <!-- 密碼修改彈出視窗 -->
+    <UpdatePassword
+      v-model:show="showPasswordModal"
       @success="handleUpdateSuccess"
     />
   </n-space>
