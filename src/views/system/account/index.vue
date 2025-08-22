@@ -4,7 +4,7 @@ import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
+import { NButton, NSwitch } from 'naive-ui'
 
 import { DeptApi } from '@/api/system/dept'
 import { RoleApi } from '@/api/system/role'
@@ -12,6 +12,8 @@ import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { createCopyableDialog } from '@/utils/dialog'
+
+import UpdatePassword from './components/update-password/index.vue'
 
 defineOptions({
   name: 'User Management',
@@ -22,6 +24,10 @@ const { t } = useI18n()
 const { hasPermi } = usePermi()
 
 const dataTableRef = ref()
+
+// 修改密碼彈出視窗
+const showPasswordModal = ref(false)
+const currentUser = ref<UserVo>({ })
 
 /** 處理 Modal 提交成功後返回的數據 */
 function handleCreateSuccess(params: TableRow) {
@@ -175,6 +181,25 @@ const columns: DataTableColumns<UserVo> = [
         >
           {{ checked: () => t('common.enable'), unchecked: () => t('common.disable') }}
         </NSwitch>
+      )
+    },
+  },
+  {
+    title: t('common.action'),
+    key: 'actions',
+    width: '400px',
+    render: (row: UserVo) => {
+      return (
+        <NButton
+          disabled={row.status === 0}
+          size="small"
+          onClick={() => {
+            currentUser.value = row
+            showPasswordModal.value = true
+          }}
+        >
+          修改密碼
+        </NButton>
       )
     },
   },
@@ -388,8 +413,17 @@ const options = {
 </script>
 
 <template>
-  <DataTable
-    v-bind="options"
-    @create-success="handleCreateSuccess"
-  />
+  <div>
+    <DataTable
+      v-bind="options"
+      @create-success="handleCreateSuccess"
+    />
+
+    <!-- 修改密碼彈出視窗 -->
+    <UpdatePassword
+      v-model:show="showPasswordModal"
+      :current-user="currentUser"
+      @success="dataTableRef.value?.refresh()"
+    />
+  </div>
 </template>

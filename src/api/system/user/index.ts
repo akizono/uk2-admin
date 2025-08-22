@@ -6,18 +6,18 @@ export interface Token {
 }
 
 export interface UserVo extends Api.BaseVO {
-  id?: string
-  username?: string
-  nickname?: string
-  age?: number
-  sex?: number
-  email?: string
-  mobile?: string
-  avatar?: string
+  id: string
+  username: string
+  nickname: string
+  age: number
+  sex: number
+  email: string
+  mobile: string
+  avatar: string
 
-  role?: string[]
-  roleIds?: string[]
-  roleNames?: string[]
+  role: string[]
+  roleIds: string[]
+  roleNames: string[]
   token?: Token
 }
 
@@ -33,7 +33,7 @@ export const UserApi = {
   },
 
   /** 修改使用者個人資訊 */
-  updateUser: async (data: UserVo) => {
+  updateUser: async (data: Partial<UserVo> & { password?: string }) => {
     return await request.put({ url: '/system/user/update', data, isFilterEmpty: false })
   },
 
