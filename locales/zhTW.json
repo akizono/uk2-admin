@@ -582,5 +582,10 @@
     "Turks and Caicos Islands": "特克斯和凱科斯群島",
     "U_S_Virgin_Islands": "美屬維京群島",
     "Wallis and Futuna": "瓦利斯和富圖納群島"
+  },
+  "language": {
+    "enUS": "美式英文",
+    "zhTW": "繁體中文",
+    "zhCN": "簡體中文"
   }
 }

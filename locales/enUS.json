@@ -582,5 +582,10 @@
     "Turks and Caicos Islands": "Turks and Caicos Islands",
     "U_S_Virgin_Islands": "U.S. Virgin Islands",
     "Wallis and Futuna": "Wallis and Futuna"
+  },
+  "language": {
+    "enUS": "American English",
+    "zhTW": "Traditional Chinese ",
+    "zhCN": "Simplified Chinese"
   }
 }

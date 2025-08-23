@@ -1,7 +1,7 @@
-import { LanguageApi } from '@/api/system/language'
-import { router } from '@/router'
-import { local, session, setLocale } from '@/utils'
 import { createDiscreteApi } from 'naive-ui'
+
+import { language } from '@/modules/i18n'
+import { $t, local, session, setLocale } from '@/utils'
 
 import { useTabStore } from '../tab'
 
@@ -72,36 +72,13 @@ export const useLanguageStore = defineStore('language-store', {
 
     /** 獲取語言列表 */
     async getLanguageList() {
-      const { data: result } = await LanguageApi.getLanguagePage({
-        pageSize: 0,
-        status: 1,
-      })
-
-      // 檢查列表中是否包含系統預設語言
-      const isDefaultLang = result.list.find(item => item.code === VITE_DEFAULT_LANG)
-      if (!isDefaultLang) {
-        local.remove('languageCurrent')
-
-        // 路由跳轉到404頁面
-        const tipText = `
-          <div>語言列表介面缺失系統預設語言，您有兩個處理方法</div>
-          <div>1、修改「 .env -> VITE_DEFAULT_LANG 」</div>
-          <div>2、調整語言列表介面，將系統預設語言添加到列表中</div>
-        `
-        router.push({
-          path: '/error',
-          query: {
-            tipText: encodeURIComponent(tipText),
-          },
+      for (const key in language) {
+        this.list.push({
+          value: key,
+          label: $t(`language.${key}`),
         })
       }
-      else {
-        this.list = result.list.map(item => ({
-          value: item.code,
-          label: item.name,
-        }))
-        session.set('languageList', this.list)
-      }
+      session.set('languageList', this.list)
     },
   },
 })
