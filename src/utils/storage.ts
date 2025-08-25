@@ -1,4 +1,5 @@
 import type { UserVo } from '@/api/system/user'
+import type { Language } from '@/modules/i18n'
 
 interface DictMap {
   [key: string]: import('@/store/model/dict').DictItem[]
@@ -21,7 +22,7 @@ interface Local {
   /* 儲存登入帳號 */
   loginAccount: any
   /* 儲存當前語言 */
-  languageCurrent: string
+  languageCurrent: Language
   /* 下次登入時是否提示「綁定信箱或手機」 */
   noPromptToBindMobilePhoneOrEmail: { userId: string, value: boolean }[]
 }

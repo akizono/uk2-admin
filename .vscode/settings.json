@@ -43,8 +43,8 @@
     "pcss",
     "postcss"
   ],
-  "i18n-ally.sourceLanguage": "zh-TW",
-  "i18n-ally.displayLanguage": "zh-TW",
+  "i18n-ally.sourceLanguage": "zhTW",
+  "i18n-ally.displayLanguage": "zhTW",
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.editor.preferEditor": true,
   "i18n-ally.keystyle": "nested",

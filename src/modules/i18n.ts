@@ -10,6 +10,7 @@ import zhTW from '../../locales/zhTW.json'
 
 const { VITE_DEFAULT_LANG } = import.meta.env
 
+export type Language = 'enUS' | 'zhTW' | 'zhCN'
 export const language = {
   enUS,
   zhTW,

@@ -1,10 +1,11 @@
+import type { Language } from '@/modules/i18n'
 import type { NDateLocale, NLocale } from 'naive-ui'
 
 import { dateEnUS, dateZhCN, dateZhTW, enUS, zhCN, zhTW } from 'naive-ui'
 
 import { i18n } from '@/modules/i18n'
 
-export function setLocale(locale: 'enUS' | 'zhTW' | 'zhCN') {
+export function setLocale(locale: Language) {
   i18n.global.locale.value = locale
 }
 

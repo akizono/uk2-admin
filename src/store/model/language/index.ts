@@ -1,3 +1,5 @@
+import type { Language } from '@/modules/i18n'
+
 import { createDiscreteApi } from 'naive-ui'
 
 import { language } from '@/modules/i18n'
@@ -5,7 +7,7 @@ import { $t, local, session, setLocale } from '@/utils'
 
 import { useTabStore } from '../tab'
 
-const { VITE_DEFAULT_LANG } = import.meta.env
+const { VITE_DEFAULT_LANG } = import.meta.env as { VITE_DEFAULT_LANG: Language }
 const { dialog } = createDiscreteApi(['dialog'])
 
 export const useLanguageStore = defineStore('language-store', {
@@ -38,7 +40,7 @@ export const useLanguageStore = defineStore('language-store', {
   },
   actions: {
     /** 設置語言 */
-    setAppLang(lang: string) {
+    setAppLang(lang: Language) {
       dialog.warning({
         title: '警告',
         content: '確定要切換語言嗎？切換後頁面將會重新整理',
