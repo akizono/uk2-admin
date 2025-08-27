@@ -3,10 +3,9 @@ import type { MenuOption } from 'naive-ui'
 import { MenuApi } from '@/api/system/menu'
 import { router } from '@/router'
 import { $t, local } from '@/utils'
+import { defaultLang } from '@/utils/tools/defaultLang'
 
 import { createMenus, createRoutes, generateCacheRoutes } from './helper'
-
-const { VITE_DEFAULT_LANG } = import.meta.env
 
 interface RoutesStatus {
   isInitAuthRoute: boolean
@@ -49,7 +48,7 @@ export const useRouteStore = defineStore('route-store', {
 
       // 處理路由
       const newRowRoutes: AppRoute.RowRoute[] = []
-      const languageCurrent = local.get('languageCurrent') || VITE_DEFAULT_LANG
+      const languageCurrent = local.get('languageCurrent') || defaultLang()
       data.list.forEach((item) => {
         // 處理多語言
         if (item.multilingualFields) {

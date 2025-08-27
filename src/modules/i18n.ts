@@ -3,12 +3,11 @@ import type { App } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import { local } from '@/utils'
+import { defaultLang } from '@/utils/tools/defaultLang'
 
 import enUS from '../../locales/enUS.json'
 import zhCN from '../../locales/zhCN.json'
 import zhTW from '../../locales/zhTW.json'
-
-const { VITE_DEFAULT_LANG } = import.meta.env
 
 export type Language = 'enUS' | 'zhTW' | 'zhCN'
 export const language = {
@@ -19,7 +18,7 @@ export const language = {
 
 export const i18n = createI18n({
   legacy: false,
-  locale: local.get('languageCurrent') || VITE_DEFAULT_LANG, // 默認顯示語言
+  locale: local.get('languageCurrent') || defaultLang(), // 默認顯示語言
   fallbackLocale: 'enUS',
   messages: language,
 

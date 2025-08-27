@@ -4,15 +4,15 @@ import { createDiscreteApi } from 'naive-ui'
 
 import { language } from '@/modules/i18n'
 import { $t, local, session, setLocale } from '@/utils'
+import { defaultLang } from '@/utils/tools/defaultLang'
 
 import { useTabStore } from '../tab'
 
-const { VITE_DEFAULT_LANG } = import.meta.env as { VITE_DEFAULT_LANG: Language }
 const { dialog } = createDiscreteApi(['dialog'])
 
 export const useLanguageStore = defineStore('language-store', {
   state: () => {
-    const current = local.get('languageCurrent') || VITE_DEFAULT_LANG
+    const current = local.get('languageCurrent') || defaultLang()
     // 在 state 初始化時就設置語言
     setLocale(current)
 
@@ -68,7 +68,7 @@ export const useLanguageStore = defineStore('language-store', {
 
     /** 初始化語言設定 */
     initLanguage() {
-      const current = local.get('languageCurrent') || VITE_DEFAULT_LANG
+      const current = local.get('languageCurrent') || defaultLang()
       this.setAppLang(current)
     },
 
