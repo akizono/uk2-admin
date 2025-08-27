@@ -48,16 +48,6 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/error',
-    name: 'error',
-    component: () => import('@/views/error/error/index.vue'),
-    meta: {
-      title: '錯誤頁面',
-      icon: 'icon-park-outline:close-wifi',
-      withoutTab: true,
-    },
-  },
-  {
     path: '/:pathMatch(.*)*',
     component: () => import('@/views/error/404/index.vue'),
     name: 'notFound',
