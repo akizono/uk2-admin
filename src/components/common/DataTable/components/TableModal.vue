@@ -341,17 +341,25 @@ watch(formData, (newVal) => {
   })
 }, { deep: true })
 
-// 監聽 type 值的變化，清除不符合顯示條件的表單項目值
+// 監聽 type 值的變化，處理表單項目值
 watch(() => formData.value.type, (newType) => {
   if (newType === undefined)
     return
 
   // 遍歷所有表單項目
   Object.entries(formDataMapping.value).forEach(([key, item]) => {
-    // 如果有 showCondition 且條件不滿足
-    if (item.showCondition && !evaluateShowCondition(item.showCondition, formData.value)) {
-      // 清除該表單項目的值
-      formData.value[key] = undefined
+    // 如果有 showCondition
+    if (item.showCondition) {
+      const conditionMet = evaluateShowCondition(item.showCondition, formData.value)
+
+      // 如果條件不滿足，清除該表單項目的值
+      if (!conditionMet) {
+        formData.value[key] = undefined
+      }
+      // 如果條件滿足但值為 undefined，恢復預設值
+      else if (formData.value[key] === undefined) {
+        formData.value[key] = item.value
+      }
     }
   })
 })
