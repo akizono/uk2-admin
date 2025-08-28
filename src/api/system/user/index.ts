@@ -1,3 +1,5 @@
+import type { DeptVO } from '../dept'
+
 import request from '@/utils/request'
 
 export interface Token {
@@ -14,6 +16,10 @@ export interface UserVo extends Api.BaseVO {
   email: string
   mobile: string
   avatar: string
+
+  dept: DeptVO
+  deptId: string
+  deptName: string
 
   role: string[]
   roleIds: string[]

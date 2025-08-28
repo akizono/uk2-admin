@@ -215,7 +215,7 @@ const initFormData: InitFormData[] = [
   },
   {
     name: 'isCache',
-    value: undefined,
+    value: 1,
     span: 1,
     label: t('menu.isCache'),
     type: 'switch',
@@ -227,7 +227,7 @@ const initFormData: InitFormData[] = [
   },
   {
     name: 'isShowTab',
-    value: undefined,
+    value: 1,
     span: 1,
     label: t('menu.isShowTab'),
     type: 'switch',
