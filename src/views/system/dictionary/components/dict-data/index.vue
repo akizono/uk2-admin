@@ -1,14 +1,18 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import type { DictTypeVO } from '@/api/system/dict-type'
 import type { InitFormData } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
 import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
+import { usePermi } from '@/hooks'
 import { wrapOptionsToPromise } from '@/utils/initFormData'
+import { NSwitch } from 'naive-ui'
 
 const { t } = useI18n()
+const { hasPermi } = usePermi()
+
 const modalRef = ref()
-// const dataTableRef = ref()
+const dataTableRef = ref()
 const modalTitle = ref('')
 const filterColumnValue = ref<string>('')
 
@@ -56,6 +60,9 @@ const columns: DataTableColumns<DictDataVO> = [
     title: t('common.status'),
     align: 'center',
     key: 'status',
+    render: (row: DictTypeVO) => {
+      return <NSwitch disabled={!hasPermi(row.status === 1 ? permission.block : permission.unblock)} value={row.status === 1} onUpdateValue={value => dataTableRef.value.handleStatusChange(row, value)} />
+    },
   },
 ]
 
@@ -216,6 +223,7 @@ const options = {
 
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
+
   getFunction: DictDataApi.getDictDataPage, // 獲取表格數據的 API
   deleteFunction: DictDataApi.deleteDictData, // 刪除表格數據的 API
   updateFunction: DictDataApi.updateDictData, // 更新表格數據的 API
