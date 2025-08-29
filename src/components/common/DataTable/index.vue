@@ -50,6 +50,7 @@ const props = defineProps<{
   columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
+
   getFunction: (...args: any[]) => Promise<any> // 獲取列表數據的函數
   deleteFunction?: (...args: any[]) => Promise<any> // 刪除列表數據的函數
   updateFunction?: (...args: any[]) => Promise<any> // 更新列表數據的函數（傳遞到 Modal）
@@ -57,6 +58,8 @@ const props = defineProps<{
 
   blockFunction?: (...args: any[]) => Promise<any> // 封鎖列表數據的函數
   unblockFunction?: (...args: any[]) => Promise<any> // 解封鎖列表數據的函數
+
+  getFunctionExtraParams?: Record<string, any> // 獲取列表數據的函數的額外參數（每次獲取列表數據的時候都會帶著這個參數）
 
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
