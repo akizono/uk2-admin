@@ -157,6 +157,23 @@ export interface InitFormData {
   }
   /** 是否多語言 */
   multilingual?: boolean
+  /**
+   * 日期轉換格式(僅在View模式下生效)
+   * 格式參考: https://www.naiveui.com/zh-CN/os-theme/components/time#format.vue
+   */
+  dateFormat?: string
+  /**
+   * 控制欄位在不同模式下的顯示狀態
+   * 若不設置或為空，則預設在所有模式下都顯示
+   */
+  showInMode?: {
+    /** 是否在檢視模式下顯示 */
+    view?: boolean
+    /** 是否在新增模式下顯示 */
+    add?: boolean
+    /** 是否在編輯模式下顯示 */
+    edit?: boolean
+  }
 }
 
 /** 彈出視窗類型 */

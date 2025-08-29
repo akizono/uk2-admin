@@ -820,12 +820,21 @@ function closeModal() {
       <template v-if="modalType === 'view'">
         <n-descriptions :column="2" bordered label-placement="left">
           <template v-for="(item, key) in formDataMapping" :key="key">
-            <n-descriptions-item v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)" :label="item.label" :span="item.span || 1">
+            <n-descriptions-item
+              v-if="!item.hidden
+                && evaluateShowCondition(item.showCondition, formData)
+                && (item.showInMode === undefined || item.showInMode.view === undefined || item.showInMode.view)"
+              :label="item.label"
+              :span="item.span || 1"
+            >
               <template v-if="item.type === 'switch'">
                 {{ formData[item.name] === 1 ? $t('common.enable') : $t('common.disable') }}
               </template>
               <template v-else-if="item.dictType">
                 <AsyncDictLabel :dict-type="item.dictType" :value="formData[item.name]" />
+              </template>
+              <template v-else-if="item.dateFormat">
+                <n-time :time="new Date(formData[item.name])" :format="item.dateFormat" />
               </template>
               <template v-else>
                 {{ formData[item.name] }}
@@ -839,7 +848,12 @@ function closeModal() {
         <n-grid :cols="2" :x-gap="18">
           <template v-for="item in formDataMapping" :key="item.name">
             <n-form-item-grid-item
-              v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)"
+              v-if="!item.hidden
+                && evaluateShowCondition(item.showCondition, formData)
+                && (item.showInMode === undefined
+                  || (modalType === 'add' ? (item.showInMode.add === undefined || item.showInMode.add)
+                    : (item.showInMode.edit === undefined || item.showInMode.edit))
+                )"
               :span="item.span"
               :path="item.name"
             >
