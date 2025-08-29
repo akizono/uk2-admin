@@ -31,7 +31,7 @@ export const MultilingualFieldsApi = {
 
   /** 修改多語言欄位 */
   updateMultilingualFields: async (data: MultilingualFieldsVO) => {
-    return await request.put({ url: '/system/multilingual-fields/update', data, isFilterEmpty: false })
+    return await request.put({ url: '/system/multilingual-fields/update', data })
   },
 
   /** 批次修改多語言欄位 */

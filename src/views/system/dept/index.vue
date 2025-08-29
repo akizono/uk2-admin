@@ -2,11 +2,12 @@
 import type { DeptVO } from '@/api/system/dept'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
+import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
+
 import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
-import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Department Management',

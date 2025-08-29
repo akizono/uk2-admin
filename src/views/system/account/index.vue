@@ -4,13 +4,14 @@ import type { UserVo } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
+import { NButton, NSwitch } from 'naive-ui'
+
 import { DeptApi } from '@/api/system/dept'
 import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { createCopyableDialog } from '@/utils/dialog'
-import { NButton, NSwitch } from 'naive-ui'
 
 import UpdatePassword from './components/update-password/index.vue'
 
@@ -209,7 +210,13 @@ const initFormData: InitFormData[] = [
   {
     name: 'id',
     value: undefined,
-    hidden: true,
+    span: 2,
+    label: 'ID',
+    showInMode: {
+      view: true,
+      add: false,
+      edit: false,
+    },
   },
   {
     name: 'username',

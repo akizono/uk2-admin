@@ -1,11 +1,13 @@
 <script setup lang="tsx">
 import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
+import type { DataTableColumns, FormRules } from 'naive-ui'
+
+import { NSwitch } from 'naive-ui'
 
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
-import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
@@ -100,7 +102,13 @@ const initFormData: InitFormData[] = [
   {
     name: 'id',
     value: undefined,
-    hidden: true,
+    span: 2,
+    label: 'ID',
+    showInMode: {
+      view: true,
+      add: false,
+      edit: false,
+    },
   },
   {
     name: 'parentId',
