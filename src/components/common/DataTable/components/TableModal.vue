@@ -4,6 +4,7 @@ import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
+import AsyncDictLabel from '@/components/common/AsyncDictLabel/index.vue'
 import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
 import { useLanguageStore } from '@/store/model/language'
@@ -822,6 +823,9 @@ function closeModal() {
             <n-descriptions-item v-if="!item.hidden && evaluateShowCondition(item.showCondition, formData)" :label="item.label" :span="item.span || 1">
               <template v-if="item.type === 'switch'">
                 {{ formData[item.name] === 1 ? $t('common.enable') : $t('common.disable') }}
+              </template>
+              <template v-else-if="item.dictType">
+                <AsyncDictLabel :dict-type="item.dictType" :value="formData[item.name]" />
               </template>
               <template v-else>
                 {{ formData[item.name] }}
