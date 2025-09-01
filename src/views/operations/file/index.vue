@@ -5,6 +5,7 @@ import type { DataTableColumns } from 'naive-ui'
 
 import { FileApi } from '@/api/operations/file'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { downloadFile } from '@/utils/download'
 import { NButton } from 'naive-ui'
 
 import PreviewModal from './components/preview/index.vue'
@@ -69,9 +70,9 @@ const columns: DataTableColumns<FileVO> = [
           <NButton size="small" onClick={() => previewModalRef.value.openModal(row)}>
             預覽
           </NButton>
-          {/* <NButton size="small" onClick={() => modalRef.value.openModal(row)}>
+          <NButton size="small" onClick={() => downloadFile(row.url, row.name)}>
             下載
-          </NButton> */}
+          </NButton>
         </>
 
       )

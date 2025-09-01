@@ -1,6 +1,8 @@
 <script setup lang="tsx">
 import type { FileVO } from '@/api/operations/file'
 
+import { getDictLabel } from '@/utils/dict'
+
 const modalRef = ref()
 const modalTitle = ref('')
 
@@ -51,7 +53,7 @@ defineExpose({
             {{ rowData.remark }}
           </n-descriptions-item>
           <n-descriptions-item label="狀態" :span="1">
-            {{ rowData.status }}
+            {{ getDictLabel('common_status', rowData.status) }}
           </n-descriptions-item>
           <n-descriptions-item label="建立者ID" :span="1">
             {{ rowData.creator }}
