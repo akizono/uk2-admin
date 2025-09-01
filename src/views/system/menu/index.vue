@@ -3,11 +3,10 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
+import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
@@ -182,7 +181,7 @@ const initFormData: InitFormData[] = [
     showCondition: {
       field: 'type',
       operator: 'in',
-      value: [1, 2],
+      value: [2],
     },
   },
   {
@@ -211,7 +210,7 @@ const initFormData: InitFormData[] = [
   {
     name: 'link',
     value: undefined,
-    span: 1,
+    span: 2,
     label: t('menu.externalLink'),
     type: 'input',
     placeholder: 'Eg: https://google.com',
