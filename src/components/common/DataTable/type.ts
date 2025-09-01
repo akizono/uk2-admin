@@ -106,7 +106,21 @@ export interface InitFormData {
     'switch' | // 開關
     'select' | // 下拉選單
     'radio' | // 單選框
-    'icon-select' // 圖示選擇器
+    'icon-select' | // 圖示選擇器
+    'file' // 檔案上傳
+  /** 檔案上傳配置 */
+  fileOptions?: {
+    /** 最大檔案數量 */
+    maxFileCount: number
+    /** 最大檔案大小 (MB) */
+    maxFileSize: number
+    /** 檔案顯示類型 */
+    filetype: 'img' | 'list'
+    /** 允許的檔案副檔名 */
+    fileExtension: string[]
+    /** 是否自動上傳 */
+    autoUpload: boolean
+  }
   /** rules規則中的type屬性 */
   rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'
   /** 選單配置 */

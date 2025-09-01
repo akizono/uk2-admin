@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Condition, ConditionGroup, InitFormData, ModalType, TableRow } from '../type'
+import type { FileVO } from '@/api/operations/file'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
 import AsyncDictLabel from '@/components/common/AsyncDictLabel/index.vue'
+import FileUpload from '@/components/common/FileUpload/index.vue'
 import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
 import { useLanguageStore } from '@/store/model/language'
@@ -445,10 +447,18 @@ function processFormData() {
     }
   }
 
-  // 處理多語言欄位
+  // 多語言欄位
   const newMFData: Record<string, MultilingualFieldsVO[]> = {}
+
   for (const key in formDataMapping.value) {
     const item = formDataMapping.value[key]
+
+    // 處理檔案欄位（只向後端傳遞url）
+    if (item.type === 'file') {
+      processedData[item.name] = processedData[item.name].map((item: FileVO) => item.url)
+    }
+
+    // 處理多語言欄位
     if (item.multilingual && item.type !== 'select' && item.type !== 'switch' && item.type !== 'radio') {
       // 只儲存需要提交的多語言欄位
       newMFData[item.name] = multilingualFields.value[item.name]
@@ -830,6 +840,17 @@ function closeModal() {
               <template v-if="item.type === 'switch'">
                 {{ formData[item.name] === 1 ? $t('common.enable') : $t('common.disable') }}
               </template>
+              <template v-else-if="item.type === 'file' && item.fileOptions">
+                <FileUpload
+                  v-model="formData[item.name]"
+                  :max-file-count="item.fileOptions.maxFileCount"
+                  :max-file-size="item.fileOptions.maxFileSize"
+                  :filetype="item.fileOptions.filetype"
+                  :file-extension="item.fileOptions.fileExtension"
+                  :auto-upload="false"
+                  disabled
+                />
+              </template>
               <template v-else-if="item.dictType">
                 <AsyncDictLabel :dict-type="item.dictType" :value="formData[item.name]" />
               </template>
@@ -872,6 +893,15 @@ function closeModal() {
                 <n-input v-else-if="item.type === 'textarea'" v-model:value="formData[item.name]" type="textarea" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable />
                 <n-input-number v-else-if="item.type === 'input-number'" v-model:value="formData[item.name]" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" :placeholder="item.placeholder" clearable />
                 <n-switch v-else-if="item.type === 'switch'" v-model:value="formData[item.name]" :checked-value="1" :unchecked-value="0" :disabled="(item.disableEditInput && modalType === 'edit') || (item.disableAddInput && modalType === 'add')" />
+                <FileUpload
+                  v-else-if="item.type === 'file' && item.fileOptions"
+                  v-model="formData[item.name]"
+                  :max-file-count="item.fileOptions.maxFileCount"
+                  :max-file-size="item.fileOptions.maxFileSize"
+                  :filetype="item.fileOptions.filetype"
+                  :file-extension="item.fileOptions.fileExtension"
+                  :auto-upload="item.fileOptions.autoUpload"
+                />
                 <template v-else-if="item.type === 'select'">
                   <!-- 如果數據中包含 children，使用樹狀選擇器 -->
                   <n-tree-select
