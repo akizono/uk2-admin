@@ -23,17 +23,16 @@ export const FileApi = {
     try {
       // 創建 FormData 對象
       const formData = new FormData()
-
-      console.log('上傳文件數量:', data.files.length)
+      // console.log('上傳文件數量:', data.files.length)
 
       // 將文件添加到 FormData 中
-      data.files.forEach((file, index) => {
-        console.log(`添加文件 ${index + 1}:`, file.name, file.size, file.type)
+      data.files.forEach((file, _index) => {
+        // console.log(`添加文件 ${index + 1}:`, file.name, file.size, file.type)
         formData.append('files', file, file.name)
       })
 
       // 檢查 FormData 內容
-      console.log('FormData 已創建，但無法直接查看內容')
+      // console.log('FormData 已創建，但無法直接查看內容')
 
       // 直接使用 axios 進行上傳，完全繞過自訂請求邏輯
       const response = await axios.post(
@@ -44,16 +43,17 @@ export const FileApi = {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${local.get('accessToken')}`,
             'Language-Current': local.get('languageCurrent'),
+            'skip-auth-token': true,
           },
         },
       )
 
-      console.log('上傳響應:', response)
+      // console.log('上傳響應:', response)
 
       return response.data
     }
     catch (error) {
-      console.error('上傳錯誤:', error)
+      console.error('error:', error)
       throw error
     }
   },
