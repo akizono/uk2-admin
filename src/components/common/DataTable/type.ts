@@ -120,6 +120,12 @@ export interface InitFormData {
     fileExtension: string[]
     /** 是否自動上傳 */
     autoUpload: boolean
+    /**
+     * 是否單個文件
+     * 如果開啟了這個選項，那麼 maxFileCount 只能為 1，並且文件會以字串的形式上傳
+     * 如果不開啟，則會以數組的形式上傳
+     */
+    singleFile?: boolean
   }
   /** rules規則中的type屬性 */
   rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'

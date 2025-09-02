@@ -455,7 +455,14 @@ function processFormData() {
 
     // 處理檔案欄位（只向後端傳遞url）
     if (item.type === 'file') {
-      processedData[item.name] = processedData[item.name].map((item: FileVO) => item.url)
+      if (item.fileOptions?.singleFile) {
+        if (processedData[item.name] && processedData[item.name].length > 0) {
+          processedData[item.name] = processedData[item.name][0].url
+        }
+      }
+      else {
+        processedData[item.name] = processedData[item.name].map((item: FileVO) => item.url)
+      }
     }
 
     // 處理多語言欄位

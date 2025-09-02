@@ -316,6 +316,22 @@ function propsVerify() {
     return
   }
 
+  // 如果 initFormData 中存在 type 為 file 的欄位，則必須包含 fileOptions 屬性
+  // 如果 fileOptions 中存在 singleFile 為 true，則必須包含 maxFileCount 為 1
+  const fileFormItems = props.initFormData?.filter((item: InitFormData) => item.type === 'file') || []
+  for (const item of fileFormItems) {
+    if (!item.fileOptions) {
+      propsVerifyErrorMsg.value = 'type 為 file 的欄位必須包含 fileOptions 屬性'
+      propsVerifyPassed.value = false
+      return
+    }
+    if (item.fileOptions.singleFile && item.fileOptions.maxFileCount !== 1) {
+      propsVerifyErrorMsg.value = '如果 fileOptions 中存在 singleFile 為 true，則必須包含 maxFileCount 為 1'
+      propsVerifyPassed.value = false
+      return
+    }
+  }
+
   propsVerifyPassed.value = true
 }
 
