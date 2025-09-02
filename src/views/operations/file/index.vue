@@ -6,9 +6,10 @@ import type { DataTableColumns } from 'naive-ui'
 import { FileApi } from '@/api/operations/file'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { downloadFile } from '@/utils/download'
-import { NButton } from 'naive-ui'
+import { NButton, NImage, NTime } from 'naive-ui'
+import IconParkOutlineUpload from '~icons/icon-park-outline/upload'
 
-import PreviewModal from './components/preview/index.vue'
+import FileUpload from './components/file-upload/index.vue'
 
 defineOptions({
   name: 'File Management',
@@ -16,8 +17,10 @@ defineOptions({
 
 const { t } = useI18n()
 
-const previewModalRef = ref()
+/** 上傳檔案的 ref */
+const fileUploadRef = ref()
 
+/** 權限配置 */
 const permission = {
   create: ['operations:file:create'],
   page: ['operations:file:page'],
@@ -36,6 +39,24 @@ const initQueryParams: InitQueryParams[] = [
   },
 ]
 
+/** 表格上方的插槽 */
+const neckSlot = [
+  <>
+    <NButton
+      class="m-l-10px"
+      type="primary"
+      v-slots={{
+        icon: () => <IconParkOutlineUpload />,
+      }}
+      onClick={() => {
+        fileUploadRef.value.openModal()
+      }}
+    >
+      上傳檔案
+    </NButton>
+  </>,
+]
+
 /** 表格列定義 */
 const columns: DataTableColumns<FileVO> = [
   {
@@ -43,17 +64,23 @@ const columns: DataTableColumns<FileVO> = [
     align: 'center',
     key: 'name',
   },
-  {
-    title: '檔案類型',
-    align: 'center',
-    key: 'type',
-    width: '100px',
-  },
+  // {
+  //   title: '檔案類型',
+  //   align: 'center',
+  //   key: 'type',
+  // },
   {
     title: '大小',
     align: 'center',
     key: 'size',
     width: '100px',
+    render: (row: FileVO) => {
+      return (
+        <>
+          {`${row.size} KB`}
+        </>
+      )
+    },
   },
   {
     title: '檔案URL',
@@ -62,14 +89,37 @@ const columns: DataTableColumns<FileVO> = [
     copy: true,
   },
   {
+    title: '上傳時間',
+    align: 'center',
+    key: 'createTime',
+    width: '180px',
+    render: (row: FileVO) => {
+      return (
+        <>
+          <NTime time={new Date(row.createTime)} />
+        </>
+      )
+    },
+  },
+  {
+    title: '檔案內容',
+    align: 'center',
+    key: 'preview',
+    width: '180px',
+    render: (row: FileVO) => {
+      return (
+        <>
+          <NImage src={row.url} width="30px" height="30px" object-fit="cover" />
+        </>
+      )
+    },
+  },
+  {
     title: t('common.action'),
     key: 'actions',
     render: (row: FileVO) => {
       return (
         <>
-          <NButton size="small" onClick={() => previewModalRef.value.openModal(row)}>
-            預覽
-          </NButton>
           <NButton size="small" onClick={() => downloadFile(row.url, row.name)}>
             下載
           </NButton>
@@ -107,6 +157,7 @@ const options = {
   pagination: true, // 是否開啟分頁
 
   /** 表格配置 */
+  neckSlot, // 表格頂部的自訂按鈕
   columns, // 表格欄位的定義
   initQueryParams, // 初始化查詢參數
   getFunction: FileApi.getFilePage, // 獲取表格數據的 API
@@ -125,7 +176,7 @@ const options = {
 <template>
   <div>
     <DataTable v-bind="options" />
-    <PreviewModal ref="previewModalRef" />
+    <FileUpload ref="fileUploadRef" />
   </div>
 </template>
 

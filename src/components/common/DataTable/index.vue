@@ -47,6 +47,7 @@ const props = defineProps<{
   filterColumnName?: string // 過濾條件的欄位名稱
   filterColumnValue?: ComputedRef<string> // 過濾條件的欄位 ID（ 所有新增和查詢的介面都會自動帶上{[filterColumnName]:filterColumnValue.value} ）
 
+  neckSlot?: VNode[] // 表格頂部的自訂按鈕
   columns: DataTableColumns<any> // 表格列定義
   viewEntranceColumns?: string[] // 點擊後能進入查看視窗的欄位
   initQueryParams?: InitQueryParams[] // 初始化查詢參數
@@ -1745,6 +1746,10 @@ onMounted(async () => {
                 </template>
                 {{ t('common.batchDelete') }}
               </NButton>
+
+              <template v-for="item in neckSlot" :key="item">
+                <component :is="item" />
+              </template>
             </div>
           </n-flex>
         </template>

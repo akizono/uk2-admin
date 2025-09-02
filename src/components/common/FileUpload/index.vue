@@ -8,11 +8,12 @@ const props = withDefaults(defineProps<{
   maxFileCount: number
   maxFileSize: number // 單位：MB
   filetype: 'img' | 'list'
-  fileExtension: string[]
+  fileExtension?: string[]
   autoUpload: boolean
   disabled?: boolean
 }>(), {
   modelValue: () => [],
+  fileExtension: () => [],
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -80,7 +81,7 @@ function validateFile(file: File): { valid: boolean, message?: string } {
 
   // 檢查文件類型
   const extension = file.name.split('.').pop()?.toLowerCase() || ''
-  if (props.fileExtension.length > 0 && !props.fileExtension.includes(extension)) {
+  if (props.fileExtension && props.fileExtension.length > 0 && !props.fileExtension.includes(extension)) {
     return { valid: false, message: `只允許上傳 ${props.fileExtension.join(', ')} 格式的檔案` }
   }
 
@@ -338,7 +339,7 @@ onBeforeUnmount(() => {
     <input
       ref="fileInputRef"
       type="file"
-      :accept="fileExtension.length ? fileExtension.map(ext => `.${ext}`).join(',') : '*/*'"
+      :accept="fileExtension && fileExtension.length > 0 ? fileExtension.map(ext => `.${ext}`).join(',') : '*/*'"
       :multiple="maxFileCount > 1"
       class="hidden"
       @change="handleFileSelect"
