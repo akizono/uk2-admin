@@ -61,13 +61,13 @@ watch(() => props.modelValue, (newValue, oldValue) => {
 
 // 觸發文件選擇
 function triggerFileSelect() {
-  console.log('triggerFileSelect 函數被調用')
+  // console.log('triggerFileSelect 函數被調用')
   if (fileInputRef.value) {
-    console.log('觸發文件選擇對話框')
+    // console.log('觸發文件選擇對話框')
     fileInputRef.value.click()
   }
   else {
-    console.log('fileInputRef 為空')
+    // console.log('fileInputRef 為空')
   }
 }
 
@@ -89,34 +89,34 @@ function validateFile(file: File): { valid: boolean, message?: string } {
 
 // 處理文件選擇
 function handleFileSelect(event: Event) {
-  console.log('handleFileSelect 函數被調用')
+  // console.log('handleFileSelect 函數被調用')
   const input = event.target as HTMLInputElement
-  console.log('input.files:', input.files)
+  // console.log('input.files:', input.files)
 
   if (!input.files || input.files.length === 0) {
-    console.log('沒有選擇文件，返回')
+    // console.log('沒有選擇文件，返回')
     return
   }
 
   // 檢查是否超過最大文件數
   if (fileList.value.length + input.files.length > props.maxFileCount) {
     window.$message.error(`最多只能上傳 ${props.maxFileCount} 個檔案`)
-    console.log('超過最大文件數，返回')
+    // console.log('超過最大文件數，返回')
     return
   }
 
-  console.log('開始添加文件到列表...')
+  // console.log('開始添加文件到列表...')
   // 添加文件到列表
   Array.from(input.files).forEach((file) => {
-    console.log('處理文件:', file.name)
+    // console.log('處理文件:', file.name)
     const validation = validateFile(file)
     if (!validation.valid) {
       window.$message.error(validation.message || '檔案驗證失敗')
-      console.log('文件驗證失敗:', validation.message)
+      // console.log('文件驗證失敗:', validation.message)
       return
     }
 
-    console.log('添加文件到列表:', file.name)
+    // console.log('添加文件到列表:', file.name)
     fileList.value.push({
       file,
       status: 'pending',
@@ -124,7 +124,7 @@ function handleFileSelect(event: Event) {
     })
   })
 
-  console.log('更新後的文件列表:', fileList.value)
+  // console.log('更新後的文件列表:', fileList.value)
 
   // 重設輸入框
   if (input)
@@ -132,29 +132,29 @@ function handleFileSelect(event: Event) {
 
   // 如果設置為自動上傳，則立即上傳文件
   if (props.autoUpload) {
-    console.log('自動上傳模式，立即上傳')
+    // console.log('自動上傳模式，立即上傳')
     uploadFiles()
   }
   else {
-    console.log('非自動上傳模式，等待用戶點擊提交')
+    // console.log('非自動上傳模式，等待用戶點擊提交')
   }
 }
 
 // 上傳文件
 async function uploadFiles() {
-  console.log('uploadFiles 函數被調用')
-  console.log('當前文件列表:', fileList.value)
+  // console.log('uploadFiles 函數被調用')
+  // console.log('當前文件列表:', fileList.value)
 
   // 收集待上傳和上傳失敗的文件
   const filesToUpload = fileList.value.filter(item => (item.status === 'pending' || item.status === 'error') && item.file)
-  console.log('待上傳文件:', filesToUpload)
+  // console.log('待上傳文件:', filesToUpload)
 
   if (filesToUpload.length === 0) {
-    console.log('沒有待上傳文件，返回')
+    // console.log('沒有待上傳文件，返回')
     return
   }
 
-  console.log('開始上傳...')
+  // console.log('開始上傳...')
   startUploading()
 
   try {
@@ -166,18 +166,18 @@ async function uploadFiles() {
     // 收集要上傳的文件
     const files = filesToUpload.map(item => item.file!).filter(Boolean)
 
-    console.log('準備上傳文件:', files.map(f => ({ name: f.name, size: f.size, type: f.type })))
+    // console.log('準備上傳文件:', files.map(f => ({ name: f.name, size: f.size, type: f.type })))
 
     // 檢查文件是否有效
     files.forEach((file) => {
       if (!(file instanceof File)) {
-        console.error('無效的文件對象:', file)
+        // console.error('無效的文件對象:', file)
       }
     })
 
     // 上傳文件
     const response = await FileApi.uploadFile({ files })
-    console.log('上傳文件響應:', response)
+    // console.log('上傳文件響應:', response)
 
     // 檢查響應格式並提取文件數據
     let fileVOs: FileVO[] = []
@@ -195,7 +195,7 @@ async function uploadFiles() {
         fileVOs = responseData.files as FileVO[]
       }
       else {
-        console.error('無法解析上傳響應:', response)
+        // console.error('無法解析上傳響應:', response)
         throw new Error('上傳響應格式不正確')
       }
     }
@@ -215,8 +215,8 @@ async function uploadFiles() {
 
     window.$message.success('檔案上傳成功')
   }
-  catch (error) {
-    console.error('文件上傳錯誤:', error)
+  catch {
+    // console.error('文件上傳錯誤:', error)
     filesToUpload.forEach((item) => {
       item.status = 'error'
       item.error = '上傳失敗'
@@ -330,34 +330,6 @@ onBeforeUnmount(() => {
   })
   objectURLs.value = []
 })
-
-// 獲取文件圖示
-function getFileIcon(fileName: string): string {
-  const extension = getFileExtension(fileName)
-
-  // 根據副檔名返回對應的圖示類名
-  switch (extension) {
-    case 'pdf':
-      return 'i-mdi-file-pdf-box'
-    case 'doc':
-    case 'docx':
-      return 'i-mdi-file-word-box'
-    case 'xls':
-    case 'xlsx':
-      return 'i-mdi-file-excel-box'
-    case 'ppt':
-    case 'pptx':
-      return 'i-mdi-file-powerpoint-box'
-    case 'zip':
-    case 'rar':
-    case '7z':
-      return 'i-mdi-zip-box'
-    case 'txt':
-      return 'i-mdi-file-document-box'
-    default:
-      return 'i-mdi-file-box'
-  }
-}
 </script>
 
 <template>
@@ -387,7 +359,6 @@ function getFileIcon(fileName: string): string {
           <!-- 非圖片文件 -->
           <template v-else>
             <div class="file-icon-container">
-              <div :class="[getFileIcon(item.fileVO?.name || item.file?.name || '')]" />
               <div class="file-name">
                 {{ item.fileVO?.name || item.file?.name }}
               </div>
@@ -437,7 +408,12 @@ function getFileIcon(fileName: string): string {
     <div v-else-if="filetype === 'list'" class="list-upload-container">
       <div v-for="(item, index) in fileList" :key="index" class="file-item" :class="{ pending: item.status === 'pending' }">
         <div class="file-info">
-          <div class="file-icon" :class="[getFileIcon(item.fileVO?.name || item.file?.name || '')]" />
+          <div class="file-status-icon">
+            <span v-if="item.status === 'success'" class="status-icon success">✅</span>
+            <span v-else-if="item.status === 'error'" class="status-icon error">❌</span>
+            <span v-else-if="item.status === 'uploading'" class="status-icon uploading">⏳</span>
+            <span v-else-if="item.status === 'pending'" class="status-icon pending">⌛</span>
+          </div>
           <div class="file-name">
             {{ item.fileVO?.name || item.file?.name }}
           </div>
@@ -463,7 +439,7 @@ function getFileIcon(fileName: string): string {
       <!-- 上傳按鈕 -->
       <div
         v-if="fileList.length < maxFileCount && !disabled" class="upload-button" @click="() => {
-          console.log('點擊上傳文件按鈕');
+          // console.log('點擊上傳文件按鈕');
           triggerFileSelect();
         }"
       >
@@ -483,7 +459,6 @@ function getFileIcon(fileName: string): string {
       </div>
       <n-button
         type="primary" :loading="isUploading" @click="() => {
-          console.log('點擊提交上傳按鈕');
           uploadFiles();
         }"
       >
@@ -659,6 +634,35 @@ function getFileIcon(fileName: string): string {
   min-width: 0;
 }
 
+.file-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.status-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.status-icon.success {
+  color: #67c23a;
+}
+
+.status-icon.error {
+  color: #f56c6c;
+}
+
+.status-icon.uploading {
+  color: #409eff;
+}
+
+.status-icon.pending {
+  color: #909399;
+}
+
 .file-icon {
   font-size: 24px;
 }
@@ -702,6 +706,6 @@ function getFileIcon(fileName: string): string {
 .manual-upload-button {
   margin-top: 16px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 </style>
