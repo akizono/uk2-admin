@@ -34,6 +34,16 @@ export function login(data: LoginVO): ApiResponse<UserVo> {
   })
 }
 
+// 登出
+export function logout() {
+  return request.get({
+    url: '/system/auth/logout',
+    headers: {
+      'refresh-token': `Bearer ${local.get('refreshToken')}`,
+    },
+  })
+}
+
 // 更新 Token
 export const refreshTokenMethodUrl = '/system/auth/refreshTokenMethod'
 export function refreshTokenMethod(): ApiResponse<RefreshTokenVO> {

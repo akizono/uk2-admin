@@ -1,8 +1,9 @@
-import { login } from '@/api/system/auth'
+import { createDiscreteApi } from 'naive-ui'
+
+import { login, logout as logoutApi } from '@/api/system/auth'
 import { type Token, UserApi, type UserVo } from '@/api/system/user'
 import { router } from '@/router'
 import { local } from '@/utils'
-import { createDiscreteApi } from 'naive-ui'
 
 import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
@@ -25,17 +26,24 @@ export const useAuthStore = defineStore('auth-store', {
   actions: {
     /** 處理登出流程，清除使用者資訊及相關資料 */
     async logout() {
-      const route = unref(router.currentRoute)
+      // 調用 logout 接口，清空後端的登錄狀態
+      await logoutApi()
+
       // 清除本地快取
       this.clearAuthStorage()
+
       // 清除路由和選單資料
+      const route = unref(router.currentRoute)
       const routeStore = useRouteStore()
       routeStore.resetRouteStore()
+
       // 清除頁籤列資料
       const tabStore = useTabStore()
       tabStore.clearAllTabs()
+
       // 重設目前的 Store
       this.$reset()
+
       // 導向登入頁面
       if (route.meta.requiresAuth) {
         router.push({
