@@ -1,4 +1,4 @@
-import type { UserVo } from '../user'
+import type { UserVO } from '../user'
 
 import request from '@/utils/request'
 
@@ -22,7 +22,7 @@ export interface LogVO extends Api.BaseVO {
   operationName: string
   resourceId: string
 
-  user: UserVo
+  user: UserVO
 }
 
 export const LogApi = {

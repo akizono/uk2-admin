@@ -1,11 +1,13 @@
 <script setup lang="ts">
-const text = ref('# Hello Editor ![图片描述](https://via.placeholder.com/350x150)')
+import { $t } from '@/utils'
+
+const text = ref('# Hello Editor ![Image description](https://via.placeholder.com/350x150)')
 </script>
 
 <template>
-  <n-card title="MarkDown编辑器">
+  <n-card :title="$t('md.title')">
     <n-space vertical :size="12">
-      <n-alert title="基于 md-editor-v3 封装" type="success" />
+      <n-alert :title="$t('md.basedOn')" type="success" />
       <MarkDownEditor v-model="text" />
     </n-space>
   </n-card>

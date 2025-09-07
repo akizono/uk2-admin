@@ -2,6 +2,7 @@
 import type { FileVO } from '@/api/operations/file'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns } from 'naive-ui'
+import { $t } from '@/utils'
 
 import { FileApi } from '@/api/operations/file'
 import DataTable from '@/components/common/DataTable/index.vue'
@@ -14,8 +15,6 @@ import FileUpload from './components/file-upload/index.vue'
 defineOptions({
   name: 'File Management',
 })
-
-const { t } = useI18n()
 
 /** 上傳檔案的 ref */
 const fileUploadRef = ref()
@@ -32,9 +31,9 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: '檔案名稱',
+    label: $t('file.fileName'),
     class: '!w-64',
-    placeholder: '檔案名稱',
+    placeholder: $t('file.fileName'),
     inputType: 'input',
   },
 ]
@@ -52,7 +51,7 @@ const neckSlot = [
         fileUploadRef.value.openModal()
       }}
     >
-      上傳檔案
+    { $t('file.uploadFileAction') }
     </NButton>
   </>,
 ]
@@ -60,17 +59,17 @@ const neckSlot = [
 /** 表格列定義 */
 const columns: DataTableColumns<FileVO> = [
   {
-    title: '檔案名稱',
+    title: $t('file.fileName'),
     align: 'center',
     key: 'name',
   },
   // {
-  //   title: '檔案類型',
+  //   title: $t('file.fileType'),
   //   align: 'center',
   //   key: 'type',
   // },
   {
-    title: '大小',
+    title: $t('file.fileSize'),
     align: 'center',
     key: 'size',
     width: '100px',
@@ -83,13 +82,13 @@ const columns: DataTableColumns<FileVO> = [
     },
   },
   {
-    title: '檔案URL',
+    title: $t('file.fileUrl'),
     align: 'center',
     key: 'url',
     copy: true,
   },
   {
-    title: '上傳時間',
+    title: $t('file.uploadTime'),
     align: 'center',
     key: 'createTime',
     width: '180px',
@@ -102,7 +101,7 @@ const columns: DataTableColumns<FileVO> = [
     },
   },
   {
-    title: '檔案內容',
+    title: $t('file.filePreview'),
     align: 'center',
     key: 'preview',
     width: '180px',
@@ -115,13 +114,13 @@ const columns: DataTableColumns<FileVO> = [
     },
   },
   {
-    title: t('common.action'),
+    title: $t('common.action'),
     key: 'actions',
     render: (row: FileVO) => {
       return (
         <>
           <NButton size="small" onClick={() => downloadFile(row.url, row.name)}>
-            下載
+            { $t('file.downloadFileAction') }
           </NButton>
         </>
 
@@ -168,7 +167,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '檔案', // 表格中的數據名稱
+  modalName: $t('file.fileEntity'), // 表格中的數據名稱
   permission, // 權限配置
 }
 </script>

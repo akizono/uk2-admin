@@ -2,7 +2,7 @@
 import type { FormInst } from 'naive-ui'
 
 import { useAuthStore } from '@/store'
-import { local } from '@/utils'
+import { $t, local } from '@/utils'
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -12,18 +12,17 @@ function toOtherForm(type: any) {
   emit('update:modelValue', type)
 }
 
-const { t } = useI18n()
 const rules = computed(() => {
   return {
     account: {
       required: true,
       trigger: 'blur',
-      message: t('login.accountRuleTip'),
+      message: $t('login.accountRuleTip'),
     },
     password: {
       required: true,
       trigger: 'blur',
-      message: t('login.passwordRuleTip'),
+      message: $t('login.passwordRuleTip'),
     },
   }
 })

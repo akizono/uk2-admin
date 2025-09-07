@@ -42,10 +42,10 @@ export const useLanguageStore = defineStore('language-store', {
     /** 設置語言 */
     setAppLang(lang: Language) {
       dialog.warning({
-        title: '警告',
-        content: '確定要切換語言嗎？切換後頁面將會重新整理',
-        positiveText: '確定',
-        negativeText: '取消',
+        title: $t('common.warn'),
+        content: $t('language.confirmToSwitchLanguage'),
+        positiveText: $t('common.confirm'),
+        negativeText: $t('common.cancel'),
         draggable: true,
         onPositiveClick: () => {
           // 設置語言

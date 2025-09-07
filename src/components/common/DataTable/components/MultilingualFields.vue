@@ -4,6 +4,7 @@ import type { TableRow } from '../type'
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields'
 import { useBoolean } from '@/hooks'
 import { useLanguageStore } from '@/store/model/language'
+import { $t } from '@/utils'
 import { generateUUID } from '@/utils/tools/generateUUID'
 
 defineProps<{
@@ -11,8 +12,6 @@ defineProps<{
 }>()
 
 const emit = defineEmits(['submit'])
-
-const { t } = useI18n()
 
 const languageStore = useLanguageStore()
 
@@ -49,10 +48,10 @@ const modalTitle = computed(() => {
   if (!modalType.value)
     return ''
   return `${{
-    add: t('common.add'),
-    view: t('common.view'),
-    edit: t('common.edit'),
-  }[modalType.value]}：「${(modalName.value ?? '')}」${t('dataTable.multilingualFields')}`
+    add: $t('common.add'),
+    view: $t('common.view'),
+    edit: $t('common.edit'),
+  }[modalType.value]}：「${(modalName.value ?? '')}」${$t('dataTable.multilingualFields')}`
 })
 // 表單驗證規則
 const formRules = computed(() => {
@@ -60,7 +59,7 @@ const formRules = computed(() => {
   languageList.value.forEach((item) => {
     rules[item.value] = {
       required: true,
-      message: t('dataTable.pleaseFillMultilingualFields'),
+      message: $t('dataTable.pleaseFillMultilingualFields'),
       trigger: ['blur', 'input'],
     }
   })
@@ -141,7 +140,7 @@ async function handleSubmit() {
   catch (errors) {
     endSubmitLoading()
     console.error('Form validation failed:', errors)
-    window.$message.error(t('dataTable.formValidationFailed'))
+    window.$message.error($t('dataTable.formValidationFailed'))
   }
 }
 
@@ -149,14 +148,14 @@ async function handleSubmit() {
 async function handleConvertLanguage() {
   try {
     if (!formData.value[languageStore.current]) {
-      return window.$message.error(`${t('dataTable.pleaseFill')}「${languageStore.currentName}」`)
+      return window.$message.error(`${$t('dataTable.pleaseFill')}「${languageStore.currentName}」`)
     }
     startFormLoading()
     const { data: result } = await MultilingualFieldsApi.convertLanguage({ text: formData.value[languageStore.current] })
     for (const item of languageList.value) {
       formData.value[item.value] = result[item.value]
     }
-    window.$message.success(t('dataTable.convertSuccess'))
+    window.$message.success($t('dataTable.convertSuccess'))
   }
   finally {
     endFormLoading()
@@ -210,7 +209,7 @@ function closeModal() {
         <template #icon>
           <icon-park-outline-magic-wand />
         </template>
-        {{ t('dataTable.convertSuccessTitle1') }}「{{ languageStore.currentName }}」{{ t('dataTable.convertSuccessTitle2') }}
+        {{ $t('dataTable.convertSuccessTitle1') }}「{{ languageStore.currentName }}」{{ $t('dataTable.convertSuccessTitle2') }}
       </n-button>
     </n-flex>
 
@@ -231,10 +230,10 @@ function closeModal() {
     <template #action>
       <n-space justify="center">
         <n-button type="primary" :loading="submitLoading" @click="handleSubmit">
-          {{ t('common.submit') }}
+          {{ $t('common.submit') }}
         </n-button>
         <n-button @click="closeModal">
-          {{ t('common.cancel') }}
+          {{ $t('common.cancel') }}
         </n-button>
       </n-space>
     </template>

@@ -1,9 +1,9 @@
 import { createDiscreteApi } from 'naive-ui'
 
 import { login, logout as logoutApi } from '@/api/system/auth'
-import { type Token, UserApi, type UserVo } from '@/api/system/user'
+import { type Token, UserApi, type UserVO } from '@/api/system/user'
 import { router } from '@/router'
-import { local } from '@/utils'
+import { $t, local } from '@/utils'
 
 import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
@@ -13,7 +13,7 @@ const { dialog } = createDiscreteApi(['dialog'])
 export const useAuthStore = defineStore('auth-store', {
   state: () => {
     return {
-      user: local.get('user') as UserVo,
+      user: local.get('user') as UserVO,
       accessToken: local.get('accessToken') || '',
     }
   },
@@ -69,7 +69,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理登入後的資料 */
-    async handleLoginInfo(user: UserVo) {
+    async handleLoginInfo(user: UserVO) {
       // 儲存 Token 和使用者資訊
       local.set('user', user)
       local.set('accessToken', user.token!.accessToken)
@@ -97,7 +97,7 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 提示使用者綁定信箱或者手機 */
-    tipsBindEmailOrMobile(user: UserVo) {
+    tipsBindEmailOrMobile(user: UserVO) {
       if (!user.email && !user.mobile) {
         // 檢查是否已經忽略提示
         const noPromptToBindMobilePhoneOrEmail = local.get('noPromptToBindMobilePhoneOrEmail')
@@ -107,10 +107,10 @@ export const useAuthStore = defineStore('auth-store', {
 
         setTimeout(() => {
           dialog.warning({
-            title: '提示',
-            content: `為了更方便地找回密碼，建議您先綁定信箱或手機喔！`,
-            positiveText: '前往綁定',
-            negativeText: '不再提示',
+            title: $t('auth.hint'),
+            content: $t('auth.hintContent'),
+            positiveText: $t('auth.hintPositiveText'),
+            negativeText: $t('auth.hintNegativeText'),
             maskClosable: false,
             // 前往綁定
             onPositiveClick: () => {

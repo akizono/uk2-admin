@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { useAppStore } from '@/store'
 import { NFlex } from 'naive-ui'
 import IconAuto from '~icons/icon-park-outline/laptop-computer'
 import IconMoon from '~icons/icon-park-outline/moon'
 import IconSun from '~icons/icon-park-outline/sun-one'
 
-const { t } = useI18n()
+import { useAppStore } from '@/store'
+import { $t } from '@/utils'
 
 const appStore = useAppStore()
 
 const options = computed(() => {
   return [
     {
-      label: t('app.light'),
+      label: $t('app.light'),
       value: 'light',
       icon: IconSun,
     },
     {
-      label: t('app.dark'),
+      label: $t('app.dark'),
       value: 'dark',
       icon: IconMoon,
     },
     {
-      label: t('app.system'),
+      label: $t('app.system'),
       value: 'auto',
       icon: IconAuto,
     },

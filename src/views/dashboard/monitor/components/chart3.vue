@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type ECOption, useEcharts } from '@/hooks'
+import { $t } from '@/utils'
 
 const option = ref<ECOption>({
   tooltip: {
@@ -32,19 +33,19 @@ const option = ref<ECOption>({
     data: [
       {
         value: 335,
-        name: '直接訪問',
+        name: $t('monitor.directAccess'),
       },
       {
         value: 77,
-        name: 'Bilibili',
+        name: $t('monitor.bilibili'),
       },
       {
         value: 82,
-        name: '知乎',
+        name: $t('monitor.zhihu'),
       },
       {
         value: 421,
-        name: '小紅書',
+        name: $t('monitor.xiaohongshu'),
       },
     ],
   },

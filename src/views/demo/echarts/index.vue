@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { type ECOption, useEcharts } from '@/hooks'
 import { graphic } from 'echarts'
+
+import { type ECOption, useEcharts } from '@/hooks'
+import { $t } from '@/utils'
 
 // 饼状图
 const pieOptions = ref<ECOption>({
   title: {
-    text: '饼图',
+    text: $t('echarts.pieChart'),
   },
   color: [
     '#37a2da',
@@ -38,7 +40,7 @@ const pieOptions = ref<ECOption>({
   series: [
     {
       type: 'pie',
-      name: '增值电信业务统计表',
+      name: $t('echarts.valueAddedTelecomStats'),
       radius: [40, 150],
       roseType: 'area',
       data: [
@@ -79,7 +81,7 @@ function updatePieChart() {
 // 折线图
 const lineOptions = ref<ECOption>({
   title: {
-    text: '折线图',
+    text: $t('echarts.lineChart'),
   },
   tooltip: {
     trigger: 'axis',
@@ -270,7 +272,7 @@ useEcharts('lineRef', lineOptions)
 // 柱状图
 const barOptions = ref<ECOption>({
   title: {
-    text: '柱状图',
+    text: $t('echarts.barChart'),
   },
   tooltip: {},
   grid: {
@@ -282,7 +284,7 @@ const barOptions = ref<ECOption>({
   },
   legend: {
     itemGap: 50,
-    data: ['注册总量', '最新注册量'],
+    data: [$t('echarts.totalRegistrations'), $t('echarts.latestRegistrations')],
   },
   xAxis: [
     {
@@ -303,7 +305,7 @@ const barOptions = ref<ECOption>({
       axisTick: {
         show: false,
       },
-      data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
+      data: [$t('echarts.month1'), $t('echarts.month2'), $t('echarts.month3'), $t('echarts.month4'), $t('echarts.month5'), $t('echarts.month6'), $t('echarts.month7')],
     },
   ],
   yAxis: [
@@ -332,7 +334,7 @@ const barOptions = ref<ECOption>({
   ],
   series: [
     {
-      name: '注册总量',
+      name: $t('echarts.totalRegistrations'),
       type: 'line',
       showAllSymbol: true,
       symbol: 'emptyCircle',
@@ -376,7 +378,7 @@ const barOptions = ref<ECOption>({
       data: [393, 438, 485, 631, 689, 824, 987],
     },
     {
-      name: '最新注册量',
+      name: $t('echarts.latestRegistrations'),
       type: 'bar',
       barWidth: 20,
       tooltip: {
@@ -419,12 +421,12 @@ const radarOptions = ref<ECOption>({
   radar: [
     {
       indicator: [
-        { name: '萧塘', max: 100 },
-        { name: '环城东路', max: 100 },
-        { name: '望园路', max: 100 },
-        { name: '奉贤新城', max: 100 },
-        { name: '奉浦大道', max: 100 },
-        { name: '金海湖', max: 100 },
+        { name: $t('echarts.ximenStation'), max: 100 },
+        { name: $t('echarts.taipeiMainStation'), max: 100 },
+        { name: $t('echarts.cityHallStation'), max: 100 },
+        { name: $t('echarts.zhongxiaoFuxingStation'), max: 100 },
+        { name: $t('echarts.songjiangNanjingStation'), max: 100 },
+        { name: $t('echarts.zhongshanStation'), max: 100 },
       ],
     },
   ],
@@ -433,7 +435,7 @@ const radarOptions = ref<ECOption>({
       type: 'radar',
       data: [
         {
-          name: '进站',
+          name: $t('echarts.inboundTraffic'),
           value: [43, 90, 80, 53, 78, 89, 77, 50],
           areaStyle: {
             color: {
@@ -464,7 +466,7 @@ const radarOptions = ref<ECOption>({
           },
         },
         {
-          name: '出站',
+          name: $t('echarts.outboundTraffic'),
           value: [50, 44, 56, 69, 43, 77, 90, 20],
           areaStyle: {
             color: {
@@ -508,7 +510,7 @@ useEcharts('radarRef', radarOptions)
   >
     <n-card>
       <n-button @click="updatePieChart">
-        手动更新图表
+        {{ $t('echarts.manualUpdateChart') }}
       </n-button>
       <div
         ref="pieRef"

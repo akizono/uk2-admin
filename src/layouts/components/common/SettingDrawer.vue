@@ -1,40 +1,39 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store'
+import { $t } from '@/utils'
 
 import LayoutSelector from './LayoutSelector.vue'
 
 const appStore = useAppStore()
 
-const { t } = useI18n()
-
 const transitionSelectorOptions = computed(() => {
   return [
     {
-      label: t('app.transitionNull'),
+      label: $t('app.transitionNull'),
       value: '',
     },
     {
-      label: t('app.transitionFadeSlide'),
+      label: $t('app.transitionFadeSlide'),
       value: 'fade-slide',
     },
     {
-      label: t('app.transitionFadeBottom'),
+      label: $t('app.transitionFadeBottom'),
       value: 'fade-bottom',
     },
     {
-      label: t('app.transitionFadeScale'),
+      label: $t('app.transitionFadeScale'),
       value: 'fade-scale',
     },
     {
-      label: t('app.transitionZoomFade'),
+      label: $t('app.transitionZoomFade'),
       value: 'zoom-fade',
     },
     {
-      label: t('app.transitionZoomOut'),
+      label: $t('app.transitionZoomOut'),
       value: 'zoom-out',
     },
     {
-      label: t('app.transitionSoft'),
+      label: $t('app.transitionSoft'),
       value: 'fade',
     },
   ]
@@ -61,13 +60,13 @@ const palette = [
 
 function resetSetting() {
   window.$dialog.warning({
-    title: t('app.resetSettingTitle'),
-    content: t('app.resetSettingContent'),
-    positiveText: t('common.confirm'),
-    negativeText: t('common.cancel'),
+    title: $t('app.resetSettingTitle'),
+    content: $t('app.resetSettingContent'),
+    positiveText: $t('common.confirm'),
+    negativeText: $t('common.cancel'),
     onPositiveClick: () => {
       appStore.resetAlltheme()
-      window.$message.success(t('app.resetSettingMeaasge'))
+      window.$message.success($t('app.resetSettingMeaasge'))
     },
   })
 }
@@ -75,7 +74,7 @@ function resetSetting() {
 
 <template>
   <n-drawer v-model:show="appStore.showSetting" :width="360">
-    <n-drawer-content :title="t('app.systemSetting')" closable>
+    <n-drawer-content :title="$t('app.systemSetting')" closable>
       <n-space vertical>
         <n-divider>{{ $t('app.layoutSetting') }}</n-divider>
         <LayoutSelector v-model:value="appStore.layoutMode" />

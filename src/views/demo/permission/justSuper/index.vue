@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+import { $t } from '@/utils'
 </script>
 
 <template>
   <div>
-    只有超级管理员可见
+    {{ $t('permission.onlySuperAdminVisible') }}
   </div>
 </template>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { downloadFile } from '@/api/demo/test'
+import { $t } from '@/utils'
 
 const emit = defineEmits<{
   update: [data: any]
@@ -41,7 +42,7 @@ async function handleDownloadFile() {
     downloadLink(data.value, 'fileOk')
   }
   catch (error) {
-    console.error('下載失敗:', error)
+    console.error(`${$t('downLoad.downloadFailed')}:`, error)
   }
   finally {
     isDownloading.value = false
@@ -67,18 +68,18 @@ function downloadLink(data: Blob, name: string) {
 </script>
 
 <template>
-  <n-card title="帶進度的下載文件" size="small">
+  <n-card :title="$t('downLoad.downloadFileWithProgress')" size="small">
     <n-space vertical>
       <n-input v-model:value="filePath" />
-      <div>檔案大小：{{ downloading.total }}B</div>
-      <div>已下載：{{ downloading.loaded }}B</div>
+      <div>{{ $t('downLoad.fileSize') }}：{{ downloading.total }}B</div>
+      <div>{{ $t('downLoad.downloaded') }}：{{ downloading.loaded }}B</div>
       <n-progress type="line" indicator-placement="inside" :percentage="downloadProcess" />
       <n-space>
         <n-button strong secondary @click="handleDownloadFile">
-          開始下載
+          {{ $t('downLoad.startDownload') }}
         </n-button>
         <n-button strong secondary type="warning" @click="abort">
-          中斷下載
+          {{ $t('downLoad.abortDownload') }}
         </n-button>
       </n-space>
     </n-space>

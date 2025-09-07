@@ -1,5 +1,6 @@
 import type { DeptVO } from '../dept'
 
+import { $t } from '@/utils'
 import request from '@/utils/request'
 
 export interface Token {
@@ -7,7 +8,7 @@ export interface Token {
   refreshToken: string
 }
 
-export interface UserVo extends Api.BaseVO {
+export interface UserVO extends Api.BaseVO {
   id: string
   username: string
   nickname: string
@@ -29,17 +30,17 @@ export interface UserVo extends Api.BaseVO {
 
 export const UserApi = {
   /** 獲取使用者分頁列表 */
-  getUserPage: async (params: PageParams & Partial<UserVo>): PageRes<UserVo> => {
+  getUserPage: async (params: PageParams & Partial<UserVO>): PageRes<UserVO> => {
     return await request.get({ url: '/system/user/page', params })
   },
 
   /** 新增使用者 */
-  createUser: async (data: UserVo) => {
+  createUser: async (data: UserVO) => {
     return await request.post({ url: '/system/user/create', data })
   },
 
   /** 修改使用者個人資訊 */
-  updateUser: async (data: Partial<UserVo> & { password?: string }) => {
+  updateUser: async (data: Partial<UserVO> & { password?: string }) => {
     return await request.put({ url: '/system/user/update', data, isFilterEmpty: false })
   },
 
@@ -65,8 +66,8 @@ export const UserApi = {
       data,
       headers: {
         'specify-error-message': [
-          { code: 400, message: '操作過於頻繁，請稍後再試' },
-          { code: 409, message: '該電子郵件已被使用' },
+          { code: 400, message: $t('common.operationTooFrequent') },
+          { code: 409, message: $t('user.emailExist') },
         ],
       },
     })
@@ -79,8 +80,8 @@ export const UserApi = {
       data,
       headers: {
         'specify-error-message': [
-          { code: 400, message: '操作過於頻繁，請稍後再試' },
-          { code: 409, message: '該手機號碼已被使用' },
+          { code: 400, message: $t('common.operationTooFrequent') },
+          { code: 409, message: $t('user.mobileExist') },
         ],
       },
     })
@@ -98,19 +99,19 @@ export const UserApi = {
       data,
       headers: {
         'specify-error-message': [
-          { code: 400, message: '驗證碼錯誤或已過期' },
+          { code: 400, message: $t('user.verifyCodeError') },
         ],
       },
     })
   },
 
   /** 修改個人資訊 */
-  updatePersonalInfo: async (data: Partial<Omit<UserVo, keyof Api.BaseVO | 'id' | 'username' | 'email' | 'mobile' | 'role' | 'roleIds' | 'roleNames' | 'token'>>) => {
+  updatePersonalInfo: async (data: Partial<Omit<UserVO, keyof Api.BaseVO | 'id' | 'username' | 'email' | 'mobile' | 'role' | 'roleIds' | 'roleNames' | 'token'>>) => {
     return await request.put({ url: '/system/user/update-personal-info', data })
   },
 
   /** 獲取個人資訊 */
-  getPersonalInfo: async (): ApiResponse<UserVo> => {
+  getPersonalInfo: async (): ApiResponse<UserVO> => {
     return await request.get({ url: '/system/user/get-personal-info' })
   },
 
@@ -121,7 +122,7 @@ export const UserApi = {
       data,
       headers: {
         'specify-error-message': [
-          { code: 400, message: '舊密碼錯誤' },
+          { code: 400, message: $t('user.oldPasswordError') },
         ],
       },
     })

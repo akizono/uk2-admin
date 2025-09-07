@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/store'
+import { $t } from '@/utils'
 
 import Chart from './components/chart.vue'
 
@@ -44,7 +45,7 @@ const { user } = useAuthStore()
                   </n-el>
                 </template>
                 <template #header>
-                  <n-statistic label="活躍用戶">
+                  <n-statistic :label="$t('workbench.activeUsers')">
                     <n-number-animation show-separator :from="0" :to="12039" />
                   </n-statistic>
                 </template>
@@ -62,7 +63,7 @@ const { user } = useAuthStore()
                   </n-el>
                 </template>
                 <template #header>
-                  <n-statistic label="用戶">
+                  <n-statistic :label="$t('workbench.user')">
                     <n-number-animation show-separator :from="0" :to="44039" />
                   </n-statistic>
                 </template>
@@ -80,7 +81,7 @@ const { user } = useAuthStore()
                   </n-el>
                 </template>
                 <template #header>
-                  <n-statistic label="瀏覽量">
+                  <n-statistic :label="$t('workbench.viewCount')">
                     <n-number-animation show-separator :from="0" :to="551039" />
                   </n-statistic>
                 </template>
@@ -98,7 +99,7 @@ const { user } = useAuthStore()
                   </n-el>
                 </template>
                 <template #header>
-                  <n-statistic label="收藏數">
+                  <n-statistic :label="$t('workbench.numberOfFavorites')">
                     <n-number-animation show-separator :from="0" :to="7739" />
                   </n-statistic>
                 </template>
@@ -106,13 +107,13 @@ const { user } = useAuthStore()
             </n-card>
           </n-gi>
         </n-grid>
-        <n-card title="動態">
+        <n-card :title="$t('workbench.dynamic')">
           <template #header-extra>
             <n-button
               type="primary"
               quaternary
             >
-              更多
+              {{ $t('workbench.more') }}
             </n-button>
           </template>
           <n-list hoverable>
@@ -125,9 +126,9 @@ const { user } = useAuthStore()
                 />
               </template>
               <n-thing
-                title="沙發"
+                :title="$t('workbench.sofa')"
                 title-extra="09/29/2022"
-                description="論壇或帖子中第一個回復的網友，象徵“搶占最佳位置”。衍生詞“板凳”（第二回復）、“地板”（第三回復）。"
+                :description="$t('workbench.forum')"
               />
             </n-list-item>
             <n-list-item>
@@ -141,7 +142,7 @@ const { user } = useAuthStore()
               <n-thing
                 title="orz"
                 title-extra="09/29/2022"
-                description="象形文字，模擬人跪拜的姿勢，表示“服了”“崩潰”或“膜拜”。變體包括“OTL”“囧rz”。"
+                :description="$t('workbench.orz')"
               />
             </n-list-item>
             <n-list-item>
@@ -153,9 +154,9 @@ const { user } = useAuthStore()
                 />
               </template>
               <n-thing
-                title="悲劇"
+                :title="$t('workbench.tragedy')"
                 title-extra="09/29/2022"
-                description="諧音“悲劇”，用生活物品代指負面情緒，如“人生就像茶几，上面擺滿了悲劇”。"
+                :description="$t('workbench.tragedyPlace')"
               />
             </n-list-item>
             <n-list-item>
@@ -167,9 +168,9 @@ const { user } = useAuthStore()
                 />
               </template>
               <n-thing
-                title="醬紫"
+                :title="$t('workbench.sauce')"
                 title-extra="09/29/2022"
-                description="諧音“這樣子”，源自台灣腔普通話的變體發音，後成為賣萌用語。"
+                :description="$t('workbench.thisWay')"
               />
             </n-list-item>
           </n-list>
@@ -183,13 +184,13 @@ const { user } = useAuthStore()
         vertical
         :size="16"
       >
-        <n-card title="公告">
+        <n-card :title="$t('workbench.announcement')">
           <template #header-extra>
             <n-button
               type="primary"
               quaternary
             >
-              更多
+              {{ $t('workbench.more') }}
             </n-button>
           </template>
           <n-list>
@@ -200,11 +201,11 @@ const { user } = useAuthStore()
                   type="info"
                   size="small"
                 >
-                  通知
+                  {{ $t('workbench.notification') }}
                 </n-tag>
               </template>
               <n-button text>
-                全服維護中，預計14:00開服。
+                {{ $t('workbench.maintenance') }}
               </n-button>
             </n-list-item>
             <n-list-item>
@@ -214,11 +215,11 @@ const { user } = useAuthStore()
                   type="success"
                   size="small"
                 >
-                  消息
+                  {{ $t('workbench.message') }}
                 </n-tag>
               </template>
               <n-button text>
-                新版本上線，新增跨服戰場！
+                {{ $t('workbench.newVersion') }}
               </n-button>
             </n-list-item>
             <n-list-item>
@@ -228,11 +229,11 @@ const { user } = useAuthStore()
                   type="warning"
                   size="small"
                 >
-                  活動
+                  {{ $t('workbench.activity') }}
                 </n-tag>
               </template>
               <n-button text>
-                限時雙倍經驗，今晚20:00開跑！
+                {{ $t('workbench.limitedTime') }}
               </n-button>
             </n-list-item>
           </n-list>
@@ -248,7 +249,7 @@ const { user } = useAuthStore()
             <n-card>
               <n-flex vertical align="center">
                 <n-text depth="3">
-                  訂單數
+                  {{ $t('workbench.orderCount') }}
                 </n-text>
                 <n-icon-wrapper :size="46" :border-radius="999">
                   <nova-icon :size="26" icon="icon-park-outline:all-application" />
@@ -263,7 +264,7 @@ const { user } = useAuthStore()
             <n-card>
               <n-flex vertical align="center">
                 <n-text depth="3">
-                  待辦
+                  {{ $t('workbench.todo') }}
                 </n-text>
                 <n-el>
                   <n-icon-wrapper :size="46" color="var(--warning-color)" :border-radius="999">
@@ -277,34 +278,34 @@ const { user } = useAuthStore()
             </n-card>
           </n-gi>
         </n-grid>
-        <n-card title="任務進度">
+        <n-card :title="$t('workbench.taskProgress')">
           <n-timeline>
-            <n-timeline-item content="啊" />
+            <n-timeline-item :content="$t('workbench.a')" />
             <n-timeline-item
               type="success"
-              title="成功"
-              content="哪裡成功"
+              :title="$t('workbench.success')"
+              :content="$t('workbench.successPlace')"
               time="2018-04-03 20:46"
             />
             <n-timeline-item
               type="error"
-              content="哪裡錯誤"
+              :content="$t('workbench.error')"
               time="2018-04-03 20:46"
             />
             <n-timeline-item
               type="warning"
-              title="警告"
-              content="哪裡警告"
+              :title="$t('workbench.warning')"
+              :content="$t('workbench.warningPlace')"
               time="2018-04-03 20:46"
             />
             <n-timeline-item
               type="info"
-              title="資訊"
-              content="是的"
+              :title="$t('workbench.information')"
+              :content="$t('workbench.yes')"
               time="2018-04-03 20:46"
               line-type="dashed"
             />
-            <n-timeline-item content="啊" />
+            <n-timeline-item :content="$t('workbench.a')" />
           </n-timeline>
         </n-card>
       </n-space>

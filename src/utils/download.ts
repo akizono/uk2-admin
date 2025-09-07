@@ -1,3 +1,5 @@
+import { $t } from '@/utils'
+
 /**
  * 創建下載連結並觸發下載
  * @param url 下載檔案的URL
@@ -55,7 +57,7 @@ export function downloadFile(url: string, fileName?: string): void {
     }
 
     xhr.onerror = function () {
-      console.error('下載檔案失敗，嘗試使用傳統方法')
+      console.error($t('download.downloadFailedTryTraditional'))
       // 如果XHR失敗，回退到傳統方法
       createDownloadLink(url, downloadFileName)
     }
@@ -63,7 +65,7 @@ export function downloadFile(url: string, fileName?: string): void {
     xhr.send()
   }
   catch (error) {
-    console.error('下載檔案失敗:', error)
+    console.error(`${$t('download.downloadFailed')}:`, error)
     // 如果出錯，回退到傳統方法
     createDownloadLink(url, downloadFileName)
   }

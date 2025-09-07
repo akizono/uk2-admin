@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { useBoolean } from '@/hooks'
 import { NButton, NModal, NSpace } from 'naive-ui'
+
+import { useBoolean } from '@/hooks'
+import { $t } from '@/utils'
 
 defineProps<{
   title: string
@@ -39,7 +41,7 @@ function closeModal() {
       <NSpace justify="center">
         <slot name="action">
           <NButton @click="closeModal">
-            關閉
+            {{ $t('common.close') }}
           </NButton>
         </slot>
       </NSpace>

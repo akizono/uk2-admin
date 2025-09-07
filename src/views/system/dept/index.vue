@@ -8,12 +8,12 @@ import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'Department Management',
 })
 
-const { t } = useI18n()
 const { hasPermi } = usePermi()
 
 const dataTableRef = ref()
@@ -38,25 +38,25 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: t('dept.deptName'),
+    label: $t('dept.deptName'),
     class: '!w-64',
-    placeholder: t('dept.deptNamePlaceholder'),
+    placeholder: $t('dept.deptNamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'code',
     value: undefined,
-    label: t('dept.deptCode'),
+    label: $t('dept.deptCode'),
     class: '!w-64',
-    placeholder: t('dept.deptCodePlaceholder'),
+    placeholder: $t('dept.deptCodePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'status',
     value: undefined,
-    label: t('common.status'),
+    label: $t('common.status'),
     class: '!w-64',
-    placeholder: t('common.statusPlaceholder'),
+    placeholder: $t('common.statusPlaceholder'),
     inputType: 'select',
     dictType: 'common_status',
   },
@@ -65,28 +65,28 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<DeptVO> = [
   {
-    title: t('dept.deptName'),
+    title: $t('dept.deptName'),
     align: 'center',
     key: 'name',
     multilingual: true,
   },
   {
-    title: t('dept.deptCode'),
+    title: $t('dept.deptCode'),
     align: 'center',
     key: 'code',
   },
   {
-    title: t('dept.leaderUser'),
+    title: $t('dept.leaderUser'),
     align: 'center',
     key: 'leaderUser.nickname',
   },
   {
-    title: t('common.sort'),
+    title: $t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: t('common.status'),
+    title: $t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: DeptVO) => {
@@ -112,7 +112,7 @@ const initFormData: InitFormData[] = [
     name: 'parentId',
     value: undefined,
     span: 2,
-    label: t('dept.parentDept'),
+    label: $t('dept.parentDept'),
     type: 'select',
     selectOptions: {
       api: DeptApi.getDeptPage,
@@ -125,7 +125,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 1,
-    label: t('dept.deptName'),
+    label: $t('dept.deptName'),
     type: 'input',
     multilingual: true,
   },
@@ -133,14 +133,14 @@ const initFormData: InitFormData[] = [
     name: 'code',
     value: undefined,
     span: 1,
-    label: t('dept.deptCode'),
+    label: $t('dept.deptCode'),
     type: 'input',
   },
   {
     name: 'leaderUserId',
     value: undefined,
     span: 1,
-    label: t('dept.leaderUser'),
+    label: $t('dept.leaderUser'),
     type: 'select',
     selectOptions: {
       api: UserApi.getUserPage,
@@ -153,21 +153,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: t('common.sort'),
+    label: $t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: t('common.remark'),
+    label: $t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: t('common.status'),
+    label: $t('common.status'),
     type: 'switch',
   },
 ]
@@ -176,22 +176,22 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   name: {
     required: true,
-    message: t('dept.deptNameRule'),
+    message: $t('dept.deptNameRule'),
     trigger: ['blur', 'input'],
   },
   code: {
     required: true,
-    message: t('dept.deptCodeRule'),
+    message: $t('dept.deptCodeRule'),
     trigger: ['blur', 'input'],
   },
   leaderUserId: {
     required: true,
-    message: t('dept.leaderUserRule'),
+    message: $t('dept.leaderUserRule'),
     trigger: ['blur', 'change'],
   },
   sort: {
     required: true,
-    message: t('common.sortRule'),
+    message: $t('common.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -225,7 +225,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: t('dept.dept'), // 表格中的數據名稱
+  modalName: $t('dept.dept'), // 表格中的數據名稱
   modalWidth: '800px', // 表格的寬度
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '800px', // 多語言欄位彈出視窗的寬度

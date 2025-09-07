@@ -1,4 +1,4 @@
-import type { UserVo } from '@/api/system/user'
+import type { UserVO } from '@/api/system/user'
 import type { Language } from '@/modules/i18n'
 
 interface DictMap {
@@ -14,7 +14,7 @@ interface Session {
 /** 設定localStorage的類型 */
 interface Local {
   /* 儲存使用者資訊 */
-  user: UserVo
+  user: UserVO
   /* 儲存訪問token */
   accessToken: string
   /* 儲存刷新token */

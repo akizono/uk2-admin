@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { $t } from '@/utils'
+
 import AMap from './components/AMap.vue'
 import BMap from './components/BMap.vue'
 
@@ -9,19 +11,19 @@ defineOptions({
 const maps = [
   {
     id: 'BMap',
-    label: '百度地圖',
+    label: $t('map.baiduMap'),
     component: BMap,
   },
   {
     id: 'AMap',
-    label: '高德地圖',
+    label: $t('map.gaodeMap'),
     component: AMap,
   },
 ]
 </script>
 
 <template>
-  <n-card title="地圖範例(keepalive快取)">
+  <n-card :title="$t('map.mapExample')">
     <n-tabs
       type="line"
       animated

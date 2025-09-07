@@ -4,14 +4,16 @@ import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { DataTableColumns, FormInst, FormRules, NDataTable } from 'naive-ui'
 import type { ComputedRef, VNode } from 'vue'
 
-import CopyText from '@/components/custom/CopyText.vue'
-import { useBoolean, useThrottleAction } from '@/hooks'
-import { useDictStore, useLanguageStore } from '@/store'
-import { arrayToTree, sortTreeData } from '@/utils/array'
-import { createIcon } from '@/utils/icon'
 import { useDebounceFn } from '@vueuse/core'
 import { NButton, NPopconfirm, NPopover, NSpace, useThemeVars } from 'naive-ui'
 import IconAttention from '~icons/icon-park-outline/attention'
+
+import CopyText from '@/components/custom/CopyText.vue'
+import { useBoolean, useThrottleAction } from '@/hooks'
+import { useDictStore, useLanguageStore } from '@/store'
+import { $t } from '@/utils'
+import { arrayToTree, sortTreeData } from '@/utils/array'
+import { createIcon } from '@/utils/icon'
 
 import AsyncDictLabel from '../AsyncDictLabel/index.vue'
 import TableModal from './components/TableModal.vue'
@@ -67,7 +69,6 @@ const props = defineProps<{
   permission: Record<string, string[]> // 權限配置
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
-const { t } = useI18n()
 const languageStore = useLanguageStore()
 
 const propsVerifyPassed = ref(false)
@@ -77,29 +78,29 @@ function propsVerify() {
   const paginationON = props.pagination
   const initQueryParamsIncludePageSize0 = props.initQueryParams?.some((item: InitQueryParams) => item.name === 'pageSize' && item.value === 0)
   if (initQueryParamsIncludePageSize0 && paginationON) {
-    propsVerifyErrorMsg.value = t('dataTable.paginationError')
+    propsVerifyErrorMsg.value = $t('dataTable.paginationError')
     propsVerifyPassed.value = false
     return
   }
 
   // 檢查必要的 CRUD 函數
   if (!props.getFunction) {
-    propsVerifyErrorMsg.value = t('dataTable.getFunctionError')
+    propsVerifyErrorMsg.value = $t('dataTable.getFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.del && !props.deleteFunction) {
-    propsVerifyErrorMsg.value = t('dataTable.deleteFunctionError')
+    propsVerifyErrorMsg.value = $t('dataTable.deleteFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.edit && !props.updateFunction) {
-    propsVerifyErrorMsg.value = t('dataTable.updateFunctionError')
+    propsVerifyErrorMsg.value = $t('dataTable.updateFunctionError')
     propsVerifyPassed.value = false
     return
   }
   if (props.add && !props.createFunction) {
-    propsVerifyErrorMsg.value = t('dataTable.createFunctionError')
+    propsVerifyErrorMsg.value = $t('dataTable.createFunctionError')
     propsVerifyPassed.value = false
     return
   }
@@ -108,7 +109,7 @@ function propsVerify() {
   const searchON = props.search
   const hasPageOutside = props.initQueryParams?.some(item => item.name !== 'pageSize' && item.name !== 'currentPage') || false
   if (searchON && !hasPageOutside) {
-    propsVerifyErrorMsg.value = t('dataTable.searchError')
+    propsVerifyErrorMsg.value = $t('dataTable.searchError')
     propsVerifyPassed.value = false
     return
   }
@@ -119,7 +120,7 @@ function propsVerify() {
     ['name', 'value', 'inputType'].every(key => key in item),
   ) || false
   if (props.initQueryParams && !hasEssential) {
-    propsVerifyErrorMsg.value = t('dataTable.initQueryParamsError')
+    propsVerifyErrorMsg.value = $t('dataTable.initQueryParamsError')
     propsVerifyPassed.value = false
     return
   }
@@ -129,7 +130,7 @@ function propsVerify() {
     item.inputType === 'select' && (!item.dictType && !item.selectOptions),
   )
   if (!hasSelectCarryDictType) {
-    propsVerifyErrorMsg.value = t('dataTable.initQueryParamsSelectError')
+    propsVerifyErrorMsg.value = $t('dataTable.initQueryParamsSelectError')
     propsVerifyPassed.value = false
     return
   }
@@ -141,12 +142,12 @@ function propsVerify() {
 
     if (pageSizeParam) {
       if (typeof pageSizeParam.value !== 'number') {
-        propsVerifyErrorMsg.value = t('dataTable.pageSizeError')
+        propsVerifyErrorMsg.value = $t('dataTable.pageSizeError')
         propsVerifyPassed.value = false
         return
       }
       if (pageSizeParam.value < 0) {
-        propsVerifyErrorMsg.value = t('dataTable.pageSizeNegativeError')
+        propsVerifyErrorMsg.value = $t('dataTable.pageSizeNegativeError')
         propsVerifyPassed.value = false
         return
       }
@@ -154,12 +155,12 @@ function propsVerify() {
 
     if (currentPageParam) {
       if (typeof currentPageParam.value !== 'number') {
-        propsVerifyErrorMsg.value = t('dataTable.currentPageError')
+        propsVerifyErrorMsg.value = $t('dataTable.currentPageError')
         propsVerifyPassed.value = false
         return
       }
       if (currentPageParam.value <= 0) {
-        propsVerifyErrorMsg.value = t('dataTable.currentPageNegativeError')
+        propsVerifyErrorMsg.value = $t('dataTable.currentPageNegativeError')
         propsVerifyPassed.value = false
         return
       }
@@ -171,14 +172,14 @@ function propsVerify() {
   for (const item of selectFormItems) {
     // 檢查是否有任一選項來源
     if (!item.selectOptions && !item.dictType) {
-      propsVerifyErrorMsg.value = t('dataTable.selectOptionsError')
+      propsVerifyErrorMsg.value = $t('dataTable.selectOptionsError')
       propsVerifyPassed.value = false
       return
     }
 
     // 檢查是否同時存在兩種選項來源
     if (item.selectOptions && item.dictType) {
-      propsVerifyErrorMsg.value = t('dataTable.selectOptionsDictTypeError')
+      propsVerifyErrorMsg.value = $t('dataTable.selectOptionsDictTypeError')
       propsVerifyPassed.value = false
       return
     }
@@ -186,22 +187,22 @@ function propsVerify() {
     // 如果使用selectOptions，檢查必要屬性
     if (item.selectOptions) {
       if (!item.selectOptions.api) {
-        propsVerifyErrorMsg.value = t('dataTable.selectOptionsApiError')
+        propsVerifyErrorMsg.value = $t('dataTable.selectOptionsApiError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.selectParam) {
-        propsVerifyErrorMsg.value = t('dataTable.selectOptionsSelectParamError')
+        propsVerifyErrorMsg.value = $t('dataTable.selectOptionsSelectParamError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping) {
-        propsVerifyErrorMsg.value = t('dataTable.selectOptionsItemMappingError')
+        propsVerifyErrorMsg.value = $t('dataTable.selectOptionsItemMappingError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
-        propsVerifyErrorMsg.value = t('dataTable.itemMappingError')
+        propsVerifyErrorMsg.value = $t('dataTable.itemMappingError')
         propsVerifyPassed.value = false
         return
       }
@@ -213,14 +214,14 @@ function propsVerify() {
   for (const item of radioFormItems) {
     // 檢查是否有任一選項來源
     if (!item.selectOptions && !item.dictType) {
-      propsVerifyErrorMsg.value = t('dataTable.radioOptionsError')
+      propsVerifyErrorMsg.value = $t('dataTable.radioOptionsError')
       propsVerifyPassed.value = false
       return
     }
 
     // 檢查是否同時存在兩種選項來源
     if (item.selectOptions && item.dictType) {
-      propsVerifyErrorMsg.value = t('dataTable.radioOptionsDictTypeError')
+      propsVerifyErrorMsg.value = $t('dataTable.radioOptionsDictTypeError')
       propsVerifyPassed.value = false
       return
     }
@@ -228,17 +229,17 @@ function propsVerify() {
     // 如果使用selectOptions，檢查必要屬性
     if (item.selectOptions) {
       if (!item.selectOptions.api) {
-        propsVerifyErrorMsg.value = t('dataTable.selectOptionsApiError')
+        propsVerifyErrorMsg.value = $t('dataTable.selectOptionsApiError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping) {
-        propsVerifyErrorMsg.value = t('dataTable.selectOptionsItemMappingError')
+        propsVerifyErrorMsg.value = $t('dataTable.selectOptionsItemMappingError')
         propsVerifyPassed.value = false
         return
       }
       if (!item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value) {
-        propsVerifyErrorMsg.value = t('dataTable.itemMappingError')
+        propsVerifyErrorMsg.value = $t('dataTable.itemMappingError')
         propsVerifyPassed.value = false
         return
       }
@@ -250,7 +251,7 @@ function propsVerify() {
     item.type === 'radio' && !item.dictType && (!item.selectOptions || !item.selectOptions.api || !item.selectOptions.itemMapping || !item.selectOptions.itemMapping.label || !item.selectOptions.itemMapping.value),
   )
   if (!hasRadioCarryDictType) {
-    propsVerifyErrorMsg.value = t('dataTable.radioOptionsErrorMsg')
+    propsVerifyErrorMsg.value = $t('dataTable.radioOptionsErrorMsg')
     propsVerifyPassed.value = false
     return
   }
@@ -258,28 +259,28 @@ function propsVerify() {
   // 如果 columns 存在 status 欄位，則必須包含 blockFunction 和 unblockFunction
   const hasStatusColumn = props.columns.some(item => 'key' in item && item.key === 'status')
   if (hasStatusColumn && (!props.blockFunction || !props.unblockFunction)) {
-    propsVerifyErrorMsg.value = t('dataTable.statusColumnError')
+    propsVerifyErrorMsg.value = $t('dataTable.statusColumnError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnName 存在則必須提供 filterColumnValue
   if (props.filterColumnName && !props.filterColumnValue) {
-    propsVerifyErrorMsg.value = t('dataTable.filterColumnNameError')
+    propsVerifyErrorMsg.value = $t('dataTable.filterColumnNameError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnValue 存在則必須提供 filterColumnName
   if (props.filterColumnValue && !props.filterColumnName) {
-    propsVerifyErrorMsg.value = t('dataTable.filterColumnValueError')
+    propsVerifyErrorMsg.value = $t('dataTable.filterColumnValueError')
     propsVerifyPassed.value = false
     return
   }
 
   // 如果 filterColumnValue.value 不是非空 string 則報錯
   if (props.filterColumnValue && (typeof props.filterColumnValue.value !== 'string' || props.filterColumnValue.value === '')) {
-    propsVerifyErrorMsg.value = t('dataTable.filterColumnValueStringError')
+    propsVerifyErrorMsg.value = $t('dataTable.filterColumnValueStringError')
     propsVerifyPassed.value = false
     return
   }
@@ -302,7 +303,7 @@ function propsVerify() {
         const allHaveShowCondition = itemsWithSameName.every(item => item.showCondition !== undefined)
 
         if (!allHaveShowCondition) {
-          propsVerifyErrorMsg.value = t('dataTable.initFormDataNameError1') + name + t('dataTable.initFormDataNameError2')
+          propsVerifyErrorMsg.value = $t('dataTable.initFormDataNameError1') + name + $t('dataTable.initFormDataNameError2')
           propsVerifyPassed.value = false
           return
         }
@@ -312,7 +313,7 @@ function propsVerify() {
 
   // 如果開啟了菜單功能，則必須提供 getMenuDataFunction 和 filterField
   if (props.showMenu && (!props.getMenuDataFunction || !props.filterField)) {
-    propsVerifyErrorMsg.value = t('dataTable.menuFunctionError')
+    propsVerifyErrorMsg.value = $t('dataTable.menuFunctionError')
     propsVerifyPassed.value = false
     return
   }
@@ -322,12 +323,12 @@ function propsVerify() {
   const fileFormItems = props.initFormData?.filter((item: InitFormData) => item.type === 'file') || []
   for (const item of fileFormItems) {
     if (!item.fileOptions) {
-      propsVerifyErrorMsg.value = 'type 為 file 的欄位必須包含 fileOptions 屬性'
+      propsVerifyErrorMsg.value = $t('dataTable.typeFileError')
       propsVerifyPassed.value = false
       return
     }
     if (item.fileOptions.singleFile && item.fileOptions.maxFileCount !== 1) {
-      propsVerifyErrorMsg.value = '如果 fileOptions 中存在 singleFile 為 true，則必須包含 maxFileCount 為 1'
+      propsVerifyErrorMsg.value = $t('dataTable.singleFileError')
       propsVerifyPassed.value = false
       return
     }
@@ -662,7 +663,7 @@ const columns = computed(() => {
   const indexColumn = props.index
     ? [
         {
-          title: t('dataTable.serialNumber'),
+          title: $t('dataTable.serialNumber'),
           key: 'index',
           align: 'center',
           fixed: 'left',
@@ -719,7 +720,7 @@ const columns = computed(() => {
                 trigger: 'hover',
               }, {
                 trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
-                default: () => h('span', t('dataTable.multilingualNotSet')),
+                default: () => h('span', $t('dataTable.multilingualNotSet')),
               }),
             ])
           }
@@ -757,7 +758,7 @@ const columns = computed(() => {
                 trigger: 'hover',
               }, {
                 trigger: () => h(IconAttention, { style: { color: themeVars.value.warningColor } }),
-                default: () => h('span', t('dataTable.multilingualNotSet')),
+                default: () => h('span', $t('dataTable.multilingualNotSet')),
               }),
             ])
           }
@@ -795,7 +796,7 @@ const columns = computed(() => {
   // 操作列  - 內部的 actions 和 externalActionsColumn 合併
   const operateColumn = [
     {
-      title: t('common.action'),
+      title: $t('common.action'),
       align: 'center',
       key: 'actions',
       width: externalActionsColumn?.width || 280,
@@ -813,7 +814,7 @@ const columns = computed(() => {
                   modalRef.value.openModal('view', row, parentData)
                 }}
               >
-                {t('common.check')}
+                {$t('common.check')}
               </NButton>
             )}
             {props.edit && (
@@ -825,13 +826,13 @@ const columns = computed(() => {
                   modalRef.value.openModal('edit', row, parentData)
                 }}
               >
-                {t('common.edit')}
+                {$t('common.edit')}
               </NButton>
             )}
             {props.del && (
               <NPopconfirm onPositiveClick={() => handleDelete(row)}>
                 {{
-                  default: () => t('common.deleteConfirm'),
+                  default: () => $t('common.deleteConfirm'),
                   trigger: () => (
                     <NButton
                       v-hasPermi={props.permission.delete}
@@ -839,7 +840,7 @@ const columns = computed(() => {
                       type="error"
                       loading={delBtnLoadMap.value[row.id!]}
                     >
-                      {t('common.delete')}
+                      {$t('common.delete')}
                     </NButton>
                   ),
                 }}
@@ -979,7 +980,7 @@ function handleAdd() {
 async function handleDelete(row: TableRow) {
   try {
     if (row.children && row.children.length > 0) {
-      window.$message.warning(t('dataTable.hasChildrenDeleteError'))
+      window.$message.warning($t('dataTable.hasChildrenDeleteError'))
       return
     }
 
@@ -1018,10 +1019,10 @@ async function handleDelete(row: TableRow) {
       deleteRecursively(list.value)
     }
 
-    window.$message.success(t('dataTable.deleteSuccess') + props.modalName)
+    window.$message.success($t('dataTable.deleteSuccess') + props.modalName)
   }
   catch (error) {
-    window.$message.error(t('dataTable.deleteError-1') + row.id + t('dataTable.deleteError-2') + error)
+    window.$message.error($t('dataTable.deleteError-1') + row.id + $t('dataTable.deleteError-2') + error)
   }
   finally {
     delBtnLoadMap.value[row.id!] = false
@@ -1034,7 +1035,7 @@ const batchDeleteLoading = ref(false)
 const checkedRowKeys = ref<string[]>([])
 async function handleBatchDelete() {
   if (checkedRowKeys.value.length === 0) {
-    window.$message.warning(t('dataTable.batchDeleteError'))
+    window.$message.warning($t('dataTable.batchDeleteError'))
     return
   }
   showBatchDeleteModalRef.value = true
@@ -1073,8 +1074,8 @@ async function confirmBatchDelete() {
         successDeletedIds.push(id)
       }
       catch (error) {
-        console.error(t('dataTable.deleteError-1') + id + t('dataTable.deleteError-2') + error)
-        window.$message.error(t('dataTable.deleteError-1') + id + t('dataTable.deleteError-2'))
+        console.error($t('dataTable.deleteError-1') + id + $t('dataTable.deleteError-2') + error)
+        window.$message.error($t('dataTable.deleteError-1') + id + $t('dataTable.deleteError-2'))
         // 繼續處理下一個，不中斷整個過程
       }
     }
@@ -1093,7 +1094,7 @@ async function confirmBatchDelete() {
     }
 
     if (successDeletedIds.length > 0) {
-      window.$message.success(t('dataTable.batchDeleteSuccess1') + successDeletedIds.length + t('dataTable.batchDeleteSuccess2'))
+      window.$message.success($t('dataTable.batchDeleteSuccess1') + successDeletedIds.length + $t('dataTable.batchDeleteSuccess2'))
     }
 
     // 只移除成功刪除的 ID
@@ -1105,11 +1106,11 @@ async function confirmBatchDelete() {
     }
     else {
       // 如果有剩餘的未成功刪除的項目，顯示提示
-      window.$message.warning(checkedRowKeys.value.length + t('dataTable.batchDeleteFailed'))
+      window.$message.warning(checkedRowKeys.value.length + $t('dataTable.batchDeleteFailed'))
     }
   }
   catch {
-    window.$message.error(t('dataTable.batchDeleteProcessError'))
+    window.$message.error($t('dataTable.batchDeleteProcessError'))
   }
   finally {
     batchDeleteLoading.value = false
@@ -1233,7 +1234,7 @@ async function updateChildrenStatus(item: TableRow) {
           catch {
             // API調用失敗，恢復狀態為啟用
             child.status = 1
-            window.$message.error(t('dataTable.blockOperationFailed') + child.id)
+            window.$message.error($t('dataTable.blockOperationFailed') + child.id)
           }
         }
         // 繼續處理這個子項的子項（如果有的話）
@@ -1641,7 +1642,7 @@ onMounted(async () => {
   <n-result
     v-if="!propsVerifyPassed"
     status="error"
-    :title="t('dataTable.propsVerifyError')"
+    :title="$t('dataTable.propsVerifyError')"
     :description="propsVerifyErrorMsg"
   />
 
@@ -1658,17 +1659,17 @@ onMounted(async () => {
                 >
                   <n-input
                     v-if="item.inputType === 'input'" v-model:value="queryParams[item.name]"
-                    :placeholder="item.placeholder || t('common.inputPlaceholder')"
+                    :placeholder="item.placeholder || $t('common.inputPlaceholder')"
                   />
                   <n-input-number
                     v-if="item.inputType === 'input-number'" v-model:value="queryParams[item.name]"
-                    :placeholder="item.placeholder || t('common.inputPlaceholder')"
+                    :placeholder="item.placeholder || $t('common.inputPlaceholder')"
                   />
                   <n-select
                     v-if="item.inputType === 'select' && item.dictType"
                     v-model:value="queryParams[item.name]"
                     :options="dictOptionsMap[item.dictType]"
-                    :placeholder="item.placeholder || t('common.selectPlaceholder')"
+                    :placeholder="item.placeholder || $t('common.selectPlaceholder')"
                     :loading="selectLoadingMap[item.dictType]"
                     clearable
                     @update:value="getList"
@@ -1682,8 +1683,8 @@ onMounted(async () => {
                     remote
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
-                    :placeholder="item.placeholder || t('dataTable.searchPlaceholder')"
-                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    :placeholder="item.placeholder || $t('dataTable.searchPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? $t('dataTable.searching') : $t('dataTable.noMatchingOptions')"
                     key-field="key"
                     label-field="label"
                     children-field="children"
@@ -1701,8 +1702,8 @@ onMounted(async () => {
                     remote
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
-                    :placeholder="item.placeholder || t('common.selectPlaceholder')"
-                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    :placeholder="item.placeholder || $t('common.selectPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? $t('dataTable.searching') : $t('dataTable.noMatchingOptions')"
                     clearable
                     :multiple="item.selectOptions?.multiple"
                     @search="(query: string) => handleSearch(query, item)"
@@ -1715,13 +1716,13 @@ onMounted(async () => {
                   <template #icon>
                     <icon-park-outline-search />
                   </template>
-                  {{ t('common.search') }}
+                  {{ $t('common.search') }}
                 </NButton>
                 <NButton strong secondary @click="handleResetSearch">
                   <template #icon>
                     <icon-park-outline-redo />
                   </template>
-                  {{ t('common.reset') }}
+                  {{ $t('common.reset') }}
                 </NButton>
               </n-flex>
             </n-flex>
@@ -1737,14 +1738,14 @@ onMounted(async () => {
                 <template #icon>
                   <icon-park-outline-add-one />
                 </template>
-                {{ t('common.add') + props.modalName }}
+                {{ $t('common.add') + props.modalName }}
               </NButton>
 
               <NButton v-if="del" v-hasPermi="permission.delete" type="error" class="m-l-10px" :disabled="checkedRowKeys.length === 0" @click="handleBatchDelete">
                 <template #icon>
                   <icon-park-outline-delete />
                 </template>
-                {{ t('common.batchDelete') }}
+                {{ $t('common.batchDelete') }}
               </NButton>
 
               <template v-for="item in neckSlot" :key="item">
@@ -1805,15 +1806,15 @@ onMounted(async () => {
       <n-modal
         v-model:show="showBatchDeleteModalRef"
         preset="dialog"
-        :title="t('common.confirmDelete')"
-        :positive-text="t('common.confirm')"
-        :negative-text="t('common.cancel')"
+        :title="$t('common.confirmDelete')"
+        :positive-text="$t('common.confirm')"
+        :negative-text="$t('common.cancel')"
         :loading="batchDeleteLoading"
         @positive-click="confirmBatchDelete"
         @negative-click="() => { showBatchDeleteModalRef = false }"
       >
         <template #default>
-          {{ t('dataTable.batchDeleteModalTitle1') + checkedRowKeys.length + t('dataTable.batchDeleteModalTitle2') }}
+          {{ $t('dataTable.batchDeleteModalTitle1') + checkedRowKeys.length + $t('dataTable.batchDeleteModalTitle2') }}
         </template>
       </n-modal>
     </NSpace>

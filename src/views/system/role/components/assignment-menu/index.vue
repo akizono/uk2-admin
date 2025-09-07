@@ -2,12 +2,14 @@
 import type { MenuVO } from '@/api/system/menu'
 import type { RoleVO } from '@/api/system/role'
 
+import { ElTree } from 'element-plus'
+import { useDialog } from 'naive-ui'
+
 import { MenuApi } from '@/api/system/menu'
 import { RoleMenuApi } from '@/api/system/role-menu'
 import { useAppStore } from '@/store/'
+import { $t } from '@/utils'
 import { arrayToTree, sortTreeData } from '@/utils/array'
-import { ElTree } from 'element-plus'
-import { useDialog } from 'naive-ui'
 
 const appStore = useAppStore()
 const dialog = useDialog()
@@ -60,7 +62,7 @@ async function handleSubmit() {
   try {
     const roleId = rowData.value.id
     if (roleId === '1') {
-      return window.$message.error('「超級管理員」的權限禁止修改')
+      return window.$message.error($t('role.superAdminPermissionForbidden'))
     }
 
     loading.value = true
@@ -75,15 +77,15 @@ async function handleSubmit() {
 
     if (data.menuIds.length === 0) {
       return dialog.warning({
-        title: '警告',
-        content: '目前為角色分配的菜單為空，將會導致該角色無法使用任何功能，包括無法正常登入系統，確定要繼續嗎？',
-        positiveText: '確定',
-        negativeText: '取消',
+        title: $t('common.warn'),
+        content: $t('role.emptyMenuAssignmentWarning'),
+        positiveText: $t('common.confirm'),
+        negativeText: $t('common.cancel'),
         draggable: true,
         onPositiveClick: async () => {
           await RoleMenuApi.batchUpdate(data)
           modalVisible.value = false
-          window.$message.success('保存成功')
+          window.$message.success($t('common.saveSuccess'))
         },
         onNegativeClick: () => {
         },
@@ -92,7 +94,7 @@ async function handleSubmit() {
 
     await RoleMenuApi.batchUpdate(data)
     modalVisible.value = false
-    window.$message.success('保存成功')
+    window.$message.success($t('common.saveSuccess'))
   }
   finally {
     loading.value = false
@@ -127,7 +129,7 @@ defineExpose({
     v-model:show="modalVisible"
     :mask-closable="false"
     preset="card"
-    :title="`${modalTitle} - 菜單&權限`"
+    :title="`${modalTitle} - ${$t('role.menuAndPermission')}`"
     class="max-w-680px w-100%"
     :segmented="{
       content: true,
@@ -139,18 +141,18 @@ defineExpose({
         <n-space>
           <n-button-group size="small">
             <n-button type="primary" round @click="handleAllCheckedChange(true)">
-              全部選中
+              {{ $t('role.selectAll') }}
             </n-button>
             <n-button type="warning" round @click="handleAllCheckedChange(false)">
-              全部取消
+              {{ $t('role.cancelAll') }}
             </n-button>
           </n-button-group>
           <n-button-group size="small">
             <n-button type="primary" secondary round @click="handleMenuExpandChange(true)">
-              全部展開
+              {{ $t('role.expandAll') }}
             </n-button>
             <n-button type="warning" secondary round @click="handleMenuExpandChange(false)">
-              全部折疊
+              {{ $t('role.collapseAll') }}
             </n-button>
           </n-button-group>
         </n-space>
@@ -160,7 +162,7 @@ defineExpose({
           ref="treeRef"
           :data="treeList"
           :props="defaultProps"
-          empty-text="載入中，請稍後..."
+          :empty-text="$t('role.loadingPleaseWait')"
           node-key="id"
           show-checkbox
           :class="appStore.colorMode === 'dark' ? 'el-tree-dark' : 'el-tree-light'"
@@ -171,10 +173,10 @@ defineExpose({
     <template #action>
       <n-space justify="center">
         <n-button type="primary" :loading="loading" @click="handleSubmit">
-          保存
+          {{ $t('common.save') }}
         </n-button>
         <n-button :disabled="loading" @click="modalVisible = false">
-          取消
+          {{ $t('common.cancel') }}
         </n-button>
       </n-space>
     </template>

@@ -2,10 +2,12 @@
 import type { RoleVO } from '@/api/system/role'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
+import { type DataTableColumns, type FormRules, NButton, NSwitch } from 'naive-ui'
+
 import { RoleApi } from '@/api/system/role'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
-import { type DataTableColumns, type FormRules, NButton, NSwitch } from 'naive-ui'
+import { $t } from '@/utils'
 
 import AssignmentMenu from './components/assignment-menu/index.vue'
 
@@ -14,7 +16,6 @@ defineOptions({
 })
 
 const { hasPermi } = usePermi()
-const { t } = useI18n()
 
 const dataTableRef = ref()
 const assignmentMenuRef = ref()
@@ -34,17 +35,17 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'code',
     value: undefined,
-    label: '角色代碼',
+    label: $t('role.code'),
     class: '!w-64',
-    placeholder: '請填寫',
+    placeholder: $t('role.inputPlaceholder'),
     inputType: 'input',
   },
   {
     name: 'name',
     value: undefined,
-    label: '角色名稱',
+    label: $t('role.name'),
     class: '!w-64',
-    placeholder: '請填寫',
+    placeholder: $t('role.inputPlaceholder'),
     inputType: 'input',
   },
 
@@ -53,28 +54,28 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<RoleVO> = [
   {
-    title: '角色代碼',
+    title: $t('role.code'),
     align: 'left',
     key: 'code',
     copy: true,
   },
   {
-    title: '角色名稱',
+    title: $t('role.name'),
     align: 'left',
     key: 'name',
   },
   {
-    title: '備注',
+    title: $t('role.remark'),
     align: 'left',
     key: 'remark',
   },
   {
-    title: t('common.sort'),
+    title: $t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: t('common.status'),
+    title: $t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: RoleVO) => {
@@ -88,13 +89,13 @@ const columns: DataTableColumns<RoleVO> = [
     },
   },
   {
-    title: t('common.action'),
+    title: $t('common.action'),
     key: 'actions',
     width: '400px',
     render: (row: RoleVO) => {
       return (
         <NButton disabled={row.status === 0} size="small" onClick={() => assignmentMenuRef.value.openModal(row)}>
-          菜單&權限
+          {$t('role.menuAndPermission')}
         </NButton>
       )
     },
@@ -112,42 +113,42 @@ const initFormData: InitFormData[] = [
     name: 'code',
     value: undefined,
     span: 2,
-    label: '角色代碼',
+    label: $t('role.code'),
     type: 'input',
   },
   {
     name: 'name',
     value: undefined,
     span: 2,
-    label: '角色名稱',
+    label: $t('role.name'),
     type: 'input',
   },
   {
     name: 'description',
     value: undefined,
     span: 2,
-    label: '角色描述',
+    label: $t('role.description'),
     type: 'textarea',
   },
   {
     name: 'sort',
     value: undefined,
     span: 2,
-    label: t('common.sort'),
+    label: $t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: t('common.remark'),
+    label: $t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 2,
-    label: t('common.status'),
+    label: $t('common.status'),
     type: 'switch',
   },
 ]
@@ -156,12 +157,12 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   code: {
     required: true,
-    message: '角色代碼不能為空',
+    message: $t('role.codeNotEmpty'),
     trigger: ['blur', 'input'],
   },
   name: {
     required: true,
-    message: '角色名稱不能為空',
+    message: $t('role.nameNotEmpty'),
     trigger: ['blur', 'input'],
   },
   sort: {
@@ -199,7 +200,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '角色', // 表格中的數據名稱
+  modalName: $t('role.role'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }

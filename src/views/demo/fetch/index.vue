@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { $t } from '@/utils'
+
 import Delete from './components/Delete.vue'
 import DownLoad from './components/DownLoad.vue'
 import DownLoadWithProgress from './components/DownLoadWithProgress.vue'
@@ -17,7 +19,7 @@ function handleUpdate(data: any) {
 </script>
 
 <template>
-  <n-card title="網路請求範例">
+  <n-card :title="$t('fetch.title')">
     <n-split direction="horizontal" :max="0.75" :min="0.25">
       <template #1>
         <div class="grid grid-cols-3 gap-2 p-2">

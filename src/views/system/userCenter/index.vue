@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/store'
-import { getDictLabel } from '@/utils'
+import { $t, getDictLabel } from '@/utils'
 
 import UpdateEmailOrMobile from './components/update-email-or-mobile/index.vue'
 import UpdatePassword from './components/update-password/index.vue'
@@ -47,7 +47,7 @@ function handleEditPassword() {
           <template #icon>
             <icon-park-outline-edit />
           </template>
-          個人資訊
+          {{ $t('userCenter.personalInfo') }}
         </n-button>
       </template>
       <n-space size="large">
@@ -55,44 +55,44 @@ function handleEditPassword() {
         <n-descriptions
           label-placement="left"
           :column="2"
-          :title="`傍晚好，${user?.nickname || user?.username}，這裡是簡單的個人中心模板`"
+          :title="`${$t('userCenter.greetingPrefix')}${user?.nickname || user?.username}${$t('userCenter.greetingSuffix')}`"
         >
           <n-descriptions-item label="id">
             {{ user!.id }}
           </n-descriptions-item>
-          <n-descriptions-item label="使用者名稱">
+          <n-descriptions-item :label="$t('userCenter.username')">
             {{ user!.username }}
           </n-descriptions-item>
-          <n-descriptions-item label="暱稱">
+          <n-descriptions-item :label="$t('userCenter.nickname')">
             {{ user?.nickname }}
           </n-descriptions-item>
-          <n-descriptions-item label="年齡">
+          <n-descriptions-item :label="$t('userCenter.ageLabel')">
             {{ user?.age }}
           </n-descriptions-item>
-          <n-descriptions-item label="性別">
+          <n-descriptions-item :label="$t('userCenter.sexLabel')">
             {{ getDictLabel('system_user_sex', user?.sex) }}
           </n-descriptions-item>
-          <n-descriptions-item label="角色">
+          <n-descriptions-item :label="$t('userCenter.roleLabel')">
             {{ user!.roleNames!.join('、 ') }}
           </n-descriptions-item>
-          <n-descriptions-item :span="2" label="手機號碼">
-            {{ user?.mobile || '未綁定' }}
+          <n-descriptions-item :span="2" :label="$t('userCenter.mobileNumberLabel')">
+            {{ user?.mobile || $t('userCenter.unbound') }}
             <n-button text icon-placement="right" strong @click="handleEditMobile">
               <template #icon>
                 <icon-park-outline-edit />
               </template>
             </n-button>
           </n-descriptions-item>
-          <n-descriptions-item :span="2" label="電子郵件">
-            {{ user?.email || '未綁定' }}
+          <n-descriptions-item :span="2" :label="$t('userCenter.emailLabel')">
+            {{ user?.email || $t('userCenter.unbound') }}
             <n-button text icon-placement="right" strong @click="handleEditEmail">
               <template #icon>
                 <icon-park-outline-edit />
               </template>
             </n-button>
           </n-descriptions-item>
-          <n-descriptions-item :span="2" label="登錄密碼">
-            已設置
+          <n-descriptions-item :span="2" :label="$t('userCenter.loginPasswordLabel')">
+            {{ $t('userCenter.passwordSetStatus') }}
             <n-button text icon-placement="right" strong @click="handleEditPassword">
               <template #icon>
                 <icon-park-outline-edit />

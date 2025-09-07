@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { UserVo } from '@/api/system/user'
+import type { UserVO } from '@/api/system/user'
 import type { FormRules } from 'naive-ui'
 
 import { UserApi } from '@/api/system/user'
 import { useAuthStore } from '@/store/model/auth'
-import { getDictData } from '@/utils'
+import { $t, getDictData } from '@/utils'
 
 const props = withDefaults(defineProps<{
   show: boolean
-  user?: UserVo
+  user?: UserVO
 }>(), {
   show: false,
   user: undefined,
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 const authStore = useAuthStore()
 
 const formRef = ref()
-const formValue = ref<Partial<UserVo>>({})
+const formValue = ref<Partial<UserVO>>({})
 const sexOptions = getDictData('system_user_sex')
 const loading = ref(false)
 
@@ -32,13 +32,13 @@ const rules: FormRules = {
       required: true,
       validator: (rule, value) => {
         if (value === null || value === undefined) {
-          return new Error('請輸入年齡')
+          return new Error($t('userCenter.inputAge'))
         }
         if (value < 0) {
-          return new Error('年齡不能小於0歲')
+          return new Error($t('userCenter.ageCannotBeLessThanZero'))
         }
         if (value > 127) {
-          return new Error('年齡不能超過127歲')
+          return new Error($t('userCenter.ageCannotExceed127'))
         }
         return true
       },
@@ -53,7 +53,7 @@ async function handleValidateClick() {
 
     loading.value = true
     await UserApi.updatePersonalInfo(formValue.value)
-    window.$message.success('修改成功')
+    window.$message.success($t('userCenter.personalInfoUpdateSuccess'))
 
     // 更新個人資訊
     authStore.updatePersonalInfo()
@@ -87,7 +87,7 @@ watch(() => props.show, (newVal) => {
   <n-modal
     :show="show"
     preset="card"
-    title="資訊修改"
+    :title="$t('userCenter.personalInfoUpdateTitle')"
     class="w-600px"
     @update:show="emit('update:show', $event)"
   >
@@ -100,16 +100,16 @@ watch(() => props.show, (newVal) => {
           :rules="rules"
           label-placement="left"
         >
-          <n-form-item label="暱稱" path="nickname">
-            <n-input v-model:value="formValue.nickname" placeholder="輸入暱稱" />
+          <n-form-item :label="$t('userCenter.nickname')" path="nickname">
+            <n-input v-model:value="formValue.nickname" :placeholder="$t('userCenter.inputNicknamePlaceholder')" />
           </n-form-item>
-          <n-form-item label="年齡" path="age">
-            <n-input-number v-model:value="formValue.age" placeholder="輸入年齡" class="w-full" />
+          <n-form-item :label="$t('userCenter.ageLabel')" path="age">
+            <n-input-number v-model:value="formValue.age" :placeholder="$t('userCenter.inputAgePlaceholder')" class="w-full" />
           </n-form-item>
-          <n-form-item label="性別" path="sex">
-            <n-select v-model:value="formValue.sex" placeholder="輸入性別" :options="sexOptions" />
+          <n-form-item :label="$t('userCenter.sexLabel')" path="sex">
+            <n-select v-model:value="formValue.sex" :placeholder="$t('userCenter.inputSexPlaceholder')" :options="sexOptions" />
           </n-form-item>
-          <n-form-item label="頭像地址" path="avatar">
+          <n-form-item :label="$t('userCenter.avatarAddressLabel')" path="avatar">
             <n-input v-model:value="formValue.avatar" />
           </n-form-item>
         </n-form>
@@ -118,10 +118,10 @@ watch(() => props.show, (newVal) => {
     <template #action>
       <n-flex justify="center">
         <n-button type="primary" :loading="loading" @click="handleValidateClick">
-          確認修改
+          {{ $t('userCenter.confirmUpdate') }}
         </n-button>
         <n-button @click="handleCancel">
-          取消
+          {{ $t('common.cancel') }}
         </n-button>
       </n-flex>
     </template>

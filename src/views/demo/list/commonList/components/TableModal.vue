@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { User } from '@/api/demo/system'
 
+import { $t } from '@/utils'
+
 interface Props {
   visible: boolean
   type?: ModalType
@@ -39,8 +41,8 @@ function closeModal(visible = false) {
 type ModalType = 'add' | 'edit'
 const title = computed(() => {
   const titles: Record<ModalType, string> = {
-    add: '添加用戶',
-    edit: '編輯用戶',
+    add: $t('demoList.addUser'),
+    edit: $t('demoList.editUser'),
   }
   return titles[type]
 })
@@ -80,25 +82,25 @@ watch(
   >
     <n-form label-placement="left" :model="formModel" label-align="left" :label-width="80">
       <n-grid :cols="24" :x-gap="18">
-        <n-form-item-grid-item :span="12" label="使用者名稱" path="name">
+        <n-form-item-grid-item :span="12" :label="$t('demoList.userNameField')" path="name">
           <n-input v-model:value="formModel.userName" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="年齡" path="age">
+        <n-form-item-grid-item :span="12" :label="$t('demoList.age')" path="age">
           <n-input-number v-model:value="formModel.gender" />
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="性別" path="gender">
+        <n-form-item-grid-item :span="12" :label="$t('demoList.gender')" path="gender">
           <n-radio-group v-model:value="formModel.gender">
             <n-space>
               <n-radio :value="1">
-                男
+                {{ $t('demoList.male') }}
               </n-radio>
               <n-radio :value="0">
-                女
+                {{ $t('demoList.female') }}
               </n-radio>
             </n-space>
           </n-radio-group>
         </n-form-item-grid-item>
-        <n-form-item-grid-item :span="12" label="信箱" path="email">
+        <n-form-item-grid-item :span="12" :label="$t('demoList.email')" path="email">
           <n-input v-model:value="formModel.email" />
         </n-form-item-grid-item>
       </n-grid>
@@ -106,10 +108,10 @@ watch(
     <template #action>
       <n-space justify="center">
         <n-button @click="closeModal()">
-          取消
+          {{ $t('demoList.cancel') }}
         </n-button>
         <n-button type="primary">
-          提交
+          {{ $t('demoList.submit') }}
         </n-button>
       </n-space>
     </template>

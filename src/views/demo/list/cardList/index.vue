@@ -1,52 +1,54 @@
 <script setup lang="ts">
+import { $t } from '@/utils'
+
 const currentRadio = ref(0)
 
 const cardData = [
   {
-    title: '一类',
+    title: $t('demoList.categoryOne'),
     id: 1,
     children: [
       {
         id: 0,
-        title: '卡片',
-        content: '卡片内容',
+        title: $t('demoList.cardOne'),
+        content: $t('demoList.cardOneContent'),
       },
       {
         id: 1,
-        title: '卡片2',
-        content: '卡片2内容',
+        title: $t('demoList.cardTwo'),
+        content: $t('demoList.cardTwoContent'),
       },
     ],
   },
   {
-    title: '二类',
+    title: $t('demoList.categoryTwo'),
     id: 2,
     children: [
       {
         id: 0,
-        title: '卡片',
-        content: '卡片内容',
+        title: $t('demoList.cardThree'),
+        content: $t('demoList.cardThreeContent'),
       },
       {
         id: 1,
-        title: '卡片2',
-        content: '卡片2内容',
+        title: $t('demoList.cardFour'),
+        content: $t('demoList.cardFourContent'),
       },
     ],
   },
   {
-    title: '三类',
+    title: $t('demoList.categoryThree'),
     id: 3,
     children: [
       {
         id: 0,
-        title: '卡片',
-        content: '卡片内容',
+        title: $t('demoList.cardFive'),
+        content: $t('demoList.cardFiveContent'),
       },
       {
         id: 1,
-        title: '卡片2',
-        content: '卡片2内容',
+        title: $t('demoList.cardSix'),
+        content: $t('demoList.cardSixContent'),
       },
     ],
   },
@@ -54,7 +56,7 @@ const cardData = [
 const radioDate = [
   {
     value: 0,
-    label: '全部',
+    label: $t('demoList.all'),
   },
   ...cardData.map((item) => {
     return { value: item.id, label: item.title }
@@ -110,12 +112,12 @@ const radioDate = [
               <template #action>
                 <n-space justify="space-between">
                   <span />
-                  <n-button>开通</n-button>
+                  <n-button>{{ $t('demoList.activate') }}</n-button>
                 </n-space>
               </template>
               <template #header-extra>
                 <n-tag type="info">
-                  生效中
+                  {{ $t('demoList.active') }}
                 </n-tag>
               </template>
             </n-thing>

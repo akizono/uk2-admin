@@ -2,6 +2,7 @@
 import type { FormInst } from 'naive-ui'
 
 import { UserApi } from '@/api/system/user'
+import { $t } from '@/utils'
 
 const props = withDefaults(defineProps<{
   show: boolean
@@ -13,8 +14,6 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'success'): void
 }>()
-
-// const { t } = useI18n()
 
 const formRef = ref<FormInst | null>(null)
 const formValue = ref({
@@ -30,22 +29,22 @@ const rules = computed(() => {
     oldPassword: {
       required: true,
       trigger: 'blur',
-      message: '請輸入舊密碼',
+      message: $t('userCenter.inputOldPassword'),
     },
     newPassword: {
       required: true,
       trigger: 'blur',
       validator: (rule: unknown, value: string) => {
         if (!value) {
-          return new Error('請輸入新密碼')
+          return new Error($t('userCenter.inputNewPassword'))
         }
 
         if (value.length < 6) {
-          return new Error('密碼長度至少6位')
+          return new Error($t('userCenter.passwordLengthMin'))
         }
 
         if (value === formValue.value.oldPassword) {
-          return new Error('新密碼不能與舊密碼相同')
+          return new Error($t('userCenter.newPasswordCannotBeSameAsOld'))
         }
 
         return true
@@ -56,11 +55,11 @@ const rules = computed(() => {
       trigger: 'blur',
       validator: (rule: unknown, value: string) => {
         if (!value) {
-          return new Error('請確認新密碼')
+          return new Error($t('userCenter.confirmNewPassword'))
         }
 
         if (value !== formValue.value.newPassword) {
-          return new Error('兩次輸入的密碼不一致')
+          return new Error($t('userCenter.passwordsDoNotMatch'))
         }
 
         return true
@@ -81,7 +80,7 @@ async function handleSubmit() {
         newPassword: formValue.value.newPassword,
       })
 
-      window.$message.success('密碼修改成功')
+      window.$message.success($t('userCenter.passwordUpdateSuccess'))
       emit('success')
       emit('update:show', false)
 
@@ -124,7 +123,7 @@ watch(() => props.show, (newVal) => {
   <n-modal
     :show="show"
     preset="card"
-    title="修改密碼"
+    :title="$t('userCenter.updatePasswordTitle')"
     class="w-500px"
     @update:show="emit('update:show', $event)"
   >
@@ -137,27 +136,27 @@ watch(() => props.show, (newVal) => {
           :rules="rules"
           label-placement="left"
         >
-          <n-form-item label="舊密碼" path="oldPassword">
+          <n-form-item :label="$t('userCenter.oldPasswordLabel')" path="oldPassword">
             <n-input
               v-model:value="formValue.oldPassword"
               type="password"
-              placeholder="請輸入舊密碼"
+              :placeholder="$t('userCenter.inputOldPassword')"
               show-password-on="click"
             />
           </n-form-item>
-          <n-form-item label="新密碼" path="newPassword">
+          <n-form-item :label="$t('userCenter.newPasswordLabel')" path="newPassword">
             <n-input
               v-model:value="formValue.newPassword"
               type="password"
-              placeholder="請輸入新密碼（至少6位）"
+              :placeholder="$t('userCenter.inputNewPasswordPlaceholder')"
               show-password-on="click"
             />
           </n-form-item>
-          <n-form-item label="確認密碼" path="confirmPassword">
+          <n-form-item :label="$t('userCenter.confirmPasswordLabel')" path="confirmPassword">
             <n-input
               v-model:value="formValue.confirmPassword"
               type="password"
-              placeholder="請再次輸入新密碼"
+              :placeholder="$t('userCenter.reenterNewPasswordPlaceholder')"
               show-password-on="click"
             />
           </n-form-item>
@@ -167,10 +166,10 @@ watch(() => props.show, (newVal) => {
     <template #action>
       <n-flex justify="center">
         <n-button type="primary" :loading="loading" @click="handleSubmit">
-          確認修改
+          {{ $t('userCenter.confirmUpdate') }}
         </n-button>
         <n-button @click="handleCancel">
-          取消
+          {{ $t('common.cancel') }}
         </n-button>
       </n-flex>
     </template>

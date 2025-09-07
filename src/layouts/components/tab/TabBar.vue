@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationNormalized } from 'vue-router'
 
-import { useAppStore, useTabStore } from '@/store'
 import { useDraggable } from 'vue-draggable-plus'
 import IconClose from '~icons/icon-park-outline/close'
 import IconDelete from '~icons/icon-park-outline/delete-four'
@@ -9,6 +8,9 @@ import IconFullwith from '~icons/icon-park-outline/fullwidth'
 import IconRedo from '~icons/icon-park-outline/redo'
 import IconLeft from '~icons/icon-park-outline/to-left'
 import IconRight from '~icons/icon-park-outline/to-right'
+
+import { useAppStore, useTabStore } from '@/store'
+import { $t } from '@/utils'
 
 import ContentFullScreen from './ContentFullScreen.vue'
 import DropTabs from './DropTabs.vue'
@@ -23,36 +25,35 @@ const router = useRouter()
 function handleTab(route: RouteLocationNormalized) {
   router.push(route.fullPath)
 }
-const { t } = useI18n()
 const options = computed(() => {
   return [
     {
-      label: t('common.reload'),
+      label: $t('common.reload'),
       key: 'reload',
       icon: () => h(IconRedo),
     },
     {
-      label: t('common.close'),
+      label: $t('common.close'),
       key: 'closeCurrent',
       icon: () => h(IconClose),
     },
     {
-      label: t('app.closeOther'),
+      label: $t('app.closeOther'),
       key: 'closeOther',
       icon: () => h(IconDelete),
     },
     {
-      label: t('app.closeLeft'),
+      label: $t('app.closeLeft'),
       key: 'closeLeft',
       icon: () => h(IconLeft),
     },
     {
-      label: t('app.closeRight'),
+      label: $t('app.closeRight'),
       key: 'closeRight',
       icon: () => h(IconRight),
     },
     {
-      label: t('app.closeAll'),
+      label: $t('app.closeAll'),
       key: 'closeAll',
       icon: () => h(IconFullwith),
     },

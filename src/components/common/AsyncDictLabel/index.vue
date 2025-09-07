@@ -19,7 +19,7 @@ async function getLabel() {
     }
   }
   catch (error) {
-    console.warn(`無法載入字典標籤 ${props.dictType}:`, error)
+    console.warn(`Unable to load dictionary tag ${props.dictType}:`, error)
     // 發生錯誤時，顯示原始值或空字串
     label.value = props.value?.toString() || ''
   }

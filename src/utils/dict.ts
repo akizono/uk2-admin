@@ -1,6 +1,7 @@
 import type { DictItem } from '@/store/model/dict'
 
 import { useDictStore } from '@/store'
+import { $t } from '@/utils'
 
 // 全局字典快取
 const dictCache = ref<Record<string, DictItem[]>>({})
@@ -32,7 +33,7 @@ function initDict(dictType: string) {
       }
     })
     .catch((error) => {
-      console.warn(`無法載入字典數據 ${dictType}:`, error)
+      console.warn(`${$t('dictionary.dictLoadError')} ${dictType}:`, error)
       // 設置錯誤狀態，避免無限重試
       errorCache.value[dictType] = true
       // 設置空數組作為快取，避免後續重試

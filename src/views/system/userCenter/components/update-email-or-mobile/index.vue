@@ -7,7 +7,7 @@ import { UserApi } from '@/api/system/user'
 import { CountryCallingCodes } from '@/constants'
 import { Regex } from '@/constants/Regex'
 import { useAuthStore } from '@/store/model/auth'
-import { local } from '@/utils'
+import { $t, local } from '@/utils'
 
 const props = withDefaults(defineProps<{
   show: boolean
@@ -25,7 +25,6 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { t } = useI18n()
 
 const formRef = ref<FormInst | null>(null)
 const formValue = ref({
@@ -46,14 +45,14 @@ const rules = computed(() => {
       trigger: 'blur',
       validator: (rule: unknown, value: string) => {
         if (!value) {
-          return new Error(props.type === 'email' ? '請輸入電子郵件' : '請輸入手機號碼')
+          return new Error(props.type === 'email' ? $t('userCenter.inputEmail') : $t('userCenter.inputMobile'))
         }
 
         if (props.type === 'email') {
           // 電子郵件格式校驗
           const emailRegex = new RegExp(Regex.Email)
           if (!emailRegex.test(value)) {
-            return new Error('請輸入有效的電子郵件格式')
+            return new Error($t('userCenter.invalidEmailFormat'))
           }
         }
 
@@ -63,7 +62,7 @@ const rules = computed(() => {
     verifyCode: {
       required: true,
       trigger: 'blur',
-      message: '請輸入驗證碼',
+      message: $t('userCenter.inputVerifyCode'),
     },
   }
 })
@@ -73,7 +72,7 @@ async function sendVerifyCode() {
     return
 
   if (!formValue.value.value) {
-    window.$message.warning(props.type === 'email' ? '請先輸入電子郵件' : '請先輸入手機號碼')
+    window.$message.warning(props.type === 'email' ? $t('userCenter.inputEmailFirst') : $t('userCenter.inputMobileFirst'))
     return
   }
 
@@ -81,7 +80,7 @@ async function sendVerifyCode() {
   if (props.type === 'email') {
     const emailRegex = new RegExp(Regex.Email)
     if (!emailRegex.test(formValue.value.value)) {
-      window.$message.warning('請輸入有效的電子郵件格式')
+      window.$message.warning($t('userCenter.invalidEmailFormat'))
       return
     }
   }
@@ -90,14 +89,14 @@ async function sendVerifyCode() {
   try {
     if (props.type === 'email') {
       await UserApi.sendBindEmail({ email: formValue.value.value })
-      window.$message.success('驗證碼已發送至您的電子郵件')
+      window.$message.success($t('userCenter.emailCodeSent'))
     }
     else {
       // 添加國家區號前綴
       const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
       const mobileWithCode = `+${countryCode} ${formValue.value.value}`
       await UserApi.sendBindMobile({ mobile: mobileWithCode })
-      window.$message.success('驗證碼已發送至您的手機')
+      window.$message.success($t('userCenter.mobileCodeSent'))
     }
 
     // 開始倒數計時
@@ -151,7 +150,7 @@ async function handleSubmit() {
 
       await UserApi.bindEmailOrMobile(data)
 
-      window.$message.success(props.type === 'email' ? '電子郵件綁定成功' : '手機號碼綁定成功')
+      window.$message.success(props.type === 'email' ? $t('userCenter.emailBindSuccess') : $t('userCenter.mobileBindSuccess'))
 
       // 更新個人資訊
       authStore.updatePersonalInfo()
@@ -203,7 +202,7 @@ function preventNonNumericInput(event: KeyboardEvent) {
 
 // 國家選項
 const countryOptions = computed(() => Object.keys(CountryCallingCodes).map((country: string) => ({
-  label: t(`country.${country}`),
+  label: $t(`country.${country}`),
   value: country,
   rawName: country, // 保存原始名稱，用於顯示
 })))
@@ -224,7 +223,7 @@ watch(() => props.show, (newVal) => {
   <n-modal
     :show="show"
     preset="card"
-    :title="type === 'email' ? '修改電子郵件' : '修改手機號碼'"
+    :title="type === 'email' ? $t('userCenter.updateEmail') : $t('userCenter.updateMobile')"
     class="w-600px"
     @update:show="emit('update:show', $event)"
   >
@@ -237,14 +236,14 @@ watch(() => props.show, (newVal) => {
           :rules="rules"
           label-placement="left"
         >
-          <n-form-item :label="type === 'email' ? '當前電子郵件' : '當前手機號碼'">
-            <n-input disabled :value="currentValue || '未綁定'" />
+          <n-form-item :label="type === 'email' ? $t('userCenter.currentEmail') : $t('userCenter.currentMobile')">
+            <n-input disabled :value="currentValue || $t('userCenter.unbound')" />
           </n-form-item>
-          <n-form-item :label="type === 'email' ? '新電子郵件' : '新手機號碼'" path="value">
+          <n-form-item :label="type === 'email' ? $t('userCenter.newEmail') : $t('userCenter.newMobile')" path="value">
             <n-input
               v-if="type === 'email'"
               v-model:value="formValue.value"
-              placeholder="請輸入新電子郵件"
+              :placeholder="$t('userCenter.inputNewEmail')"
             />
             <div v-else>
               <n-input-group>
@@ -257,23 +256,23 @@ watch(() => props.show, (newVal) => {
                 />
                 <n-input
                   v-model:value="formValue.value"
-                  placeholder="請輸入新手機號碼"
+                  :placeholder="$t('userCenter.inputNewMobile')"
                   @input="validateMobileInput"
                   @keydown="preventNonNumericInput"
                 />
               </n-input-group>
             </div>
           </n-form-item>
-          <n-form-item label="驗證碼" path="verifyCode">
+          <n-form-item :label="$t('userCenter.verifyCode')" path="verifyCode">
             <n-input-group>
-              <n-input v-model:value="formValue.verifyCode" placeholder="請輸入驗證碼" />
+              <n-input v-model:value="formValue.verifyCode" :placeholder="$t('userCenter.inputVerifyCode')" />
               <n-button
                 :loading="sendCodeLoading"
                 :disabled="countdown > 0"
                 class="min-w-[70px]!"
                 @click="sendVerifyCode"
               >
-                {{ countdown > 0 ? `${countdown}s` : '發送驗證碼' }}
+                {{ countdown > 0 ? `${countdown}s` : $t('userCenter.sendVerifyCode') }}
               </n-button>
             </n-input-group>
           </n-form-item>
@@ -283,10 +282,10 @@ watch(() => props.show, (newVal) => {
     <template #action>
       <n-flex justify="center">
         <n-button type="primary" :loading="loading" @click="handleSubmit">
-          確認修改
+          {{ $t('userCenter.confirmUpdate') }}
         </n-button>
         <n-button @click="handleCancel">
-          取消
+          {{ $t('common.cancel') }}
         </n-button>
       </n-flex>
     </template>

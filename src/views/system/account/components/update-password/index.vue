@@ -1,22 +1,22 @@
 <script setup lang="ts">
+import type { UserVO } from '@/api/system/user'
 import type { FormInst } from 'naive-ui'
 
 import { UserApi } from '@/api/system/user'
+import { $t } from '@/utils'
 
 const props = withDefaults(defineProps<{
   show: boolean
-  currentUser: UserVo
+  currentUser: UserVO
 }>(), {
   show: false,
-  currentUser: () => ({}),
+  currentUser: () => ({} as UserVO),
 })
 
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'success'): void
 }>()
-
-// const { t } = useI18n()
 
 const formRef = ref<FormInst | null>(null)
 const formValue = ref({
@@ -29,7 +29,7 @@ const rules = {
   password: {
     required: true,
     trigger: 'blur',
-    message: '請輸入新密碼',
+    message: $t('account.newPasswordPlaceholder'),
   },
 }
 
@@ -50,7 +50,7 @@ async function handleSubmit() {
         roleIds: props.currentUser.roleIds,
       })
 
-      window.$message.success('密碼修改成功')
+      window.$message.success($t('account.passwordUpdateSuccess'))
       emit('success')
       emit('update:show', false)
     }
@@ -78,7 +78,7 @@ watch(() => props.show, (newVal) => {
   <n-modal
     :show="show"
     preset="card"
-    title="修改密碼"
+    :title="$t('account.updatePassword')"
     class="w-500px"
     @update:show="emit('update:show', $event)"
   >
@@ -91,14 +91,14 @@ watch(() => props.show, (newVal) => {
           :rules="rules"
           label-placement="left"
         >
-          <n-form-item label="使用者名稱">
+          <n-form-item :label="$t('account.passwordUpdateUsername')">
             <n-input disabled :value="currentUser.username" />
           </n-form-item>
-          <n-form-item label="新密碼" path="password">
+          <n-form-item :label="$t('account.newPassword')" path="password">
             <n-input-group>
               <n-input
                 v-model:value="formValue.password"
-                placeholder="請輸入新密碼"
+                :placeholder="$t('account.newPasswordPlaceholder')"
               />
             </n-input-group>
           </n-form-item>
@@ -108,10 +108,10 @@ watch(() => props.show, (newVal) => {
     <template #action>
       <n-flex justify="center">
         <n-button type="primary" :loading="loading" @click="handleSubmit">
-          確認修改
+          {{ $t('account.confirmUpdate') }}
         </n-button>
         <n-button @click="handleCancel">
-          取消
+          {{ $t('account.cancelButton') }}
         </n-button>
       </n-flex>
     </template>

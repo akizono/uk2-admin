@@ -1,10 +1,7 @@
-import type { UserVo } from '../user/'
+import type { UserVO } from '../user/'
 
-import { i18n } from '@/modules/i18n'
-import { local } from '@/utils'
+import { $t, local } from '@/utils'
 import request from '@/utils/request'
-
-const t = i18n.global.t
 
 export interface LoginVO {
   username: string
@@ -16,7 +13,7 @@ export interface RefreshTokenVO {
   refreshToken: string
 }
 
-interface RegisterVO extends UserVo {
+interface RegisterVO extends UserVO {
   verifyCode: string
   verifyCodeType: VerifyCodeType
   password: string
@@ -24,7 +21,7 @@ interface RegisterVO extends UserVo {
 
 // 登入（使用帳號密碼）
 export const loginUrl = '/system/auth/login'
-export function login(data: LoginVO): ApiResponse<UserVo> {
+export function login(data: LoginVO): ApiResponse<UserVO> {
   return request.post({
     url: loginUrl,
     data,
@@ -66,8 +63,8 @@ export function sendRegisterEmail(data: { email: string }) {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.operationTooFrequent') },
-        { code: 409, message: t('account.mobileOrEmailExist') },
+        { code: 400, message: $t('common.operationTooFrequent') },
+        { code: 409, message: $t('account.mobileOrEmailExist') },
       ],
     },
   })
@@ -80,8 +77,8 @@ export function sendRegisterMobile(data: { mobile: string }) {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.operationTooFrequent') },
-        { code: 409, message: t('account.mobileOrEmailExist') },
+        { code: 400, message: $t('common.operationTooFrequent') },
+        { code: 409, message: $t('account.mobileOrEmailExist') },
       ],
     },
   })
@@ -94,7 +91,7 @@ export function register(data: RegisterVO) {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.verifyCodeError') },
+        { code: 400, message: $t('login.verifyCodeError') },
       ],
     },
   })
@@ -111,7 +108,7 @@ export function checkUserHasMobileOrEmail(params: { username: string }): ApiResp
     params,
     headers: {
       'specify-error-message': [
-        { code: 409, message: t('account.mobileOrEmailExist') },
+        { code: 409, message: $t('account.mobileOrEmailExist') },
       ],
     },
   })
@@ -124,7 +121,7 @@ export function sendResetPasswordEmail(data: { username: string }) {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.operationTooFrequent') },
+        { code: 400, message: $t('common.operationTooFrequent') },
       ],
     },
   })
@@ -137,7 +134,7 @@ export function sendResetPasswordMobile(data: { username: string }) {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.operationTooFrequent') },
+        { code: 400, message: $t('common.operationTooFrequent') },
       ],
     },
   })
@@ -155,7 +152,7 @@ export function updatePassword(data: {
     data,
     headers: {
       'specify-error-message': [
-        { code: 400, message: t('login.verifyCodeError') },
+        { code: 400, message: $t('login.verifyCodeError') },
       ],
     },
   })

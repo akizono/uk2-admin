@@ -2,6 +2,7 @@
 import { FileApi, type FileVO } from '@/api/operations/file'
 import { useBoolean } from '@/hooks'
 import { useThrottleAction } from '@/hooks/useThrottleAction'
+import { $t } from '@/utils'
 
 const props = withDefaults(defineProps<{
   modelValue?: FileVO[]
@@ -76,13 +77,13 @@ function triggerFileSelect() {
 function validateFile(file: File): { valid: boolean, message?: string } {
   // 檢查檔案大小
   if (file.size > props.maxFileSize * 1024 * 1024) {
-    return { valid: false, message: `檔案大小不能超過 ${props.maxFileSize}MB` }
+    return { valid: false, message: `${$t('fileUpload.fileSizeError1')} ${props.maxFileSize} ${$t('fileUpload.fileSizeError2')}` }
   }
 
   // 檢查文件類型
   const extension = file.name.split('.').pop()?.toLowerCase() || ''
   if (props.fileExtension && props.fileExtension.length > 0 && !props.fileExtension.includes(extension)) {
-    return { valid: false, message: `只允許上傳 ${props.fileExtension.join(', ')} 格式的檔案` }
+    return { valid: false, message: `${$t('fileUpload.fileExtensionError1')} ${props.fileExtension.join(', ')} ${$t('fileUpload.fileExtensionError2')}` }
   }
 
   return { valid: true }
@@ -101,7 +102,7 @@ function handleFileSelect(event: Event) {
 
   // 檢查是否超過最大文件數
   if (fileList.value.length + input.files.length > props.maxFileCount) {
-    window.$message.error(`最多只能上傳 ${props.maxFileCount} 個檔案`)
+    window.$message.error(`${$t('fileUpload.maxFileCountError1')} ${props.maxFileCount} ${$t('fileUpload.maxFileCountError1')}`)
     // console.log('超過最大文件數，返回')
     return
   }
@@ -112,7 +113,7 @@ function handleFileSelect(event: Event) {
     // console.log('處理文件:', file.name)
     const validation = validateFile(file)
     if (!validation.valid) {
-      window.$message.error(validation.message || '檔案驗證失敗')
+      window.$message.error(validation.message || $t('fileUpload.fileValidationFailed'))
       // console.log('文件驗證失敗:', validation.message)
       return
     }
@@ -197,7 +198,7 @@ async function uploadFiles() {
       }
       else {
         // console.error('無法解析上傳響應:', response)
-        throw new Error('上傳響應格式不正確')
+        throw new Error($t('fileUpload.uploadResponseFormatError'))
       }
     }
 
@@ -214,15 +215,15 @@ async function uploadFiles() {
     // 更新 modelValue
     updateModelValue()
 
-    window.$message.success('檔案上傳成功')
+    window.$message.success($t('fileUpload.fileUploadSuccess'))
   }
   catch {
     // console.error('文件上傳錯誤:', error)
     filesToUpload.forEach((item) => {
       item.status = 'error'
-      item.error = '上傳失敗'
+      item.error = $t('fileUpload.uploadFailed')
     })
-    window.$message.error('檔案上傳失敗')
+    window.$message.error($t('fileUpload.fileUploadFailed'))
   }
   finally {
     stopUploading()
@@ -369,26 +370,26 @@ onBeforeUnmount(() => {
           <!-- 上傳中遮罩 -->
           <div v-if="item.status === 'uploading'" class="upload-overlay">
             <div class="upload-status">
-              上傳中...
+              {{ $t('fileUpload.uploading') }}
             </div>
           </div>
 
           <!-- 待上傳遮罩 -->
           <div v-else-if="item.status === 'pending'" class="pending-overlay">
             <div class="pending-status">
-              待上傳
+              {{ $t('fileUpload.pending') }}
             </div>
           </div>
 
           <!-- 上傳失敗遮罩 -->
           <div v-else-if="item.status === 'error'" class="error-overlay">
             <div class="error-status">
-              上傳失敗
+              {{ $t('fileUpload.uploadFailed') }}
             </div>
             <!-- 重新上傳按鈕 -->
             <div class="retry-button" @click.stop="retryUpload(index)">
               <icon-park-outline-refresh />
-              <span>重試</span>
+              <span>{{ $t('fileUpload.retry') }}</span>
             </div>
           </div>
 
@@ -419,12 +420,12 @@ onBeforeUnmount(() => {
             {{ item.fileVO?.name || item.file?.name }}
           </div>
           <div v-if="item.status === 'uploading'" class="file-status uploading">
-            上傳中...
+            {{ $t('fileUpload.uploading') }}
           </div>
           <div v-else-if="item.status === 'error'" class="file-status error">
-            上傳失敗
+            {{ $t('fileUpload.uploadFailed') }}
             <n-button text type="primary" size="small" class="retry-text-button" @click="retryUpload(index)">
-              重新上傳
+              {{ $t('fileUpload.reupload') }}
             </n-button>
           </div>
         </div>
@@ -445,7 +446,7 @@ onBeforeUnmount(() => {
         }"
       >
         <div class="i-mdi-upload mr-2" />
-        <span>點擊上傳文件</span>
+        <span>{{ $t('fileUpload.clickUploadFile') }}</span>
       </div>
     </div>
 
@@ -463,7 +464,7 @@ onBeforeUnmount(() => {
           uploadFiles();
         }"
       >
-        提交上傳
+        {{ $t('fileUpload.startUpload') }}
       </n-button>
     </div>
   </div>

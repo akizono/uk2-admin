@@ -3,17 +3,18 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
+import { NSwitch } from 'naive-ui'
+
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
-import { NSwitch } from 'naive-ui'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'Menu Settings',
 })
 
 const { hasPermi } = usePermi()
-const { t } = useI18n()
 
 const dataTableRef = ref()
 
@@ -37,18 +38,18 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'title',
     value: undefined,
-    label: t('menu.menuTitle'),
+    label: $t('menu.menuTitle'),
     class: '!w-64',
-    placeholder: t('menu.menuTitlePlaceholder'),
+    placeholder: $t('menu.menuTitlePlaceholder'),
     inputType: 'input',
     multilingual: true,
   },
   {
     name: 'status',
     value: undefined,
-    label: t('common.status'),
+    label: $t('common.status'),
     class: '!w-64',
-    placeholder: t('common.statusPlaceholder'),
+    placeholder: $t('common.statusPlaceholder'),
     inputType: 'select',
     dictType: 'common_status',
   },
@@ -57,7 +58,7 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<MenuVO> = [
   {
-    title: t('menu.menuTitle'),
+    title: $t('menu.menuTitle'),
     align: 'left',
     key: 'title',
     multilingual: true,
@@ -65,23 +66,23 @@ const columns: DataTableColumns<MenuVO> = [
     fixed: 'left',
   },
   {
-    title: t('menu.menuIcon'),
+    title: $t('menu.menuIcon'),
     align: 'center',
     key: 'icon',
   },
   {
-    title: t('menu.menuType'),
+    title: $t('menu.menuType'),
     align: 'center',
     key: 'type',
     dictType: 'system_menu_type',
   },
   {
-    title: t('common.sort'),
+    title: $t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: t('common.status'),
+    title: $t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: MenuVO) => {
@@ -113,7 +114,7 @@ const initFormData: InitFormData[] = [
     name: 'parentId',
     value: undefined,
     span: 2,
-    label: t('menu.parentMenu'),
+    label: $t('menu.parentMenu'),
     type: 'select',
     selectOptions: {
       api: MenuApi.getMenuPage,
@@ -126,7 +127,7 @@ const initFormData: InitFormData[] = [
     name: 'title',
     value: undefined,
     span: 2,
-    label: t('menu.menuTitle'),
+    label: $t('menu.menuTitle'),
     type: 'input',
     multilingual: true,
   },
@@ -134,7 +135,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 2,
-    label: t('menu.menuCode'),
+    label: $t('menu.menuCode'),
     type: 'input',
     showCondition: {
       field: 'type',
@@ -146,7 +147,7 @@ const initFormData: InitFormData[] = [
     name: 'path',
     value: undefined,
     span: 1,
-    label: t('menu.routePath'),
+    label: $t('menu.routePath'),
     type: 'input',
     placeholder: 'Eg: /system/user',
     showCondition: {
@@ -159,7 +160,7 @@ const initFormData: InitFormData[] = [
     name: 'component',
     value: undefined,
     span: 1,
-    label: t('menu.componentPath'),
+    label: $t('menu.componentPath'),
     type: 'input',
     placeholder: 'Eg: /system/user/index.vue',
     inputPrefix: '@/src/view',
@@ -174,10 +175,10 @@ const initFormData: InitFormData[] = [
     name: 'permission',
     value: undefined,
     span: 1,
-    label: t('menu.routePermission'),
+    label: $t('menu.routePermission'),
     type: 'input',
     placeholder: 'Eg: system:user:page',
-    helpInfo: `${t('menu.helpInfo')}`,
+    helpInfo: `${$t('menu.helpInfo')}`,
     showCondition: {
       field: 'type',
       operator: 'in',
@@ -188,7 +189,7 @@ const initFormData: InitFormData[] = [
     name: 'type',
     value: 0,
     span: 1,
-    label: t('menu.menuType'),
+    label: $t('menu.menuType'),
     type: 'radio',
     dictType: 'system_menu_type',
     // disableEditInput: true,
@@ -199,7 +200,7 @@ const initFormData: InitFormData[] = [
     name: 'icon',
     value: undefined,
     span: 1,
-    label: t('menu.menuIcon'),
+    label: $t('menu.menuIcon'),
     type: 'icon-select',
     showCondition: {
       field: 'type',
@@ -211,7 +212,7 @@ const initFormData: InitFormData[] = [
     name: 'link',
     value: undefined,
     span: 2,
-    label: t('menu.externalLink'),
+    label: $t('menu.externalLink'),
     type: 'input',
     placeholder: 'Eg: https://google.com',
     showCondition: {
@@ -224,7 +225,7 @@ const initFormData: InitFormData[] = [
     name: 'isCache',
     value: 1,
     span: 1,
-    label: t('menu.isCache'),
+    label: $t('menu.isCache'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -236,7 +237,7 @@ const initFormData: InitFormData[] = [
     name: 'isShowTab',
     value: 1,
     span: 1,
-    label: t('menu.isShowTab'),
+    label: $t('menu.isShowTab'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -248,7 +249,7 @@ const initFormData: InitFormData[] = [
     name: 'isPersistentTab',
     value: undefined,
     span: 1,
-    label: t('menu.isPersistentTab'),
+    label: $t('menu.isPersistentTab'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -260,7 +261,7 @@ const initFormData: InitFormData[] = [
     name: 'isShowSide',
     value: 1,
     span: 1,
-    label: t('menu.isShowSide'),
+    label: $t('menu.isShowSide'),
     type: 'switch',
     showCondition: {
       field: 'type',
@@ -272,21 +273,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 2,
-    label: t('common.sort'),
+    label: $t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: t('common.remark'),
+    label: $t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 2,
-    label: t('common.status'),
+    label: $t('common.status'),
     type: 'switch',
   },
 
@@ -297,29 +298,29 @@ const rules: FormRules = {
   name: [
     {
       required: true,
-      message: t('menu.menuCodePlaceholder'),
+      message: $t('menu.menuCodePlaceholder'),
       trigger: ['blur', 'input'],
     },
     {
       pattern: /^[\s\w-]+$/, // 正則表達式：允許空格(\s)、橫槓(-)、下劃線(\w包含_)、英文和數字
-      message: t('menu.menuCodeRule'),
+      message: $t('menu.menuCodeRule'),
       trigger: ['blur', 'input'],
     },
   ],
   title: {
     required: true,
-    message: t('menu.menuTitleRule'),
+    message: $t('menu.menuTitleRule'),
     trigger: ['blur', 'input'],
   },
   type: {
     required: true,
-    message: t('menu.menuTypeRule'),
+    message: $t('menu.menuTypeRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
   sort: {
     required: true,
-    message: t('common.sortPlaceholder'),
+    message: $t('common.sortPlaceholder'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -356,7 +357,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: t('menu.menu'), // 表格中的數據名稱
+  modalName: $t('menu.menu'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
   permission, // 權限配置

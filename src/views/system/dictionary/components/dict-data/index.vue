@@ -3,12 +3,13 @@ import type { DictTypeVO } from '@/api/system/dict-type'
 import type { InitFormData } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
-import { usePermi } from '@/hooks'
-import { wrapOptionsToPromise } from '@/utils/initFormData'
 import { NSwitch } from 'naive-ui'
 
-const { t } = useI18n()
+import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
+import { usePermi } from '@/hooks'
+import { $t } from '@/utils'
+import { wrapOptionsToPromise } from '@/utils/initFormData'
+
 const { hasPermi } = usePermi()
 
 const modalRef = ref()
@@ -29,35 +30,35 @@ const permission = {
 /** 表格列定義 */
 const columns: DataTableColumns<DictDataVO> = [
   {
-    title: t('dictData.dictLabel'),
+    title: $t('dictData.dictLabel'),
     align: 'center',
     key: 'label',
     copy: true,
     multilingual: true,
   },
   {
-    title: t('dictData.dictValue'),
+    title: $t('dictData.dictValue'),
     align: 'center',
     key: 'value',
     copy: true,
   },
   {
-    title: t('dictData.dataType'),
+    title: $t('dictData.dataType'),
     align: 'center',
     key: 'dataType',
   },
   {
-    title: t('common.sort'),
+    title: $t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: t('common.remark'),
+    title: $t('common.remark'),
     align: 'center',
     key: 'remark',
   },
   {
-    title: t('common.status'),
+    title: $t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: DictTypeVO) => {
@@ -82,7 +83,7 @@ const initFormData: InitFormData[] = [
     name: 'label',
     value: undefined,
     span: 2,
-    label: t('dictData.dictLabel'),
+    label: $t('dictData.dictLabel'),
     type: 'input',
     multilingual: true,
   },
@@ -90,7 +91,7 @@ const initFormData: InitFormData[] = [
     name: 'dataType',
     value: undefined,
     span: 2,
-    label: t('dictData.dataType'),
+    label: $t('dictData.dataType'),
     type: 'select',
     dictType: 'system_dict_data_data_type',
   },
@@ -98,7 +99,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: '',
     span: 2,
-    label: t('dictData.dictLabel'),
+    label: $t('dictData.dictLabel'),
     type: 'input',
     disableAddInput: true,
     disableEditInput: true,
@@ -119,7 +120,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: 0,
     span: 2,
-    label: t('dictData.dictLabel'),
+    label: $t('dictData.dictLabel'),
     type: 'input-number',
     rulesType: 'number',
     showCondition: {
@@ -132,7 +133,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: undefined,
     span: 2,
-    label: t('dictData.dictLabel'),
+    label: $t('dictData.dictLabel'),
     type: 'input',
     rulesType: 'string',
     showCondition: {
@@ -145,7 +146,7 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: undefined,
     span: 2,
-    label: t('dictData.dictLabel'),
+    label: $t('dictData.dictLabel'),
     type: 'radio',
     selectOptions: {
       api: wrapOptionsToPromise([
@@ -167,21 +168,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: t('common.sort'),
+    label: $t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: t('common.remark'),
+    label: $t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: t('common.status'),
+    label: $t('common.status'),
     type: 'switch',
   },
 ]
@@ -190,17 +191,17 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   label: {
     required: true,
-    message: t('dictData.dictLabelRule'),
+    message: $t('dictData.dictLabelRule'),
     trigger: ['blur', 'input'],
   },
   value: {
     required: true,
-    message: t('dictData.dictValueRule'),
+    message: $t('dictData.dictValueRule'),
     trigger: ['blur', 'input'],
   },
   sort: {
     required: true,
-    message: t('dictData.sortRule'),
+    message: $t('dictData.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -237,7 +238,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: t('dictData.dictData'), // 表格中的數據名稱
+  modalName: $t('dictData.dictData'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }
@@ -262,7 +263,7 @@ defineExpose({
 <template>
   <PageModal
     ref="modalRef"
-    :title="`${modalTitle} - ${t('dictData.dictData')}`"
+    :title="`${modalTitle} - ${$t('dictData.dictData')}`"
     width="90%"
   >
     <DataTable

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/store'
 import IconBookOpen from '~icons/icon-park-outline/book-open'
 import IconGithub from '~icons/icon-park-outline/github'
 import IconLogout from '~icons/icon-park-outline/logout'
 import IconUser from '~icons/icon-park-outline/user'
 
-const { t } = useI18n()
+import { useAuthStore } from '@/store'
+import { $t } from '@/utils'
 
 const { user, logout } = useAuthStore()
 const router = useRouter()
@@ -13,7 +13,7 @@ const router = useRouter()
 const options = computed(() => {
   return [
     {
-      label: t('app.userCenter'),
+      label: $t('app.userCenter'),
       key: 'userCenter',
       icon: () => h(IconUser),
     },
@@ -36,7 +36,7 @@ const options = computed(() => {
       key: 'd1',
     },
     {
-      label: t('app.loginOut'),
+      label: $t('app.loginOut'),
       key: 'loginOut',
       icon: () => h(IconLogout),
     },
@@ -45,10 +45,10 @@ const options = computed(() => {
 function handleSelect(key: string | number) {
   if (key === 'loginOut') {
     window.$dialog?.info({
-      title: t('app.loginOutTitle'),
-      content: t('app.loginOutContent'),
-      positiveText: t('common.confirm'),
-      negativeText: t('common.cancel'),
+      title: $t('app.loginOutTitle'),
+      content: $t('app.loginOutContent'),
+      positiveText: $t('common.confirm'),
+      negativeText: $t('common.cancel'),
       onPositiveClick: () => {
         logout()
       },

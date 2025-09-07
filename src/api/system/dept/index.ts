@@ -1,4 +1,4 @@
-import type { UserVo } from '../user'
+import type { UserVO } from '../user'
 
 import request from '@/utils/request'
 
@@ -8,7 +8,7 @@ export interface DeptVO extends Api.BaseVO {
   name: string
   sort: number
   leaderUserId: string
-  leaderUser: UserVo
+  leaderUser: UserVO
 }
 
 export const DeptApi = {

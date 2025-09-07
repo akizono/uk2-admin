@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getBlob } from '@/api/demo/test'
+import { $t } from '@/utils'
 
 const emit = defineEmits<{
   update: [data: any]
@@ -26,7 +27,7 @@ function downloadLink(data: Blob, name: string) {
 </script>
 
 <template>
-  <n-card title="下載文件" size="small">
+  <n-card :title="$t('downLoad.downloadFile')" size="small">
     <n-button @click="getBlobFile">
       click
     </n-button>

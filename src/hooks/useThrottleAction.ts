@@ -1,3 +1,5 @@
+import { $t } from '@/utils'
+
 interface ThrottleMap {
   [key: string]: {
     timer: NodeJS.Timeout | null
@@ -29,13 +31,13 @@ export function useThrottleAction(key: string, delay: number, callback: () => vo
 
   // 如果距離上次執行的時間小於延遲時間，則不執行
   if (now - throttleItem.lastTime < delay) {
-    window.$message.warning('操作過於頻繁，請稍後再試')
+    window.$message.warning($t('common.operationTooFrequent'))
     return
   }
 
   // 如果正在處理中，則不執行
   if (isProcessing.value) {
-    window.$message.warning('操作過於頻繁，請稍後再試')
+    window.$message.warning($t('common.operationTooFrequent'))
     return
   }
 

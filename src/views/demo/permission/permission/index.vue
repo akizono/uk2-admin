@@ -3,6 +3,7 @@ import type { Role } from '@/store/model/auth/interfaces'
 
 import { usePermi, usePermission } from '@/hooks'
 import { useAuthStore } from '@/store'
+import { $t } from '@/utils'
 
 const authStore = useAuthStore()
 const { hasPermission } = usePermission()
@@ -31,39 +32,39 @@ async function toggleUserRole(role: string) {
 </script>
 
 <template>
-  <n-card title="權限範例">
+  <n-card :title="$t('permission.permissionExample')">
     <n-h1>
-      當前權限：{{ role.join('、 ') }}
+      {{ $t('permission.currentPermission') }}：{{ role.join('、 ') }}
     </n-h1>
     <n-button-group>
       <n-button v-for="item in roleList" :key="item" type="default" @click="toggleUserRole(item)">
         {{ item }}
       </n-button>
     </n-button-group>
-    <n-h2>v-hasPermi 指令用法</n-h2>
+    <n-h2>{{ $t('permission.vHasPermiDirectiveUsage') }}</n-h2>
     <n-space>
       <n-button v-hasPermi="['system:dept:page']">
-        僅包含system:dept:page權限可見
+        {{ $t('permission.onlySystemDeptPagePermiVisible') }}
       </n-button>
     </n-space>
 
-    <n-h2>usePermission 函數用法(原版自帶的，使用角色來判斷)</n-h2>
+    <n-h2>{{ $t('permission.usePermissionFunctionUsage') }}</n-h2>
     <n-space>
       <n-button v-if="hasPermission(['super_admin'])">
-        super_admin可見
+        {{ $t('permission.superAdminVisible') }}
       </n-button>
       <n-button v-if="hasPermission(['common'])">
-        common可見
+        {{ $t('permission.commonVisible') }}
       </n-button>
       <n-button v-if="hasPermission(['super_admin', 'common'])">
-        super_admin和common可見
+        {{ $t('permission.superAdminAndCommonVisible') }}
       </n-button>
     </n-space>
 
-    <n-h2>usePermi 函數用法(使用權限來判斷)</n-h2>
+    <n-h2>{{ $t('permission.usePermiFunctionUsage') }}</n-h2>
     <n-space>
       <n-button v-if="hasPermi(['system:dept:page'])">
-        system:dept:page可見
+        {{ $t('permission.systemDeptPageVisible') }}
       </n-button>
     </n-space>
   </n-card>

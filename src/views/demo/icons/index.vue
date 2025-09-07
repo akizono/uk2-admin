@@ -1,31 +1,35 @@
+<script setup lang="ts">
+import { $t } from '@/utils'
+</script>
+
 <template>
   <n-space vertical>
-    <n-card title="图标选择器">
+    <n-card :title="$t('icons.iconSelector')">
       <icon-select />
     </n-card>
-    <n-card title="自动导入图标">
+    <n-card :title="$t('icons.autoImportIcons')">
       <div>
-        正常：<icon-park-outline-apple />
+        {{ $t('icons.normal') }}：<icon-park-outline-apple />
       </div>
       <div>
-        大：<icon-park-outline-apple class="text-2em" />
+        {{ $t('icons.large') }}：<icon-park-outline-apple class="text-2em" />
       </div>
       <div>
-        大大大：<icon-park-outline-apple class="text-4em" />
+        {{ $t('icons.extraLarge') }}：<icon-park-outline-apple class="text-4em" />
       </div>
     </n-card>
     <n-card title="自动导入svg图标">
       <div>
-        正常：<svg-icons-cool />
+        {{ $t('icons.normal') }}：<svg-icons-cool />
       </div>
       <div>
-        大：<svg-icons-cool class="text-2em" />
+        {{ $t('icons.large') }}：<svg-icons-cool class="text-2em" />
       </div>
       <div>
-        大大大：<svg-icons-cool class="text-4em" />
+        {{ $t('icons.extraLarge') }}：<svg-icons-cool class="text-4em" />
       </div>
       <div>
-        nova-icon组件加载：<nova-icon icon="local:cool" />
+        {{ $t('icons.novaIconComponentLoading') }}：<nova-icon icon="local:cool" />
       </div>
     </n-card>
   </n-space>

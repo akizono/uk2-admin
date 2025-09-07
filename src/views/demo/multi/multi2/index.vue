@@ -1,18 +1,20 @@
 <script setup lang="ts">
+import { $t } from '@/utils'
+
 const router = useRouter()
 </script>
 
 <template>
   <n-card class="h-130vh">
-    这个页面包含了一个不在侧边菜单的详情页面
+    {{ $t('multi.noSidebarDetailPageDescription') }}
     <n-button @click="router.push({ path: '/multi/multi2/detail', query: { id: 1 } })">
-      跳转详情子页1
+      {{ $t('multi.jumpToDetailPage1') }}
     </n-button>
     <n-button @click="router.push({ path: '/multi/multi2/detail', query: { id: 2 } })">
-      跳转详情子页2
+      {{ $t('multi.jumpToDetailPage2') }}
     </n-button>
     <n-button @click="router.push({ path: '/multi/multi2/detail', query: { id: 3 } })">
-      跳转详情子页3
+      {{ $t('multi.jumpToDetailPage3') }}
     </n-button>
   </n-card>
 </template>

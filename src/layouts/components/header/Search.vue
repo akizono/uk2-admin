@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useBoolean } from '@/hooks'
 import { useAppStore, useRouteStore } from '@/store'
+import { $t } from '@/utils'
 
 const appStore = useAppStore()
 const routeStore = useRouteStore()
@@ -30,8 +31,6 @@ watchEffect(() => {
     toggleModal()
 })
 
-const { t } = useI18n()
-
 // 計算符合條件的菜單選項
 const options = computed(() => {
   if (!searchValue.value)
@@ -39,13 +38,13 @@ const options = computed(() => {
 
   return routeStore.rowRoutes.filter((item) => {
     const conditions = [
-      t(`route.${String(item.name)}`, item.title || item.name)?.includes(searchValue.value),
+      $t(`route.${String(item.name)}`, item.title || item.name)?.includes(searchValue.value),
       item.path?.includes(searchValue.value),
     ]
     return conditions.some(condition => !item.hide && condition)
   }).map((item) => {
     return {
-      label: t(`route.${String(item.name)}`, item.title || item.name),
+      label: $t(`route.${String(item.name)}`, item.title || item.name),
       value: item.path,
       icon: item.icon,
     }

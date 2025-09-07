@@ -5,12 +5,11 @@ import type { DataTableColumns } from 'naive-ui'
 
 import { LogApi } from '@/api/system/log'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'System Log',
 })
-
-// const { t } = useI18n()
 
 /** 權限配置 */
 const permission = {
@@ -22,58 +21,58 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'operationName',
     value: undefined,
-    label: '操作名稱',
+    label: $t('log.operationName'),
     class: '!w-64',
-    placeholder: '操作名稱',
+    placeholder: $t('log.operationName'),
     inputType: 'input',
   },
   {
     name: 'actionType',
     value: undefined,
-    label: '操作類型',
+    label: $t('log.actionType'),
     class: '!w-64',
-    placeholder: '操作類型',
+    placeholder: $t('log.actionType'),
     inputType: 'select',
     dictType: 'system_log_action-type',
   },
   {
     name: 'module',
     value: undefined,
-    label: '業務模組名',
+    label: $t('log.module'),
     class: '!w-64',
-    placeholder: '業務模組名',
+    placeholder: $t('log.module'),
     inputType: 'input',
   },
   {
     name: 'path',
     value: undefined,
-    label: '介面路徑',
+    label: $t('log.path'),
     class: '!w-64',
-    placeholder: '介面路徑',
+    placeholder: $t('log.path'),
     inputType: 'input',
   },
   {
     name: 'method',
     value: undefined,
-    label: 'HTTP方法',
+    label: $t('log.method'),
     class: '!w-64',
-    placeholder: 'HTTP方法',
+    placeholder: $t('log.method'),
     inputType: 'select',
     dictType: 'system_log_method',
   },
   {
     name: 'statusCode',
     value: undefined,
-    label: 'HTTP狀態碼',
+    label: $t('log.statusCode'),
     class: '!w-64',
-    placeholder: 'HTTP狀態碼',
+    placeholder: $t('log.statusCode'),
     inputType: 'select',
     dictType: 'system_log_status-code',
   },
   {
     name: '',
     value: undefined,
-    label: '使用者',
+    label: $t('log.username'),
     class: '!w-64',
     placeholder: 'Eg: username',
     inputType: 'input',
@@ -81,9 +80,9 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'ip',
     value: undefined,
-    label: '使用者IP位址',
+    label: $t('log.userIp'),
     class: '!w-64',
-    placeholder: '使用者IP位址',
+    placeholder: $t('log.userIp'),
     inputType: 'input',
   },
 
@@ -92,17 +91,17 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<LogVO> = [
   {
-    title: '操作名稱',
+    title: $t('log.operationName'),
     align: 'center',
     key: 'operationName',
   },
   {
-    title: '操作類型',
+    title: $t('log.actionType'),
     align: 'center',
     key: 'actionType',
   },
   {
-    title: '業務模組名',
+    title: $t('log.module'),
     align: 'center',
     key: 'module',
   },
@@ -112,17 +111,17 @@ const columns: DataTableColumns<LogVO> = [
   //   key: 'id',
   // },
   // {
-  //   title: '介面路徑',
+  //   title: $t('log.path'),
   //   align: 'center',
   //   key: 'path',
   // },
   // {
-  //   title: 'HTTP方法',
+  //   title: $t('log.method'),
   //   align: 'center',
   //   key: 'method',
   // },
   // {
-  //   title: '請求參數(params)',
+  //   title: `${$t('log.params')}(params)`,
   //   align: 'center',
   //   key: 'params',
   //   render: (row: LogVO) => {
@@ -130,7 +129,7 @@ const columns: DataTableColumns<LogVO> = [
   //   },
   // },
   // {
-  //   title: '請求體數據(body)',
+  //   title: `${$t('log.body')}(body)`,
   //   align: 'center',
   //   key: 'body',
   //   render: (row: LogVO) => {
@@ -138,7 +137,7 @@ const columns: DataTableColumns<LogVO> = [
   //   },
   // },
   // {
-  //   title: '查詢參數(query)',
+  //   title: `${$t('log.query')}(query)`,
   //   align: 'center',
   //   key: 'query',
   //   render: (row: LogVO) => {
@@ -146,49 +145,49 @@ const columns: DataTableColumns<LogVO> = [
   //   },
   // },
   {
-    title: 'HTTP狀態碼',
+    title: $t('log.statusCode'),
     align: 'center',
     key: 'statusCode',
   },
   // {
-  //   title: '反應時間（毫秒）',
+  //   title: $t('log.responseTime'),
   //   align: 'center',
   //   key: 'responseTime',
   // },
   {
-    title: '使用者',
+    title: $t('log.username'),
     align: 'center',
     key: 'user.username',
   },
   // {
-  //   title: '使用者IP位址',
+  //   title: $t('log.userIp'),
   //   align: 'center',
   //   key: 'ip',
   // },
   // {
-  //   title: '使用者代理（瀏覽器資訊）',
+  //   title: $t('log.userAgent'),
   //   align: 'center',
   //   key: 'userAgent',
   // },
   {
-    title: '是否操作成功',
+    title: $t('log.isSuccess'),
     align: 'center',
     key: 'isSuccess',
     dictType: 'system_log_is-success',
   },
   // {
-  //   title: '錯誤資訊',
+  //   title: $t('log.errorMessage'),
   //   align: 'center',
   //   key: 'errorMessage',
   // },
   // {
-  //   title: '錯誤堆棧',
+  //   title: $t('log.errorStack'),
   //   align: 'center',
   //   key: 'errorStack',
   // },
 
   // {
-  //   title: '資源ID',
+  //   title: $t('log.resourceId'),
   //   align: 'center',
   //   key: 'resourceId',
   // },
@@ -207,105 +206,105 @@ const initFormData: InitFormData[] = [
     name: 'operationName',
     value: undefined,
     span: 1,
-    label: '操作名稱',
+    label: $t('log.operationName'),
   },
   {
     name: 'actionType',
     value: undefined,
     span: 1,
-    label: '操作類型',
+    label: $t('log.actionType'),
   },
   {
     name: 'module',
     value: undefined,
     span: 1,
-    label: '業務模組名',
+    label: $t('log.module'),
   },
   {
     name: 'method',
     value: undefined,
     span: 1,
-    label: 'HTTP方法',
+    label: $t('log.method'),
   },
   {
     name: 'statusCode',
     value: undefined,
     span: 1,
-    label: 'HTTP狀態碼',
+    label: $t('log.statusCode'),
   },
   {
     name: 'responseTime',
     value: undefined,
     span: 1,
-    label: '反應時間（毫秒）',
+    label: $t('log.responseTime'),
   },
   {
     name: 'user.username',
     value: undefined,
     span: 1,
-    label: '使用者',
+    label: $t('log.username'),
   },
   {
     name: 'isSuccess',
     value: undefined,
     span: 1,
-    label: '是否操作成功',
+    label: $t('log.isSuccess'),
     dictType: 'system_log_is-success',
   },
   {
     name: 'resourceId',
     value: undefined,
     span: 1,
-    label: '資源ID',
+    label: $t('log.resourceId'),
   },
   {
     name: 'path',
     value: undefined,
     span: 2,
-    label: '介面路徑',
+    label: $t('log.path'),
   },
   {
     name: 'params',
     value: undefined,
     span: 2,
-    label: '請求參數(params)',
+    label: `${$t('log.params')}(params)`,
   },
   {
     name: 'body',
     value: undefined,
     span: 2,
-    label: '請求體數據(body)',
+    label: `${$t('log.body')}(body)`,
   },
   {
     name: 'query',
     value: undefined,
     span: 2,
-    label: '查詢參數(query)',
+    label: `${$t('log.query')}(query)`,
   },
 
   {
     name: 'ip',
     value: undefined,
     span: 2,
-    label: '使用者IP位址',
+    label: $t('log.userIp'),
   },
   {
     name: 'userAgent',
     value: undefined,
     span: 2,
-    label: '使用者代理（瀏覽器資訊）',
+    label: $t('log.userAgent'),
   },
   {
     name: 'errorMessage',
     value: undefined,
     span: 2,
-    label: '錯誤資訊',
+    label: $t('log.errorMessage'),
   },
   {
     name: 'errorStack',
     value: undefined,
     span: 2,
-    label: '錯誤堆棧',
+    label: $t('log.errorStack'),
   },
 ]
 
@@ -329,7 +328,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '日誌', // 表格中的數據名稱
+  modalName: $t('log.log'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }

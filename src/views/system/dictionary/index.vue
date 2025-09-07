@@ -2,16 +2,17 @@
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
+import { NButton, NSwitch } from 'naive-ui'
+
 import { DictTypeApi, type DictTypeVO } from '@/api/system/dict-type'
 import { usePermi } from '@/hooks'
-import { NButton, NSwitch } from 'naive-ui'
+import { $t } from '@/utils'
 
 import DictData from './components/dict-data/index.vue'
 
 defineOptions({
   name: 'Dictionary Management',
 })
-const { t } = useI18n()
 const { hasPermi } = usePermi()
 
 const dataTableRef = ref()
@@ -32,17 +33,17 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'name',
     value: undefined,
-    label: t('dictionary.dictName'),
+    label: $t('dictionary.dictName'),
     class: '!w-64',
-    placeholder: t('dictionary.dictNamePlaceholder'),
+    placeholder: $t('dictionary.dictNamePlaceholder'),
     inputType: 'input',
   },
   {
     name: 'type',
     value: undefined,
-    label: t('dictionary.dictType'),
+    label: $t('dictionary.dictType'),
     class: '!w-64',
-    placeholder: t('dictionary.dictTypePlaceholder'),
+    placeholder: $t('dictionary.dictTypePlaceholder'),
     inputType: 'input',
   },
 ]
@@ -50,29 +51,29 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<DictTypeVO> = [
   {
-    title: t('dictionary.dictName'),
+    title: $t('dictionary.dictName'),
     align: 'center',
     key: 'name',
     multilingual: true,
   },
   {
-    title: t('dictionary.dictType'),
+    title: $t('dictionary.dictType'),
     align: 'center',
     key: 'type',
     copy: true,
   },
   {
-    title: t('common.sort'),
+    title: $t('common.sort'),
     align: 'center',
     key: 'sort',
   },
   {
-    title: t('common.remark'),
+    title: $t('common.remark'),
     align: 'center',
     key: 'remark',
   },
   {
-    title: t('common.status'),
+    title: $t('common.status'),
     align: 'center',
     key: 'status',
     render: (row: DictTypeVO) => {
@@ -80,10 +81,10 @@ const columns: DataTableColumns<DictTypeVO> = [
     },
   },
   {
-    title: t('common.action'),
+    title: $t('common.action'),
     key: 'actions',
     render: (row: DictTypeVO) => {
-      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>{t('dictionary.dictData')}</NButton>
+      return <NButton size="small" onClick={() => modalRef.value.openModal(row)}>{$t('dictionary.dictData')}</NButton>
     },
   },
 ]
@@ -99,7 +100,7 @@ const initFormData: InitFormData[] = [
     name: 'name',
     value: undefined,
     span: 1,
-    label: t('dictionary.dictName'),
+    label: $t('dictionary.dictName'),
     type: 'input',
     multilingual: true,
   },
@@ -107,7 +108,7 @@ const initFormData: InitFormData[] = [
     name: 'type',
     value: undefined,
     span: 1,
-    label: t('dictionary.dictType'),
+    label: $t('dictionary.dictType'),
     type: 'input',
     disableEditInput: true,
     disableUpdate: true,
@@ -116,21 +117,21 @@ const initFormData: InitFormData[] = [
     name: 'sort',
     value: undefined,
     span: 1,
-    label: t('common.sort'),
+    label: $t('common.sort'),
     type: 'input-number',
   },
   {
     name: 'remark',
     value: undefined,
     span: 2,
-    label: t('common.remark'),
+    label: $t('common.remark'),
     type: 'textarea',
   },
   {
     name: 'status',
     value: 1,
     span: 1,
-    label: t('common.status'),
+    label: $t('common.status'),
     type: 'switch',
   },
 ]
@@ -139,17 +140,17 @@ const initFormData: InitFormData[] = [
 const rules: FormRules = {
   name: {
     required: true,
-    message: t('dictionary.dictNameRule'),
+    message: $t('dictionary.dictNameRule'),
     trigger: ['blur', 'input'],
   },
   type: {
     required: true,
-    message: t('dictionary.dictTypeRule'),
+    message: $t('dictionary.dictTypeRule'),
     trigger: ['blur', 'input'],
   },
   sort: {
     required: true,
-    message: t('dictionary.sortRule'),
+    message: $t('dictionary.sortRule'),
     trigger: ['blur', 'input'],
     type: 'number',
   },
@@ -183,7 +184,7 @@ const options = {
   rules, // 表單驗證規則
 
   /** 其他配置 */
-  modalName: t('dictionary.dictionary'), // 表格中的數據名稱
+  modalName: $t('dictionary.dictionary'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }

@@ -1,5 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
+import { $t } from '@/utils'
+
 /* 頁面中的一些固定路由，錯誤頁等 */
 export const routes: RouteRecordRaw[] = [
   {
@@ -14,7 +16,7 @@ export const routes: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('@/views/login/index.vue'), // 注意這裡要帶上 文件後綴.vue
     meta: {
-      title: '登錄',
+      title: `${$t('route.login')}`,
       withoutTab: true,
     },
   },
@@ -23,7 +25,7 @@ export const routes: RouteRecordRaw[] = [
     name: '403',
     component: () => import('@/views/error/403/index.vue'),
     meta: {
-      title: '使用者無權限',
+      title: $t('route.userAsNoPermission'),
       withoutTab: true,
     },
   },
@@ -32,7 +34,7 @@ export const routes: RouteRecordRaw[] = [
     name: '404',
     component: () => import('@/views/error/404/index.vue'),
     meta: {
-      title: '找不到頁面',
+      title: $t('route.notFound'),
       icon: 'icon-park-outline:ghost',
       withoutTab: true,
     },
@@ -42,7 +44,7 @@ export const routes: RouteRecordRaw[] = [
     name: '500',
     component: () => import('@/views/error/500/index.vue'),
     meta: {
-      title: '伺服器錯誤',
+      title: $t('route.serverError'),
       icon: 'icon-park-outline:close-wifi',
       withoutTab: true,
     },
@@ -52,10 +54,9 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/views/error/404/index.vue'),
     name: 'notFound',
     meta: {
-      title: '找不到頁面',
+      title: $t('route.notFound'),
       icon: 'icon-park-outline:ghost',
       withoutTab: true,
     },
   },
-
 ]

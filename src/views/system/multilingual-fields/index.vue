@@ -8,13 +8,13 @@ import { NTime } from 'naive-ui'
 import { getLanguageList } from '@/api/system/lang'
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'Multilingual Field Settings',
 })
 
 // const { hasPermi } = usePermi()
-const { t } = useI18n()
 
 // const dataTableRef = ref()
 
@@ -32,15 +32,15 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'fieldId',
     value: undefined,
-    label: '欄位ID',
+    label: $t('multilingualFields.fieldId'),
     class: '!w-64',
-    placeholder: '請輸入欄位ID',
+    placeholder: $t('multilingualFields.fieldIdPlaceholder'),
     inputType: 'input',
   },
   {
     name: 'language',
     value: undefined,
-    label: '對應語言',
+    label: $t('multilingualFields.language'),
     class: '!w-64',
     inputType: 'select',
     selectOptions: {
@@ -54,9 +54,9 @@ const initQueryParams: InitQueryParams[] = [
   {
     name: 'value',
     value: undefined,
-    label: '欄位值',
+    label: $t('multilingualFields.value'),
     class: '!w-64',
-    placeholder: '請輸入欄位值',
+    placeholder: $t('multilingualFields.valuePlaceholder'),
     inputType: 'input',
   },
 ]
@@ -64,26 +64,26 @@ const initQueryParams: InitQueryParams[] = [
 /** 表格列定義 */
 const columns: DataTableColumns<MultilingualFieldsVO> = [
   {
-    title: '欄位ID',
+    title: $t('multilingualFields.fieldId'),
     align: 'left',
     key: 'fieldId',
     copy: true,
   },
   {
-    title: '對應語言',
+    title: $t('multilingualFields.language'),
     align: 'left',
     key: 'language',
     render: (row: MultilingualFieldsVO) => {
-      return t(`language.${row.language}`)
+      return $t(`language.${row.language}`)
     },
   },
   {
-    title: '欄位值',
+    title: $t('multilingualFields.value'),
     align: 'left',
     key: 'value',
   },
   {
-    title: '創建時間',
+    title: $t('multilingualFields.createTime'),
     align: 'center',
     key: 'createTime',
     render: (row: MultilingualFieldsVO) => {
@@ -91,7 +91,7 @@ const columns: DataTableColumns<MultilingualFieldsVO> = [
     },
   },
   {
-    title: '更新時間',
+    title: $t('multilingualFields.updateTime'),
     align: 'center',
     key: 'updateTime',
     render: (row: MultilingualFieldsVO) => {
@@ -116,7 +116,7 @@ const initFormData: InitFormData[] = [
     name: 'fieldId',
     value: undefined,
     span: 2,
-    label: '欄位ID',
+    label: $t('multilingualFields.fieldId'),
     type: 'input',
     disableEditInput: true,
     disableUpdate: true,
@@ -125,7 +125,7 @@ const initFormData: InitFormData[] = [
     name: 'language',
     value: undefined,
     span: 1,
-    label: '對應語言',
+    label: $t('multilingualFields.language'),
     type: 'input',
     disableEditInput: true,
     disableUpdate: true,
@@ -134,14 +134,14 @@ const initFormData: InitFormData[] = [
     name: 'value',
     value: undefined,
     span: 1,
-    label: '欄位值',
+    label: $t('multilingualFields.value'),
     type: 'input',
   },
   {
     name: 'createTime',
     value: undefined,
     span: 1,
-    label: '創建時間',
+    label: $t('multilingualFields.createTime'),
     dateFormat: 'yyyy-MM-dd hh:mm:ss',
     showInMode: {
       view: true,
@@ -152,7 +152,7 @@ const initFormData: InitFormData[] = [
     name: 'updateTime',
     value: undefined,
     span: 1,
-    label: '更新時間',
+    label: $t('multilingualFields.updateTime'),
     dateFormat: 'yyyy-MM-dd hh:mm:ss',
     showInMode: {
       view: true,
@@ -166,7 +166,7 @@ const rules: FormRules = {
   value: [
     {
       required: true,
-      message: '請輸入欄位值',
+      message: $t('multilingualFields.valuePlaceholder'),
       trigger: ['blur', 'input'],
     },
   ],
@@ -200,7 +200,7 @@ const options = {
 
   /** 其他配置 */
   modalWidth: '1000px',
-  modalName: '多語言欄位設定', // 表格中的數據名稱
+  modalName: $t('multilingualFields.multilingualFieldSettings'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
 }

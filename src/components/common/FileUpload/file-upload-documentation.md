@@ -19,7 +19,6 @@ import FileUpload from '@/components/common/FileUpload/index.vue'
 ```vue
 <script setup>
 import FileUpload from '@/components/common/FileUpload/index.vue'
-import { ref } from 'vue'
 
 const fileList = ref([])
 </script>
@@ -68,7 +67,6 @@ const fileList = ref([])
 ```vue
 <script setup>
 import FileUpload from '@/components/common/FileUpload/index.vue'
-import { ref } from 'vue'
 
 const imageList = ref([])
 </script>
@@ -102,7 +100,6 @@ const imageList = ref([])
 ```vue
 <script setup>
 import FileUpload from '@/components/common/FileUpload/index.vue'
-import { ref } from 'vue'
 
 const fileUploadRef = ref()
 const documentList = ref([])
@@ -150,7 +147,6 @@ async function handleUpload() {
 ```vue
 <script setup>
 import FileUpload from '@/components/common/FileUpload/index.vue'
-import { reactive, ref } from 'vue'
 
 const formData = reactive({
   avatar: [],

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import lib from '@/../package.json'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'About',
@@ -8,10 +9,10 @@ defineOptions({
 
 <template>
   <n-space vertical>
-    <n-card title="關於">
+    <n-card :title="$t('about.about')">
       UK2-admin是一款基於Vue3+vite+TypeScript+NaiveUI的後台管理模板，力求使用簡約的代碼實現完備功能，降低學習門檻和維護成本，讓大家能早點下班做自己的事情
     </n-card>
-    <n-card title="資訊">
+    <n-card :title="$t('about.information')">
       <n-descriptions
         label-placement="left"
         bordered
@@ -39,7 +40,7 @@ defineOptions({
             Gitee
           </n-button>
         </n-descriptions-item>
-        <n-descriptions-item label="預覽地址">
+        <n-descriptions-item :label="$t('about.previewAddress')">
           <n-button
             text
             tag="a"
@@ -47,17 +48,17 @@ defineOptions({
             target="_blank"
             type="primary"
           >
-            預覽地址
+            {{ $t('about.previewAddress') }}
           </n-button>
         </n-descriptions-item>
-        <n-descriptions-item label="版本">
+        <n-descriptions-item :label="$t('about.version')">
           <n-tag :bordered="false">
             {{ lib.version }}
           </n-tag>
         </n-descriptions-item>
       </n-descriptions>
     </n-card>
-    <n-card title="生產環境依賴">
+    <n-card :title="$t('about.productionEnvironmentDependency')">
       <n-descriptions
         label-placement="left"
         bordered
@@ -72,7 +73,7 @@ defineOptions({
         </n-descriptions-item>
       </n-descriptions>
     </n-card>
-    <n-card title="開發環境依賴">
+    <n-card :title="$t('about.developmentEnvironmentDependency')">
       <n-descriptions
         label-placement="left"
         bordered

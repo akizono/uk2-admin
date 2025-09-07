@@ -3,13 +3,13 @@ import type { FormInst, FormRules } from 'naive-ui'
 
 import { register, sendRegisterEmail, sendRegisterMobile } from '@/api/system/auth'
 import { CountryCallingCodes, Regex, UserAgreement } from '@/constants/'
+import { $t } from '@/utils'
 // import { computed, h, onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
   emit('update:modelValue', 'login')
 }
-const { t } = useI18n()
 
 // 註冊方式
 const registerType = ref<VerifyCodeType>('email')
@@ -20,22 +20,22 @@ const rules = computed<FormRules>(() => {
     username: {
       required: true,
       trigger: 'blur',
-      message: t('login.accountRuleTip'),
+      message: $t('login.accountRuleTip'),
     },
     nickname: {
       required: true,
       trigger: 'blur',
-      message: t('account.nicknameRule'),
+      message: $t('account.nicknameRule'),
     },
     password: {
       required: true,
       trigger: 'blur',
-      message: t('login.passwordRuleTip'),
+      message: $t('login.passwordRuleTip'),
     },
     verifyCode: {
       required: true,
       trigger: 'blur',
-      message: t('login.verifyCodeRuleTip'),
+      message: $t('login.verifyCodeRuleTip'),
     },
   }
 
@@ -45,12 +45,12 @@ const rules = computed<FormRules>(() => {
       {
         required: true,
         trigger: 'blur',
-        message: t('account.emailRule'),
+        message: $t('account.emailRule'),
       },
       {
         pattern: new RegExp(Regex.Email),
         trigger: 'blur',
-        message: t('account.emailFormatRule'),
+        message: $t('account.emailFormatRule'),
       },
     ]
   }
@@ -58,7 +58,7 @@ const rules = computed<FormRules>(() => {
     baseRules.mobile = {
       required: true,
       trigger: 'blur',
-      message: t('account.mobileRule'),
+      message: $t('account.mobileRule'),
     }
   }
 
@@ -78,7 +78,7 @@ const formValue = ref({
 
 // 國家選項
 const countryOptions = computed(() => Object.keys(CountryCallingCodes).map((country: string) => ({
-  label: t(`country.${country}`),
+  label: $t(`country.${country}`),
   value: country,
   rawName: country, // 保存原始名稱，用於顯示
 })))
@@ -97,11 +97,11 @@ async function sendVerifyCode() {
 
   // 檢查信箱或手機號碼是否填寫
   if (registerType.value === 'email' && !formValue.value.email) {
-    window.$message.warning(t('account.emailRule'))
+    window.$message.warning($t('account.emailRule'))
     return
   }
   if (registerType.value === 'mobile' && !formValue.value.mobile) {
-    window.$message.warning(t('account.mobileRule'))
+    window.$message.warning($t('account.mobileRule'))
     return
   }
 
@@ -109,14 +109,14 @@ async function sendVerifyCode() {
   try {
     if (registerType.value === 'email') {
       await sendRegisterEmail({ email: formValue.value.email })
-      window.$message.success(t('login.emailSentSuccess'))
+      window.$message.success($t('login.emailSentSuccess'))
     }
     else {
       // 添加國家區號前綴
       const countryCode = CountryCallingCodes[formValue.value.selectedCountry as keyof typeof CountryCallingCodes]
       const mobileWithCode = `+${countryCode} ${formValue.value.mobile}`
       await sendRegisterMobile({ mobile: mobileWithCode })
-      window.$message.success(t('login.mobileSentSuccess'))
+      window.$message.success($t('login.mobileSentSuccess'))
     }
 
     // 開始倒數計時
@@ -172,9 +172,9 @@ function preventNonNumericInput(event: KeyboardEvent) {
 // 顯示用戶協議
 function showUserAgreement() {
   window.$dialog.info({
-    title: t('login.userAgreement'),
+    title: $t('login.userAgreement'),
     content: () => h('div', { innerHTML: UserAgreement.replace(/\n/g, '<br>') }),
-    positiveText: t('common.back'),
+    positiveText: $t('common.back'),
     onPositiveClick: () => {
       // 關閉彈出視窗
     },
@@ -184,7 +184,7 @@ function showUserAgreement() {
 async function handleRegister() {
   // 檢查是否同意用戶協議
   if (!isRead.value) {
-    window.$message.warning(t('login.pleaseAgree'))
+    window.$message.warning($t('login.pleaseAgree'))
     return
   }
 
@@ -215,7 +215,7 @@ async function handleRegister() {
 
       await register(registerData)
 
-      window.$message.success(t('login.signUp') + t('dataTable.addSuccess'))
+      window.$message.success($t('login.signUp') + $t('dataTable.addSuccess'))
       toLogin()
     }
     finally {

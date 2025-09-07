@@ -4,13 +4,15 @@ import type { FileVO } from '@/api/operations/file'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
+import { useDebounceFn } from '@vueuse/core'
+
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
 import AsyncDictLabel from '@/components/common/AsyncDictLabel/index.vue'
 import FileUpload from '@/components/common/FileUpload/index.vue'
 import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
 import { useLanguageStore } from '@/store/model/language'
-import { useDebounceFn } from '@vueuse/core'
+import { $t } from '@/utils'
 
 const props = defineProps<{
   modalWidth?: string // 模態框的寬度
@@ -29,8 +31,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['success', 'resort'])
-
-const { t } = useI18n()
 
 const languageStore = useLanguageStore()
 
@@ -373,9 +373,9 @@ const modalTitle = computed(() => {
   if (!modalType.value)
     return ''
   return {
-    add: t('common.add'),
-    view: t('common.view'),
-    edit: t('common.edit'),
+    add: $t('common.add'),
+    view: $t('common.view'),
+    edit: $t('common.edit'),
   }[modalType.value] + (props.modalName ?? '')
 })
 
@@ -498,7 +498,7 @@ async function add() {
     ...(props.filterColumnName && props.filterColumnValue ? { [props.filterColumnName]: props.filterColumnValue.value } : {}),
   })
 
-  window.$message.success(t('dataTable.addSuccess'))
+  window.$message.success($t('dataTable.addSuccess'))
 
   const emitData = handleIdDataMapping(
     {
@@ -559,7 +559,7 @@ async function edit() {
   }
 
   await props.updateFunction!({ ...remain })
-  window.$message.success(t('dataTable.updateSuccess'))
+  window.$message.success($t('dataTable.updateSuccess'))
 
   const emitData = handleIdDataMapping(
     {
@@ -582,7 +582,7 @@ async function submitModal() {
 
     // 如果 id 和 parentId 相同，則提示不能將自己設為父級
     if (formData.value.id && formData.value.parentId && (formData.value.id === formData.value.parentId)) {
-      window.$message.error(t('dataTable.cannotSetSelfAsParent'))
+      window.$message.error($t('dataTable.cannotSetSelfAsParent'))
       return
     }
 
@@ -591,7 +591,7 @@ async function submitModal() {
       const item = formDataMapping.value[key]
       if (item.multilingual && item.type !== 'select' && item.type !== 'switch' && item.type !== 'radio') {
         if (!multilingualFields.value[item.name]) {
-          window.$message.error(t('dataTable.multilingualNotSetError1') + item.label + t('dataTable.multilingualNotSetError2'))
+          window.$message.error($t('dataTable.multilingualNotSetError1') + item.label + $t('dataTable.multilingualNotSetError2'))
           return
         }
       }
@@ -920,8 +920,8 @@ function closeModal() {
                     remote
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
-                    :placeholder="item.placeholder || t('dataTable.searchPlaceholder')"
-                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    :placeholder="item.placeholder || $t('dataTable.searchPlaceholder')"
+                    :empty="selectLoadingMap[item.name] ? $t('dataTable.searching') : $t('dataTable.noMatchingOptions')"
                     key-field="key"
                     label-field="label"
                     children-field="children"
@@ -939,7 +939,7 @@ function closeModal() {
                     :loading="selectLoadingMap[item.name]"
                     :clear-filter-after-select="false"
                     :placeholder="item.placeholder"
-                    :empty="selectLoadingMap[item.name] ? t('dataTable.searching') : t('dataTable.noMatchingOptions')"
+                    :empty="selectLoadingMap[item.name] ? $t('dataTable.searching') : $t('dataTable.noMatchingOptions')"
                     clearable
                     :multiple="item.selectOptions?.multiple"
                     @search="(query: string) => handleSearch(query, item)"
@@ -975,11 +975,11 @@ function closeModal() {
         <n-space justify="center">
           <template v-if="modalType !== 'view'">
             <n-button type="primary" :loading="submitLoading" @click="submitModal">
-              {{ t('common.submit') }}
+              {{ $t('common.submit') }}
             </n-button>
           </template>
           <n-button @click="closeModal">
-            {{ modalType === 'view' ? t('common.close') : t('common.cancel') }}
+            {{ modalType === 'view' ? $t('common.close') : $t('common.cancel') }}
           </n-button>
         </n-space>
       </template>

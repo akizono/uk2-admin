@@ -4,15 +4,12 @@ import axios from 'axios'
 import qs from 'qs'
 
 import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/system/auth'
-import { i18n } from '@/modules/i18n'
 import { useAuthStore } from '@/store'
-import { local } from '@/utils'
+import { $t, local } from '@/utils'
 
 import { config } from './config'
 import * as handle from './handle'
 
-// 使用 i18n 實例的全局 t 方法
-const t = i18n.global.t
 const { baseURL, requestTimeout } = config
 
 // 等待重新執行的請求佇列
@@ -68,7 +65,7 @@ service.interceptors.response.use(
 
     // 根據狀態碼，回傳前端預設的錯誤訊息
     const message = error.response?.status
-      ? t(`http.${error.response.status}`)
+      ? $t(`http.${error.response.status}`)
       : handle.handleNetworkErrorMessage(error.message)
 
     // 如果是重新整理 Token 的請求失敗，直接登出
@@ -80,7 +77,7 @@ service.interceptors.response.use(
     if (status === 401) {
       // 如果是登入請求，直接回傳錯誤
       if (url === loginUrl) {
-        window.$message?.error(t('account.accountOrPasswordError'))
+        window.$message?.error($t('account.accountOrPasswordError'))
         return Promise.reject(error)
       }
 

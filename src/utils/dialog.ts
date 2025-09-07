@@ -2,6 +2,8 @@ import type { DialogApi } from 'naive-ui'
 
 import { h } from 'vue'
 
+import { $t } from '@/utils'
+
 let dialog: DialogApi | null = null
 
 export function setdialog(instance: DialogApi) {
@@ -17,7 +19,7 @@ export function createCopyableDialog(params: {
   const { title, content, positiveText, negativeText } = params
 
   if (!dialog) {
-    console.error('Dialog 尚未初始化，請檢查設置')
+    console.error($t('dialog.checkSettingError'))
     return
   }
 
@@ -28,7 +30,7 @@ export function createCopyableDialog(params: {
     negativeText,
     onNegativeClick: () => {
       navigator.clipboard.writeText(content.replace(/<br \/>/g, ' '))
-      window.$message.success('複製成功')
+      window.$message.success($t('dialog.copySuccess'))
       return false
     },
   })

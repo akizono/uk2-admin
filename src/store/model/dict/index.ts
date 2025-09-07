@@ -1,5 +1,5 @@
 import { DictDataApi } from '@/api/system/dict-data'
-import { session } from '@/utils'
+import { $t, session } from '@/utils'
 
 export interface DictItem {
   value: string | number
@@ -142,7 +142,7 @@ export const useDictStore = defineStore('dict-store', {
         return result.list
       }
       catch (error) {
-        console.warn(`無法載入字典數據 ${type}:`, error)
+        console.warn(`${$t('dictionary.dictLoadError')} ${type}:`, error)
         throw error
       }
     },

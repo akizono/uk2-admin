@@ -2,10 +2,12 @@
 import type { User } from '@/api/demo/system'
 import type { DataTableColumns, FormInst } from 'naive-ui'
 
+import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
+
 import { fetchUserPage } from '@/api/demo/system'
 import { Gender } from '@/constants'
 import { useBoolean } from '@/hooks'
-import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
+import { $t } from '@/utils'
 
 import TableModal from './components/TableModal.vue'
 
@@ -23,17 +25,17 @@ const model = ref({ ...initialModel })
 const formRef = ref<FormInst | null>()
 const columns: DataTableColumns<User> = [
   {
-    title: '姓名',
+    title: $t('demoList.userNameField'),
     align: 'center',
     key: 'userName',
   },
   {
-    title: '年齡',
+    title: $t('demoList.age'),
     align: 'center',
     key: 'age',
   },
   {
-    title: '性別',
+    title: $t('demoList.gender'),
     align: 'center',
     key: 'gender',
     render: (row: User) => {
@@ -51,12 +53,12 @@ const columns: DataTableColumns<User> = [
     },
   },
   {
-    title: '信箱',
+    title: $t('demoList.email'),
     align: 'center',
     key: 'email',
   },
   {
-    title: '狀態',
+    title: $t('demoList.status'),
     align: 'center',
     key: 'status',
     render: (row: User) => {
@@ -68,7 +70,7 @@ const columns: DataTableColumns<User> = [
           onUpdateValue={(value: 0 | 1) =>
             handleStatusChange(value, row.id!)}
         >
-          {{ checked: () => '啟用', unchecked: () => '禁用' }}
+          {{ checked: () => $t('demoList.start'), unchecked: () => $t('demoList.disabled') }}
         </NSwitch>
       )
     },
@@ -84,12 +86,12 @@ const columns: DataTableColumns<User> = [
             size="small"
             onClick={() => handleEditTable(row)}
           >
-            編輯
+            { $t('demoList.edit') }
           </NButton>
           <NPopconfirm onPositiveClick={() => handleDelete(row.id)}>
             {{
-              default: () => '確認刪除',
-              trigger: () => <NButton size="small">刪除</NButton>,
+              default: () => $t('demoList.confirmDelete'),
+              trigger: () => <NButton size="small">{$t('demoList.delete')}</NButton>,
             }}
           </NPopconfirm>
         </NSpace>
@@ -116,14 +118,14 @@ async function getUserList() {
   })
 }
 function changePage(page: number, size: number) {
-  window.$message.success(`分頁器:${page},${size}`)
+  window.$message.success(`${$t('demoList.pager')}:${page},${size}`)
 }
 function handleResetSearch() {
   model.value = { ...initialModel }
 }
 function handleDelete(id?: number) {
   listData.value = listData.value.filter(item => item.id !== id)
-  window.$message.success(`刪除用戶id:${id}`)
+  window.$message.success(`${$t('demoList.deleteUserId')}:${id}`)
 }
 
 type ModalType = 'add' | 'edit'
@@ -153,30 +155,30 @@ function handleAddTable() {
     <n-card>
       <n-form ref="formRef" :model="model" label-placement="left" inline :show-feedback="false">
         <n-flex>
-          <n-form-item label="姓名" path="condition_1">
-            <n-input v-model:value="model.condition_1" placeholder="請輸入" />
+          <n-form-item :label="$t('demoList.userNameField')" path="condition_1">
+            <n-input v-model:value="model.condition_1" :placeholder="$t('demoList.pleaseEnter')" />
           </n-form-item>
-          <n-form-item label="年齡" path="condition_2">
-            <n-input v-model:value="model.condition_2" placeholder="請輸入" />
+          <n-form-item :label="$t('demoList.age')" path="condition_2">
+            <n-input v-model:value="model.condition_2" :placeholder="$t('demoList.pleaseEnter')" />
           </n-form-item>
-          <n-form-item label="性別" path="condition_3">
-            <n-input v-model:value="model.condition_3" placeholder="請輸入" />
+          <n-form-item :label="$t('demoList.gender')" path="condition_3">
+            <n-input v-model:value="model.condition_3" :placeholder="$t('demoList.pleaseEnter')" />
           </n-form-item>
-          <n-form-item label="地址" path="condition_4">
-            <n-input v-model:value="model.condition_4" placeholder="請輸入" />
+          <n-form-item :label="$t('demoList.address')" path="condition_4">
+            <n-input v-model:value="model.condition_4" :placeholder="$t('demoList.pleaseEnter')" />
           </n-form-item>
           <n-flex class="ml-auto">
             <NButton type="primary" @click="getUserList">
               <template #icon>
                 <icon-park-outline-search />
               </template>
-              搜索
+              {{ $t('demoList.search') }}
             </NButton>
             <NButton strong secondary @click="handleResetSearch">
               <template #icon>
                 <icon-park-outline-redo />
               </template>
-              重設
+              {{ $t('demoList.reset') }}
             </NButton>
           </n-flex>
         </n-flex>
@@ -189,19 +191,19 @@ function handleAddTable() {
             <template #icon>
               <icon-park-outline-add-one />
             </template>
-            新建
+            {{ $t('demoList.add') }}
           </NButton>
           <NButton strong secondary>
             <template #icon>
               <icon-park-outline-afferent />
             </template>
-            批次導入
+            {{ $t('demoList.batchImport') }}
           </NButton>
           <NButton strong secondary class="ml-a">
             <template #icon>
               <icon-park-outline-download />
             </template>
-            下載
+            {{ $t('demoList.download') }}
           </NButton>
         </div>
         <n-data-table :columns="columns" :data="listData" :loading="loading" />

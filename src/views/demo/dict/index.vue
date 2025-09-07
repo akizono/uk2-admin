@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DictTypeApi } from '@/api/system/dict-type'
+import { $t } from '@/utils'
 import { getValueMap as _getValueMap, getDictData, getDictEnum, getLabelMap as getDictLabelMap } from '@/utils/dict'
 
 const dictKey = ref('')
@@ -41,28 +42,28 @@ onMounted(() => {
 
 function getDict() {
   if (!dictKey.value) {
-    return window.$message.warning('請先選擇字典類型')
+    return window.$message.warning($t('dictionary.pleaseSelectDictType'))
   }
   data.value = getDictData(dictKey.value).value
 }
 
 function getEnum() {
   if (!dictKey.value) {
-    return window.$message.warning('請先選擇字典類型')
+    return window.$message.warning($t('dictionary.pleaseSelectDictType'))
   }
   data.value = getDictEnum(dictKey.value).value
 }
 
 function getValueMap() {
   if (!dictKey.value) {
-    return window.$message.warning('請先選擇字典類型')
+    return window.$message.warning($t('dictionary.pleaseSelectDictType'))
   }
   data.value = _getValueMap(dictKey.value).value
 }
 
 function getLabelMap() {
   if (!dictKey.value) {
-    return window.$message.warning('請先選擇字典類型')
+    return window.$message.warning($t('dictionary.pleaseSelectDictType'))
   }
   data.value = getDictLabelMap(dictKey.value).value
 }
@@ -87,25 +88,25 @@ const enumLabel = computed(() => {
 </script>
 
 <template>
-  <n-card title="字典範例">
+  <n-card :title="$t('dictionary.dictExampleTitle')">
     <n-flex vertical>
       <n-flex>
         <n-select v-model:value="dictKey" class="w-1/3" :options="options" :loading="loading" @update:value="changeSelect" />
-        子字典下拉框
+        {{ $t('dictionary.subDictDropdown') }}
         <n-select class="w-1/3" :options="subOptions" />
       </n-flex>
       <n-flex>
         <n-button @click="getDict">
-          獲取當前字典數據
+          {{ $t('dictionary.getDictDataBtn') }}
         </n-button>
         <n-button @click="getEnum">
-          獲取當前字典枚舉
+          {{ $t('dictionary.getDictEnumBtn') }}
         </n-button>
         <n-button @click="getValueMap">
-          獲取當前字典ValueMap
+          {{ $t('dictionary.getDictValueMapBtn') }}
         </n-button>
         <n-button @click="getLabelMap">
-          獲取當前字典LabelMap
+          {{ $t('dictionary.getDictLabelMapBtn') }}
         </n-button>
       </n-flex>
 
@@ -119,13 +120,13 @@ const enumLabel = computed(() => {
       <n-flex align="center">
         <n-input-number v-model:value="dictValue" :min="0" />
         <n-text type="info">
-          Map回顯結果 {{ dictLabel }}
+          {{ $t('dictionary.mapEchoResult') }} {{ dictLabel }}
         </n-text>
       </n-flex>
       <n-flex align="center">
         <n-input-number v-model:value="enumValue" :min="0" />
         <n-text type="info">
-          Enum回顯結果 {{ enumLabel }}
+          {{ $t('dictionary.enumEchoResult') }} {{ enumLabel }}
         </n-text>
       </n-flex>
     </n-flex>

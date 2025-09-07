@@ -4,29 +4,29 @@ import type { FormInst } from 'naive-ui'
 import { onBeforeUnmount } from 'vue'
 
 import { checkUserHasMobileOrEmail, sendResetPasswordEmail, sendResetPasswordMobile, updatePassword } from '@/api/system/auth'
+import { $t } from '@/utils'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {
   emit('update:modelValue', 'login')
 }
-const { t } = useI18n()
 
 const rules = computed(() => {
   return {
     account: {
       required: true,
       trigger: 'blur',
-      message: t('login.resetPasswordRuleTip'),
+      message: $t('login.resetPasswordRuleTip'),
     },
     verifyCode: {
       required: true,
       trigger: 'blur',
-      message: t('login.verifyCodeRuleTip'),
+      message: $t('login.verifyCodeRuleTip'),
     },
     password: {
       required: true,
       trigger: 'blur',
-      message: t('login.passwordRuleTip'),
+      message: $t('login.passwordRuleTip'),
     },
   }
 })
@@ -61,7 +61,7 @@ async function checkAccount() {
     userInfo.value = res.data
 
     if (!userInfo.value.hasMobile && !userInfo.value.hasEmail) {
-      window.$message.error(t('login.noVerifyMethodError'))
+      window.$message.error($t('login.noVerifyMethodError'))
       return
     }
 
@@ -74,7 +74,7 @@ async function checkAccount() {
 
 function goToResetStep() {
   if (!formValue.value.verifyCodeType) {
-    window.$message.warning(t('login.selectVerifyMethodTip'))
+    window.$message.warning($t('login.selectVerifyMethodTip'))
     return
   }
   currentStep.value = 'reset'
@@ -88,11 +88,11 @@ async function sendVerifyCode() {
   try {
     if (formValue.value.verifyCodeType === 'email') {
       await sendResetPasswordEmail({ username: formValue.value.account })
-      window.$message.success(t('login.emailSentSuccess'))
+      window.$message.success($t('login.emailSentSuccess'))
     }
     else {
       await sendResetPasswordMobile({ username: formValue.value.account })
-      window.$message.success(t('login.mobileSentSuccess'))
+      window.$message.success($t('login.mobileSentSuccess'))
     }
 
     // 開始倒數計時
@@ -132,7 +132,7 @@ async function handleResetPassword() {
         verifyCodeType: formValue.value.verifyCodeType,
       })
 
-      window.$message.success(t('login.resetPasswordSuccess'))
+      window.$message.success($t('login.resetPasswordSuccess'))
       toLogin()
     }
     finally {

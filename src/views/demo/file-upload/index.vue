@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import FileUpload from '@/components/common/FileUpload/index.vue'
+import { $t } from '@/utils'
 
 defineOptions({
   name: 'File Upload Demo',
@@ -14,7 +15,7 @@ function handleFileType(type: 'img' | 'list') {
 </script>
 
 <template>
-  <n-card title="檔案上傳案例">
+  <n-card :title="$t('fileUpload.fileUploadTitle')">
     <FileUpload
       v-model="fileList"
       :max-file-count="5"
@@ -27,10 +28,10 @@ function handleFileType(type: 'img' | 'list') {
     <n-divider />
 
     <n-button type="primary" :disabled="fileType === 'img'" class="m-r-10px" @click="handleFileType('img')">
-      圖片模式
+      {{ $t('fileUpload.imageMode') }}
     </n-button>
     <n-button type="primary" :disabled="fileType === 'list'" @click="handleFileType('list')">
-      列表模式
+      {{ $t('fileUpload.listMode') }}
     </n-button>
   </n-card>
 </template>
