@@ -1,7 +1,4 @@
-import { local } from '@/utils'
 import request from '@/utils/request'
-import { config } from '@/utils/request/config'
-import axios from 'axios'
 
 export interface FileVO extends Api.BaseVO {
   id: string
@@ -34,23 +31,15 @@ export const FileApi = {
       // 檢查 FormData 內容
       // console.log('FormData 已創建，但無法直接查看內容')
 
-      // 直接使用 axios 進行上傳，完全繞過自訂請求邏輯
-      const response = await axios.post(
-        `${config.baseURL}/operations/file/upload`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${local.get('accessToken')}`,
-            'Language-Current': local.get('languageCurrent'),
-            'skip-auth-token': true,
-          },
-        },
-      )
+      // 使用自訂請求系統進行上傳，保持所有攔截器功能
+      const response = await request.post({
+        url: '/operations/file/upload',
+        data: formData,
+      })
 
       // console.log('上傳響應:', response)
 
-      return response.data
+      return response
     }
     catch (error) {
       console.error('error:', error)

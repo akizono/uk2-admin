@@ -7,13 +7,16 @@ import { service } from './service'
 const { defaultHeaders } = config
 
 function request(option: any) {
+  // 檢查是否為 FormData，如果是則跳過所有資料處理
+  const isFormData = option.data instanceof FormData
+
   // 默認將物件中所有的空值移除
   const isFilterEmpty = option.isFilterEmpty === undefined ? true : option.isFilterEmpty
   if (isFilterEmpty) {
     if (option.params)
       option.params = filterEmpty(option.params)
 
-    if (option.data) {
+    if (option.data && !isFormData) {
       // 如果 data 是陣列，直接使用，不進行 filterEmpty
       option.data = Array.isArray(option.data)
         ? option.data
@@ -25,7 +28,7 @@ function request(option: any) {
     if (option.params)
       option.params = convertUndefinedToNull(option.params)
 
-    if (option.data) {
+    if (option.data && !isFormData) {
       option.data = convertUndefinedToNull(option.data)
     }
   }
@@ -42,10 +45,13 @@ function request(option: any) {
     }
   }
 
+  // 如果是 FormData，讓瀏覽器自動設定 Content-Type（包含 boundary）
+  const contentType = isFormData ? undefined : (headersType || defaultHeaders)
+
   return service({
     ...otherOption,
     headers: {
-      'Content-Type': headersType || defaultHeaders,
+      ...(contentType && { 'Content-Type': contentType }),
       ...headers,
     },
   })
@@ -91,11 +97,6 @@ export default {
   },
   download: async <T = any>(option: any) => {
     const res = await request({ method: 'GET', responseType: 'blob', ...option })
-    return res as unknown as Promise<T>
-  },
-  upload: async <T = any>(option: any) => {
-    option.headersType = 'multipart/form-data'
-    const res = await request({ method: 'POST', ...option })
     return res as unknown as Promise<T>
   },
 }
