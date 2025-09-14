@@ -241,6 +241,9 @@ const options = {
   modalName: $t('dictData.dictData'), // 表格中的數據名稱
   ref: 'dataTableRef', // 表格的 ref
   permission, // 權限配置
+
+  tableScrollX: 1200,
+  tabShowBorder: true,
 }
 
 defineExpose({

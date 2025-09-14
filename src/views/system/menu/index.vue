@@ -361,6 +361,10 @@ const options = {
   ref: 'dataTableRef', // 表格的 ref
   multilingualFieldsModalWidth: '900px', // 多語言欄位彈出視窗的寬度
   permission, // 權限配置
+
+  tableScrollX: 1200,
+  // tableOperateColumnFixed: 'right' as const,
+  // tabShowBorder: true,
 }
 </script>
 

@@ -67,6 +67,10 @@ const props = defineProps<{
   initFormData?: InitFormData[] // 初始化表單數據（傳遞到 Modal）
   rules?: FormRules // 表單驗證規則（傳遞到 Modal）
   permission: Record<string, string[]> // 權限配置
+
+  tableScrollX?: number // 表格内容的横向宽度
+  tableOperateColumnFixed?: 'left' | 'right' // 表格操作列的固定位置
+  tabShowBorder?: boolean // 表格是否显示边框
 }>()
 const emit = defineEmits(['createSuccess', 'editSuccess'])
 const languageStore = useLanguageStore()
@@ -799,6 +803,7 @@ const columns = computed(() => {
       title: $t('common.action'),
       align: 'center',
       key: 'actions',
+      fixed: props.tableOperateColumnFixed,
       width: externalActionsColumn?.width || 280,
       render: (row: TableRow) => {
         return (
@@ -1639,15 +1644,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <n-result
-    v-if="!propsVerifyPassed"
-    status="error"
-    :title="$t('dataTable.propsVerifyError')"
-    :description="propsVerifyErrorMsg"
-  />
+  <div>
+    <n-result
+      v-if="!propsVerifyPassed"
+      status="error"
+      :title="$t('dataTable.propsVerifyError')"
+      :description="propsVerifyErrorMsg"
+    />
 
-  <n-flex v-else>
-    <NSpace vertical class="flex-1">
+    <n-flex v-else>
       <n-card v-if="search && initQueryParams">
         <n-spin :show="queryLoading" size="large">
           <n-form ref="formRef" :model="queryParams" label-placement="left" inline :show-feedback="false">
@@ -1730,6 +1735,17 @@ onMounted(async () => {
         </n-spin>
       </n-card>
 
+      <n-card v-if="showMenu" class="w-70">
+        <n-tree
+          v-model:selected-keys="selectedMenuKeys"
+          block-line
+          :data="menuTreeData"
+          key-field="id"
+          label-field="name"
+          selectable
+        />
+      </n-card>
+
       <n-card class="flex-1">
         <template #header>
           <n-flex justify="space-between">
@@ -1754,69 +1770,78 @@ onMounted(async () => {
             </div>
           </n-flex>
         </template>
-        <n-flex>
-          <n-card v-if="showMenu" class="w-70">
-            <n-tree
-              v-model:selected-keys="selectedMenuKeys"
-              block-line
-              :data="menuTreeData"
-              key-field="id"
-              label-field="name"
-              selectable
+        <NSpace vertical :class="{ 'data-table-with-columns-border': tabShowBorder }">
+          <n-data-table
+            ref="tableRef"
+            v-model:checked-row-keys="checkedRowKeys"
+            v-model:expanded-row-keys="expandedRowKeys"
+            :columns="columns"
+            :data="list"
+            :loading="tableLoading"
+            :row-key="row => row.id"
+            :scroll-x="tableScrollX"
+          />
+          <template v-if="pagination">
+            <Pagination
+              v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
+              :current-page="queryParams.currentPage" @change="changePage"
             />
-          </n-card>
-          <NSpace vertical class="flex-1">
-            <n-data-table
-              ref="tableRef"
-              v-model:checked-row-keys="checkedRowKeys"
-              v-model:expanded-row-keys="expandedRowKeys"
-              :columns="columns"
-              :data="list"
-              :loading="tableLoading"
-              :row-key="row => row.id"
-            />
-            <template v-if="pagination">
-              <Pagination
-                v-if="queryParams.pageSize" :total="total" :page-size="queryParams.pageSize"
-                :current-page="queryParams.currentPage" @change="changePage"
-              />
-              <Pagination v-else :total="total" @change="changePage" />
-            </template>
-          </NSpace>
-        </n-flex>
+            <Pagination v-else :total="total" @change="changePage" />
+          </template>
+        </NSpace>
       </n-card>
+    </n-flex>
 
-      <TableModal
-        ref="modalRef"
-        :modal-width="modalWidth"
-        :modal-form-label-width="modalFormLabelWidth"
-        :modal-name="modalName"
-        :multilingual-fields-modal-width="multilingualFieldsModalWidth"
-        :update-function="updateFunction || undefined"
-        :create-function="createFunction || undefined"
+    <TableModal
+      ref="modalRef"
+      :modal-width="modalWidth"
+      :modal-form-label-width="modalFormLabelWidth"
+      :modal-name="modalName"
+      :multilingual-fields-modal-width="multilingualFieldsModalWidth"
+      :update-function="updateFunction || undefined"
+      :create-function="createFunction || undefined"
 
-        :rules="rules"
-        :init-form-data="initFormData"
+      :rules="rules"
+      :init-form-data="initFormData"
 
-        @success="tableModalSuccess"
-        @resort="handleResort"
-      />
+      @success="tableModalSuccess"
+      @resort="handleResort"
+    />
 
-      <!-- 批次刪除確認 Modal -->
-      <n-modal
-        v-model:show="showBatchDeleteModalRef"
-        preset="dialog"
-        :title="$t('common.confirmDelete')"
-        :positive-text="$t('common.confirm')"
-        :negative-text="$t('common.cancel')"
-        :loading="batchDeleteLoading"
-        @positive-click="confirmBatchDelete"
-        @negative-click="() => { showBatchDeleteModalRef = false }"
-      >
-        <template #default>
-          {{ $t('dataTable.batchDeleteModalTitle1') + checkedRowKeys.length + $t('dataTable.batchDeleteModalTitle2') }}
-        </template>
-      </n-modal>
-    </NSpace>
-  </n-flex>
+    <!-- 批次刪除確認 Modal -->
+    <n-modal
+      v-model:show="showBatchDeleteModalRef"
+      preset="dialog"
+      :title="$t('common.confirmDelete')"
+      :positive-text="$t('common.confirm')"
+      :negative-text="$t('common.cancel')"
+      :loading="batchDeleteLoading"
+      @positive-click="confirmBatchDelete"
+      @negative-click="() => { showBatchDeleteModalRef = false }"
+    >
+      <template #default>
+        {{ $t('dataTable.batchDeleteModalTitle1') + checkedRowKeys.length + $t('dataTable.batchDeleteModalTitle2') }}
+      </template>
+    </n-modal>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.data-table-with-columns-border {
+  :deep(.n-data-table .n-data-table-td) {
+    border-right: 1px solid var(--n-border-color);
+  }
+
+  :deep(.n-data-table .n-data-table-th) {
+    border-right: 1px solid var(--n-border-color);
+  }
+
+  :deep(.n-data-table .n-data-table-td:last-child) {
+    border-right: none;
+  }
+
+  :deep(.n-data-table .n-data-table-th:last-child) {
+    border-right: none;
+  }
+}
+</style>

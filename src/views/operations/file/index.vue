@@ -169,6 +169,9 @@ const options = {
   modalWidth: '1000px',
   modalName: $t('file.fileEntity'), // 表格中的數據名稱
   permission, // 權限配置
+
+  tableScrollX: 1400,
+  tabShowBorder: true,
 }
 </script>
 
