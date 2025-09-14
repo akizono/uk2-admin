@@ -9,6 +9,7 @@ import IconRedo from '~icons/icon-park-outline/redo'
 import IconLeft from '~icons/icon-park-outline/to-left'
 import IconRight from '~icons/icon-park-outline/to-right'
 
+import { useTabScroll } from '@/hooks'
 import { useAppStore, useTabStore } from '@/store'
 import { $t } from '@/utils'
 
@@ -20,6 +21,8 @@ import TabBarItem from './TabBarItem.vue'
 const tabStore = useTabStore()
 const { tabs } = storeToRefs(useTabStore())
 const appStore = useAppStore()
+
+const { scrollbar, onWheel } = useTabScroll(computed(() => tabStore.currentTabPath))
 
 const router = useRouter()
 function handleTab(route: RouteLocationNormalized) {
@@ -114,81 +117,38 @@ useDraggable(el, tabs, {
 </script>
 
 <template>
-  <div class="p-l-2 flex w-full relative">
-    <div class="flex items-end">
-      <TabBarItem
-        v-for="item in tabStore.persistentTabs" :key="item.fullPath" :value="tabStore.currentTabPath" :route="item"
-        @click="handleTab(item)"
-      />
+  <n-scrollbar ref="scrollbar" class="relative flex h-full tab-bar-scroller-wrapper" content-class="h-full pr-34 tab-bar-scroller-content" :x-scrollable="true" @wheel="onWheel">
+    <div class="p-l-2 flex wh-full relative">
+      <div class="flex items-end">
+        <TabBarItem
+          v-for="item in tabStore.persistentTabs" :key="item.fullPath" :value="tabStore.currentTabPath" :route="item"
+          @click="handleTab(item)"
+        />
+      </div>
+      <div ref="el" class="flex items-end flex-1">
+        <TabBarItem
+          v-for="item in tabStore.tabs"
+          :key="item.fullPath"
+          :value="tabStore.currentTabPath"
+          :route="item"
+          closable
+          :data-tab-path="item.fullPath"
+          @close="tabStore.closeTab"
+          @click="handleTab(item)"
+          @contextmenu="handleContextMenu($event, item)"
+        />
+        <n-dropdown
+          placement="bottom-start" trigger="manual" :x="x" :y="y" :options="options" :show="showDropdown"
+          :on-clickoutside="onClickoutside" @select="handleSelect"
+        />
+      </div>
     </div>
-    <div ref="el" class="flex items-end flex-1 overflow-x-auto overflow-y-hidden">
-      <TabBarItem
-        v-for="item in tabStore.tabs" :key="item.fullPath" :value="tabStore.currentTabPath" :route="item" closable
-        @close="tabStore.closeTab"
-        @click="handleTab(item)"
-        @contextmenu="handleContextMenu($event, item)"
-      />
-      <span class="w-[140px] flex-shrink-0" />
-      <n-dropdown
-        placement="bottom-start" trigger="manual" :x="x" :y="y" :options="options" :show="showDropdown"
-        :on-clickoutside="onClickoutside" @select="handleSelect"
-      />
-    </div>
-    <!-- <span class="m-l-auto" /> -->
-    <n-el class="absolute right-0 flex items-center gap-1 bg-[var(--base-color)] h-full">
+    <n-el class="absolute right-0 top-0 flex items-center gap-1 bg-[var(--card-color)] h-full">
       <Reload />
       <ContentFullScreen />
       <DropTabs />
     </n-el>
-  </div>
-
-  <!-- <div class="wh-full flex items-end">
-    <n-tabs
-      type="card"
-      size="small"
-      :tabs-padding="10"
-      :value="tabStore.currentTabPath"
-      @close="tabStore.closeTab"
-    >
-      <n-tab
-        v-for="item in tabStore.persistentTabs"
-        :key="item.fullPath"
-        :name="item.fullPath"
-        @click="router.push(item.fullPath)"
-      >
-        <div class="flex-x-center gap-2">
-          <nova-icon :icon="item.meta.icon" /> {{ item.meta.title }}
-        </div>
-      </n-tab>
-      <n-tab
-        v-for="item in tabStore.tabs"
-        :key="item.fullPath"
-        closable
-        :name="item.fullPath"
-        @click="handleTab(item)"
-        @contextmenu="handleContextMenu($event, item)"
-      >
-        <div class="flex-x-center gap-2">
-          <nova-icon :icon="item.meta.icon" /> {{ item.meta.title }}
-        </div>
-      </n-tab>
-      <template #suffix>
-        <Reload />
-        <ContentFullScreen />
-        <DropTabs />
-      </template>
-    </n-tabs>
-    <n-dropdown
-      placement="bottom-start"
-      trigger="manual"
-      :x="x"
-      :y="y"
-      :options="options"
-      :show="showDropdown"
-      :on-clickoutside="onClickoutside"
-      @select="handleSelect"
-    />
-  </div> -->
+  </n-scrollbar>
 </template>
 
 <style scoped>
