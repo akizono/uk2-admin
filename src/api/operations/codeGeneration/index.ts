@@ -82,8 +82,8 @@ export type EntityAllFieldsVO = Record<string, { label: string, type: string, nu
 
 export const CodeGenerationApi = {
   /** 獲取模組分頁列表 */
-  getCodeGenerationPage: async (params: PageParams): PageRes<CodeGenerationVO> => {
-    return await request.get({ url: '/operations/code-generation/page', params })
+  getCodeGenerationList: async (params: PageParams): PageRes<CodeGenerationVO> => {
+    return await request.get({ url: '/operations/code-generation/list', params })
   },
 
   /** 新增模組 */

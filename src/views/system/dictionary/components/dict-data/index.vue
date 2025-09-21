@@ -225,7 +225,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
 
-  getFunction: DictDataApi.getDictDataPage, // 獲取表格數據的 API
+  getListFunction: DictDataApi.getDictDataList, // 獲取表格數據的 API
   deleteFunction: DictDataApi.deleteDictData, // 刪除表格數據的 API
   updateFunction: DictDataApi.updateDictData, // 更新表格數據的 API
   createFunction: DictDataApi.createDictData, // 新增表格數據的 API

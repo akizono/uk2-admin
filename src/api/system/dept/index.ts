@@ -13,13 +13,23 @@ export interface DeptVO extends Api.BaseVO {
 
 export const DeptApi = {
   /** 獲取部門分頁列表 */
-  getDeptPage: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
-    return await request.get({ url: '/system/dept/page', params })
+  getDeptList: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
+    return await request.get({ url: '/system/dept/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「部門分頁列表」 */
-  getDeptPageByLang: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
-    return await request.getByLang({ url: '/system/dept/page', params })
+  getDeptListByLang: async (params: PageParams & Partial<DeptVO>): PageRes<DeptVO> => {
+    return await request.getByLang({ url: '/system/dept/list', params })
+  },
+
+  /** 獲取部門資料 */
+  getDept: async (id: string): ApiResponse<DeptVO> => {
+    return await request.get({ url: `/system/dept/get/${id}` })
+  },
+
+  /** 獲取「當前系統語言」版本的「部門資料」 */
+  getDeptByLang: async (id: string): ApiResponse<DeptVO> => {
+    return await request.getByLang({ url: `/system/dept/get/${id}` })
   },
 
   /** 新增部門 */

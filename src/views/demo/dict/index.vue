@@ -13,7 +13,7 @@ const data = ref()
 async function getAlldict() {
   loading.value = true
   try {
-    const { data: result } = await DictTypeApi.getDictTypePageByLang({
+    const { data: result } = await DictTypeApi.getDictTypeListByLang({
       currentPage: 1,
       pageSize: 5,
     })

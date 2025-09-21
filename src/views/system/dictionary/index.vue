@@ -171,7 +171,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: DictTypeApi.getDictTypePage, // 獲取表格數據的 API
+  getListFunction: DictTypeApi.getDictTypeList, // 獲取表格數據的 API
   deleteFunction: DictTypeApi.deleteDictType, // 刪除表格數據的 API
   updateFunction: DictTypeApi.updateDictType, // 更新表格數據的 API
   createFunction: DictTypeApi.createDictType, // 新增表格數據的 API

@@ -65,6 +65,7 @@ export default {
   getByLang: async <T = any>(option: any) => {
     const res = await request({ method: 'GET', ...option })
 
+    // 處理列表資料
     if (
       res.data.list
       && res.data.list.length > 0
@@ -75,6 +76,17 @@ export default {
         Object.keys(item.multilingualFields).forEach((key) => {
           item[key] = item.multilingualFields[key].find((item: any) => item.language === current)?.value
         })
+      })
+    }
+
+    // 處理單筆資料
+    else if (
+      res.data
+      && res.data.multilingualFields
+    ) {
+      const { current } = useLanguageStore()
+      Object.keys(res.data.multilingualFields).forEach((key) => {
+        res.data[key] = res.data.multilingualFields[key].find((item: any) => item.language === current)?.value
       })
     }
     return res as unknown as T

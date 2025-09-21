@@ -11,13 +11,23 @@ export interface DictDataVO extends Api.BaseVO {
 
 export const DictDataApi = {
   /** 獲取字典數據分頁列表 */
-  getDictDataPage: async (params: PageParams & Partial<DictDataVO>): PageRes<DictDataVO> => {
-    return await request.get({ url: '/system/dict-data/page', params })
+  getDictDataList: async (params: PageParams & Partial<DictDataVO>): PageRes<DictDataVO> => {
+    return await request.get({ url: '/system/dict-data/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「字典數據分頁列表」 */
-  getDictDataPageByLang: async (params: PageParams & Partial<DictDataVO> & { dictTypeStatus?: number }): PageRes<DictDataVO> => {
-    return await request.getByLang({ url: '/system/dict-data/page', params })
+  getDictDataListByLang: async (params: PageParams & Partial<DictDataVO> & { dictTypeStatus?: number }): PageRes<DictDataVO> => {
+    return await request.getByLang({ url: '/system/dict-data/list', params })
+  },
+
+  /** 獲取字典數據資料 */
+  getDictData: async (id: string): ApiResponse<DictDataVO> => {
+    return await request.get({ url: `/system/dict-data/get/${id}` })
+  },
+
+  /** 獲取「當前系統語言」版本的「字典數據資料」 */
+  getDictDataByLang: async (id: string): ApiResponse<DictDataVO> => {
+    return await request.getByLang({ url: `/system/dict-data/get/${id}` })
   },
 
   /** 新增字典數據 */

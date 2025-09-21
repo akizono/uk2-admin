@@ -20,13 +20,23 @@ export interface MenuVO extends Api.BaseVO {
 
 export const MenuApi = {
   /** 獲取選單分頁列表 */
-  getMenuPage: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
-    return await request.get({ url: '/system/menu/page', params })
+  getMenuList: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
+    return await request.get({ url: '/system/menu/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「選單分頁列表」 */
-  getMenuPageByLang: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
-    return await request.getByLang({ url: '/system/menu/page', params })
+  getMenuListByLang: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
+    return await request.getByLang({ url: '/system/menu/list', params })
+  },
+
+  /** 獲取選單資料 */
+  getMenu: async (id: string): ApiResponse<MenuVO> => {
+    return await request.get({ url: `/system/menu/get/${id}` })
+  },
+
+  /** 獲取「當前系統語言」版本的「選單資料」 */
+  getMenuByLang: async (id: string): ApiResponse<MenuVO> => {
+    return await request.getByLang({ url: `/system/menu/get/${id}` })
   },
 
   /** 獲取使用者有權限的菜單 */

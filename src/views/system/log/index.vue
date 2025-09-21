@@ -320,7 +320,7 @@ const options = {
   columns, // 表格欄位的定義
   // viewEntranceColumns: [],
   initQueryParams, // 初始化查詢參數
-  getFunction: LogApi.getLogPage, // 獲取表格數據的 API
+  getListFunction: LogApi.getLogList, // 獲取表格數據的 API
 
   /** 表單配置 */
   initFormData, // 初始化表單數據

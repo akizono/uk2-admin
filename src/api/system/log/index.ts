@@ -27,12 +27,12 @@ export interface LogVO extends Api.BaseVO {
 
 export const LogApi = {
   /** 獲取日誌分頁列表 */
-  getLogPage: async (params: PageParams & Partial<LogVO>): PageRes<LogVO> => {
-    return await request.get({ url: '/system/log/page', params })
+  getLogList: async (params: PageParams & Partial<LogVO>): PageRes<LogVO> => {
+    return await request.get({ url: '/system/log/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「日誌分頁列表」 */
-  getLogPageByLang: async (params: PageParams & Partial<LogVO>): PageRes<LogVO> => {
-    return await request.getByLang({ url: '/system/log/page', params })
+  getLogListByLang: async (params: PageParams & Partial<LogVO>): PageRes<LogVO> => {
+    return await request.getByLang({ url: '/system/log/list', params })
   },
 }

@@ -11,8 +11,8 @@ export interface FileVO extends Api.BaseVO {
 
 export const FileApi = {
   /** 獲取檔案分頁列表 */
-  getFilePage: async (params: PageParams & Partial<FileVO>): PageRes<FileVO> => {
-    return await request.get({ url: '/operations/file/page', params })
+  getFileList: async (params: PageParams & Partial<FileVO>): PageRes<FileVO> => {
+    return await request.get({ url: '/operations/file/list', params })
   },
 
   /** 上傳檔案 */

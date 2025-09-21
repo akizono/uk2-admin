@@ -159,7 +159,7 @@ const options = {
   neckSlot, // 表格頂部的自訂按鈕
   columns, // 表格欄位的定義
   initQueryParams, // 初始化查詢參數
-  getFunction: FileApi.getFilePage, // 獲取表格數據的 API
+  getListFunction: FileApi.getFileList, // 獲取表格數據的 API
   deleteFunction: FileApi.deleteFile, // 刪除表格數據的 API
 
   /** 表單配置 */

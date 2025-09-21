@@ -117,7 +117,7 @@ const initFormData: InitFormData[] = [
     label: $t('menu.parentMenu'),
     type: 'select',
     selectOptions: {
-      api: MenuApi.getMenuPage,
+      api: MenuApi.getMenuList,
       selectParam: 'name',
       itemMapping: { label: 'title', value: 'id' },
     },
@@ -342,7 +342,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: MenuApi.getMenuPage, // 獲取表格數據的 API
+  getListFunction: MenuApi.getMenuList, // 獲取表格數據的 API
   deleteFunction: MenuApi.deleteMenu, // 刪除表格數據的 API
   updateFunction: MenuApi.updateMenu, // 更新表格數據的 API
   createFunction: MenuApi.createMenu, // 新增表格數據的 API

@@ -104,7 +104,7 @@ export const useDictStore = defineStore('dict-store', {
      */
     async getDictByNet(type: string) {
       try {
-        const { data: result } = await DictDataApi.getDictDataPageByLang({
+        const { data: result } = await DictDataApi.getDictDataListByLang({
           pageSize: 0,
           currentPage: 1,
           dictType: type,

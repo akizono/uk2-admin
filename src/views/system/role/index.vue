@@ -185,7 +185,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: RoleApi.getRolePage, // 獲取表格數據的 API
+  getListFunction: RoleApi.getRoleList, // 獲取表格數據的 API
   deleteFunction: RoleApi.deleteRole, // 刪除表格數據的 API
   updateFunction: RoleApi.updateRole, // 更新表格數據的 API
   createFunction: RoleApi.createRole, // 新增表格數據的 API

@@ -8,8 +8,8 @@ export interface RoleMenuVO extends Api.BaseVO {
 
 export const RoleMenuApi = {
   /** 獲取 RoleMenu分頁列表 */
-  getRoleMenuPage: async (params: PageParams & Partial<RoleMenuVO>): PageRes<RoleMenuVO> => {
-    return await request.get({ url: '/system/role-menu/page', params })
+  getRoleMenuList: async (params: PageParams & Partial<RoleMenuVO>): PageRes<RoleMenuVO> => {
+    return await request.get({ url: '/system/role-menu/list', params })
   },
 
   /** 批次更新 */

@@ -115,7 +115,7 @@ const initFormData: InitFormData[] = [
     label: $t('dept.parentDept'),
     type: 'select',
     selectOptions: {
-      api: DeptApi.getDeptPage,
+      api: DeptApi.getDeptList,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
     },
@@ -143,7 +143,7 @@ const initFormData: InitFormData[] = [
     label: $t('dept.leaderUser'),
     type: 'select',
     selectOptions: {
-      api: UserApi.getUserPage,
+      api: UserApi.getUserList,
       selectParam: 'username',
       itemMapping: { label: 'nickname', value: 'id' },
       lazy: true,
@@ -212,7 +212,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: ['name'], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: DeptApi.getDeptPage, // 獲取表格數據的 API
+  getListFunction: DeptApi.getDeptList, // 獲取表格數據的 API
   deleteFunction: DeptApi.deleteDept, // 刪除表格數據的 API
   updateFunction: DeptApi.updateDept, // 更新表格數據的 API
   createFunction: DeptApi.createDept, // 新增表格數據的 API

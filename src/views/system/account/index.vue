@@ -115,7 +115,7 @@ const initQueryParams: InitQueryParams[] = [
     placeholder: $t('account.rolePlaceholder'),
     inputType: 'select',
     selectOptions: {
-      api: RoleApi.getRolePage,
+      api: RoleApi.getRoleList,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
       multiple: true,
@@ -271,7 +271,7 @@ const initFormData: InitFormData[] = [
     label: $t('account.dept'),
     type: 'select',
     selectOptions: {
-      api: DeptApi.getDeptPage,
+      api: DeptApi.getDeptList,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
     },
@@ -284,7 +284,7 @@ const initFormData: InitFormData[] = [
     label: $t('account.role'),
     type: 'select',
     selectOptions: {
-      api: RoleApi.getRolePage,
+      api: RoleApi.getRoleList,
       selectParam: 'name',
       itemMapping: { label: 'name', value: 'id' },
       multiple: true,
@@ -389,7 +389,7 @@ const options = {
   /** 菜單配置 */
   showMenu: true, // 開啟菜單功能
   menuMultilingual: true, // 菜單開啟多語言
-  getMenuDataFunction: DeptApi.getDeptPage, // 獲取菜單數據的 API
+  getMenuDataFunction: DeptApi.getDeptList, // 獲取菜單數據的 API
   filterField: 'deptId', // 過濾欄位
   menuDefaultExpandRoot: false, // 默認展開根節點
 
@@ -397,7 +397,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: [], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: UserApi.getUserPage, // 獲取表格數據的 API
+  getListFunction: UserApi.getUserList, // 獲取表格數據的 API
   deleteFunction: UserApi.deleteUser, // 刪除表格數據的 API
   updateFunction: UserApi.updateUser, // 更新表格數據的 API
   createFunction: UserApi.createUser, // 新增表格數據的 API

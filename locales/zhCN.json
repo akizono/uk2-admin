@@ -165,7 +165,7 @@
   },
   "dataTable": {
     "paginationError": "分页器已开启，pageSize不能为0",
-    "getFunctionError": "缺少 getFunction",
+    "getListFunctionError": "缺少 getListFunction",
     "deleteFunctionError": "开启删除功能但缺少deleteFunction",
     "updateFunctionError": "开启编辑功能但缺少updateFunction",
     "createFunctionError": "开启新增功能但缺少createFunction",

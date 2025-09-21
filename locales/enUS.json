@@ -165,7 +165,7 @@
   },
   "dataTable": {
     "paginationError": "The paginator is enabled, pageSize cannot be 0",
-    "getFunctionError": "Missing getFunction",
+    "getListFunctionError": "Missing getListFunction",
     "deleteFunctionError": "Enable the delete function but lack the deleteFunction",
     "updateFunctionError": "Enable editing function but lack updateFunction",
     "createFunctionError": "Enable new features but lack createFunction",

@@ -28,7 +28,7 @@ const { bool: generatePreviewLoading, setTrue: _startGeneratePreviewLoading, set
 const dictTypeOptions = ref<{ label: string, value: string }[]>([])
 // 獲取字典類型選項
 async function getDictTypeOptions() {
-  const { data: result } = await DictTypeApi.getDictTypePage({})
+  const { data: result } = await DictTypeApi.getDictTypeList({})
   dictTypeOptions.value = result.list.map(item => ({
     label: item.type,
     value: item.type,

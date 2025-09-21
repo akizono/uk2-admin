@@ -9,13 +9,23 @@ export interface DictTypeVO extends Api.BaseVO {
 
 export const DictTypeApi = {
   /** 獲取字典類型分頁列表 */
-  getDictTypePage: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
-    return await request.get({ url: '/system/dict-type/page', params })
+  getDictTypeList: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
+    return await request.get({ url: '/system/dict-type/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「字典類型分頁列表」 */
-  getDictTypePageByLang: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
-    return await request.getByLang({ url: '/system/dict-type/page', params })
+  getDictTypeListByLang: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
+    return await request.getByLang({ url: '/system/dict-type/list', params })
+  },
+
+  /** 獲取字典類型資料 */
+  getDictType: async (id: string): ApiResponse<DictTypeVO> => {
+    return await request.get({ url: `/system/dict-type/get/${id}` })
+  },
+
+  /** 獲取「當前系統語言」版本的「字典類型資料」 */
+  getDictTypeByLang: async (id: string): ApiResponse<DictTypeVO> => {
+    return await request.getByLang({ url: `/system/dict-type/get/${id}` })
   },
 
   /** 新增字典類型 */

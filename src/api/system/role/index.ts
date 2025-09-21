@@ -9,8 +9,13 @@ export interface RoleVO extends Api.BaseVO {
 
 export const RoleApi = {
   /** 獲取角色分頁列表 */
-  getRolePage: async (params: PageParams & Partial<RoleVO>): PageRes<RoleVO> => {
-    return await request.get({ url: '/system/role/page', params })
+  getRoleList: async (params: PageParams & Partial<RoleVO>): PageRes<RoleVO> => {
+    return await request.get({ url: '/system/role/list', params })
+  },
+
+  /** 獲取角色資料 */
+  getRole: async (id: string): ApiResponse<RoleVO> => {
+    return await request.get({ url: `/system/role/get/${id}` })
   },
 
   /** 新增角色 */

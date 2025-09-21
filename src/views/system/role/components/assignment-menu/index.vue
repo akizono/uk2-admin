@@ -25,7 +25,7 @@ const defaultProps = { children: 'children', label: 'title', value: 'id' }
 
 const treeList = ref<MenuVO[]>([])
 async function getTreeList() {
-  const { data: result } = await MenuApi.getMenuPageByLang({
+  const { data: result } = await MenuApi.getMenuListByLang({
     pageSize: 0,
     status: 1,
   })
@@ -36,7 +36,7 @@ async function getTreeList() {
 const checkedKeys = ref<string[]>([]) // 選中的數據
 
 async function setChecked() {
-  const { data: result } = await RoleMenuApi.getRoleMenuPage({
+  const { data: result } = await RoleMenuApi.getRoleMenuList({
     pageSize: 0,
     roleId: rowData.value.id,
   })

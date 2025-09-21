@@ -186,7 +186,7 @@ const options = {
   columns, // 表格欄位的定義
   viewEntranceColumns: ['fieldId'], // 點擊後能進入「查看視窗」的欄位
   initQueryParams, // 初始化查詢參數
-  getFunction: MultilingualFieldsApi.getMultilingualFieldsPage, // 獲取表格數據的 API
+  getListFunction: MultilingualFieldsApi.getMultilingualFieldsList, // 獲取表格數據的 API
   deleteFunction: MultilingualFieldsApi.deleteMultilingualFields, // 刪除表格數據的 API
   updateFunction: MultilingualFieldsApi.updateMultilingualFields, // 更新表格數據的 API
 
