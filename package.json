@@ -47,7 +47,10 @@
     "lint": "eslint . && vue-tsc --noEmit",
     "lint:fix": "eslint . --fix",
     "lint:check": "npx @eslint/config-inspector",
-    "sizecheck": "npx vite-bundle-visualizer"
+    "sizecheck": "npx vite-bundle-visualizer",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@vueuse/core": "^12.4.0",
@@ -92,6 +95,7 @@
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-vue-devtools": "7.7.0",
+    "vitepress": "2.0.0-alpha.12",
     "vue-tsc": "^2.2.0"
   },
   "simple-git-hooks": {

@@ -30,3 +30,6 @@ auto-imports.d.ts
 
 # Lock files
 *-lock.yaml
+
+# Docs
+docs/.vitepress/cache
