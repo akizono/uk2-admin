@@ -41,6 +41,12 @@ export const zhTWConfig = {
             { text: 'UnoCSS', link: '/zhTW/web-guide/extended-use/unocss' },
           ],
         },
+        {
+          text: '元件',
+          items: [
+            { text: 'DataTable', link: '/zhTW/web-guide/components/data-table' },
+          ],
+        },
       ],
       '/zhTW/dev/': [
         {
