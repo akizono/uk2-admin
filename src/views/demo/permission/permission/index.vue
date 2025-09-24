@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import type { Role } from '@/store/model/auth/interfaces'
-
-import { usePermi, usePermission } from '@/hooks'
+import { useHasRole, usePermi } from '@/hooks'
 import { useAuthStore } from '@/store'
 import { $t } from '@/utils'
 
 const authStore = useAuthStore()
-const { hasPermission } = usePermission()
+const { hasRole } = useHasRole()
 const { hasPermi } = usePermi()
 const { user } = authStore
 const role = user?.role || []
 
-const roleList: Role[] = ['admin', 'common']
+const roleList: string[] = ['admin', 'common']
 
 async function toggleUserRole(role: string) {
   const loginConfig = {
@@ -48,23 +46,23 @@ async function toggleUserRole(role: string) {
       </n-button>
     </n-space>
 
-    <n-h2>{{ $t('permission.usePermissionFunctionUsage') }}</n-h2>
-    <n-space>
-      <n-button v-if="hasPermission(['super_admin'])">
-        {{ $t('permission.superAdminVisible') }}
-      </n-button>
-      <n-button v-if="hasPermission(['common'])">
-        {{ $t('permission.commonVisible') }}
-      </n-button>
-      <n-button v-if="hasPermission(['super_admin', 'common'])">
-        {{ $t('permission.superAdminAndCommonVisible') }}
-      </n-button>
-    </n-space>
-
     <n-h2>{{ $t('permission.usePermiFunctionUsage') }}</n-h2>
     <n-space>
       <n-button v-if="hasPermi(['system:dept:page'])">
         {{ $t('permission.systemDeptPageVisible') }}
+      </n-button>
+    </n-space>
+
+    <n-h2>{{ $t('permission.useHasRoleFunctionUsage') }}</n-h2>
+    <n-space>
+      <n-button v-if="hasRole(['super_admin'])">
+        {{ $t('permission.superAdminVisible') }}
+      </n-button>
+      <n-button v-if="hasRole(['common'])">
+        {{ $t('permission.commonVisible') }}
+      </n-button>
+      <n-button v-if="hasRole(['super_admin', 'common'])">
+        {{ $t('permission.superAdminAndCommonVisible') }}
       </n-button>
     </n-space>
   </n-card>

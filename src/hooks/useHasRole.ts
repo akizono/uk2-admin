@@ -1,14 +1,14 @@
 import { useAuthStore } from '@/store'
 
 /** 權限判斷 */
-export function usePermission() {
+export function useHasRole() {
   const authStore = useAuthStore()
 
-  function hasPermission(
+  function hasRole(
     permission: string[] | undefined | string,
   ) {
-    if (!permission)
-      return true
+    if (!Array.isArray(permission) || permission.length === 0)
+      return false
 
     if (!authStore.user?.role)
       return false
@@ -19,17 +19,11 @@ export function usePermission() {
     if (role.includes('super_admin'))
       return true
 
-    // 如果 permission 是字符串（權限標識），則檢查是否有此權限
-    // 目前不支持權限標識檢查，暫時返回 true
-    if (typeof permission === 'string') {
-      return true
-    }
-
-    // 如果 permission 是數組（角色組），則檢查是否有此角色
+    // 檢查是否有此角色
     return permission.some(item => role.includes(item))
   }
 
   return {
-    hasPermission,
+    hasRole,
   }
 }
