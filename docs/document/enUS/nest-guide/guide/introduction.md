@@ -26,9 +26,3 @@ Current development progress:
 | ❌ | Redis | Integrated Redis Cache Data |
 | ❌ | Notices and Announcements | System Notices and Announcements Information Release and Maintenance |
 | ❌ | Site message | Message notifications within the system, providing in-site message templates and in-site message messages |
-
-## Quick Start
-
-:::tip
-Before starting the project, make sure your development environment is installed[Node.js](../../dev/nodejs)and[MySQL](../../dev/mysql)
-:::

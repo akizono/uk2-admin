@@ -338,7 +338,7 @@ pageSize: Preset to 10 (10 items per page)
 
 ### Get all data
 
-When you need to get all the data at once, just set the pageSize parameter to -1:
+When you need to get all the data at once, just set the pageSize parameter to 0:
 
 ```ts
 import type { RoleVO } from '@/api/system/role'
@@ -348,7 +348,7 @@ import { RoleApi } from '@/api/system/role'
 const roleList = ref({} as RoleVO[])
 
 async function getRoleList() {
-  const { data: result } = await RoleApi.getRoleList({ pageSize: -1 })
+  const { data: result } = await RoleApi.getRoleList({ pageSize: 0 })
   roleList.value = result.list
 }
 

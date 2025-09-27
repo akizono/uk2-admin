@@ -60,7 +60,7 @@
 
 - **類型：** `zhCN | enUS`
 
-項目中預設使用的語言。詳情請參考[多語言配置](./i18n.md)
+項目中預設使用的語言。詳情請參考[多語言配置](../extended-use/i18n.md)
 
 ### VITE_LOGIN_DEFAULT_USERNAME
 

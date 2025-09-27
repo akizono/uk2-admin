@@ -60,7 +60,7 @@ Copyright information at the bottom of the page
 
 - **type:**`zhCN | enUS`
 
-The language used in the project. Please refer to details[多語言配置](./i18n.md)
+The language used in the project. Please refer to details[多語言配置](../extended-use/i18n.md)
 
 ### VITE_LOGIN_DEFAULT_USERNAME
 

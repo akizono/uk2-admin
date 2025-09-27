@@ -1,6 +1,8 @@
 # Quick Start
 
 :::tip
+Before starting the project, please make sure that your development environment has installed [Node.js](../../dev/nodejs) and [MySQL](../../dev/mysql)
+
 Follow the steps below to complete the environment configuration and project launch to ensure that the development environment is fast and ready.
 :::
 

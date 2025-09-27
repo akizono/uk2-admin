@@ -131,7 +131,7 @@ const initQueryParams: InitQueryParams[] = [
 **pageSize Special Description: **
 - Not set: preset to 10
 - Set to 0: No page, display all data
-- Set to -1: No pages, display all data
+- Set to 0: No pages, display all data
 - Set to positive number: display the corresponding number per page
 
 **class attribute: **

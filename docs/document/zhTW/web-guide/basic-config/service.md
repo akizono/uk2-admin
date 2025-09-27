@@ -338,7 +338,7 @@ pageSize: 預設為 10（每頁10條）
 
 ### 獲取全部數據
 
-當您需要一次性獲取所有數據時，只需將 pageSize參數設置為 -1：
+當您需要一次性獲取所有數據時，只需將 pageSize參數設置為 0：
 
 ```ts
 import type { RoleVO } from '@/api/system/role'
@@ -348,7 +348,7 @@ import { RoleApi } from '@/api/system/role'
 const roleList = ref({} as RoleVO[])
 
 async function getRoleList() {
-  const { data: result } = await RoleApi.getRoleList({ pageSize: -1 })
+  const { data: result } = await RoleApi.getRoleList({ pageSize: 0 })
   roleList.value = result.list
 }
 
