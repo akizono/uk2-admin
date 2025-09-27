@@ -1,20 +1,17 @@
-# 介紹
+# introduce
 
-## 項目簡介
+## Project Introduction
 
-UK2-admin 是一個基於Nest.js、Vue3、Vite6、Typescript、Naive UI 的簡潔乾淨後台管理模板，用簡單的方式實現完整功能，並盡可能的考慮代碼規範，易讀易理解無過度封裝，方便二次開發。
+UK2-admin is a simple and clean background management template based on Nest.js, Vue3, Vite6, Typescript, and Naive UI. It implements complete functions in a simple way and considers code specifications as much as possible. It is easy to read, understand, and does not over-encapsulate, making it convenient for secondary development.
 
-- [Nova-Admin 預覽](https://nova-admin-site.netlify.app/)
-- [Nova-Admin 文件](https://nova-admin-docs.netlify.app/)
+## Project description
 
-## 項目說明
+UK2-admin is based on Nova-admin for lightweight secondary development, integrating the Nest.js backend written by the author himself. It continues the clear and concise structural design and easy-to-understand code style, without over-encapsulation, making it easy to get started and customize.
 
-UK2-admin 基於 Nova-admin 進行輕量二次開發，整合了作者自己編寫的 Nest.js 後端。它延續了清晰簡潔的結構設計與易於理解的代碼風格，沒有過度封裝，便於快速上手和訂製擴展。
+It should be noted that most of the functions of this project come from my personal development needs, and may have a certain subjective tendency and are not "universal", but for this reason, it may just fit your usage scenario. If you are also looking for a direct, non-complex and convenient for secondary development, you might as well give this project a try. So I decided to open source and look forward to meeting developers with similar needs.
 
-需要注意的是，這個項目的功能大多來源於我個人的開發需求，可能帶有一定的主觀傾向，算不上“通用”，但也正因如此，或許恰好能契合你的使用場景。如果你也在找一個直接、不複雜、又方便二次開發的管理模板，不妨試一試這個項目。於是我決定開源出來，期待能遇到有相似需求的開發者。
+### The evolution of this version mainly includes the following
 
-### 這個版本的演變主要包括以下內容
-
-- [ ] 使用 Axios 替換了 Alova
-- [ ] 完善的前後端代碼，例如菜單、權限、用戶、角色、部門、字典、日誌、文件管理等。
-- [ ] 基於個人的使用場景，封裝了通用的 DataTable組件。
+- Replaced Alova with Axios
+- Complete front-end and back-end code, such as menus, permissions, users, roles, departments, dictionaries, logs, file management, etc.
+- Based on personal usage scenarios, a general DataTable component is encapsulated.

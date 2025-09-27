@@ -8,11 +8,14 @@ hero:
   tagline: Nest.js, Vue3, Vite6, TypeScript, NaiveUI, Unocss
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Web Guide
+      link: /enUS/web-guide/guide/introduction
+    - theme: brand
+      text: Backend Guide
+      link: /enUS/nest-guide/guide/introduction
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: GitHub
+      link: https://github.com/akizono/uk2-admin
 
 features:
   - title: Latest Tech Stack

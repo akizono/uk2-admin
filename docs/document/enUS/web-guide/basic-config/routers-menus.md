@@ -1,68 +1,68 @@
-# 路由與選單
+# Routing and Menu
 
-與 Nova-admin 在代碼中編寫路由的方式不同，UK2-admin 由於對接了 Nest.js 後端，所有的路由、菜單和權限標識都通過 `/system/menu`頁面進行統一管理。
+Unlike Nova-admin's way of writing routes in code, UK2-admin has connected to the Nest.js backend, all routes, menus and permissions are passed.`/system/menu`The page is managed uniformly.
 
-通過可視化界面管理路由和菜單，讓權限配置更加直觀和高效。
+Manage routing and menus through a visual interface to make permission configuration more intuitive and efficient.
 
-## 創建新路由
+## Create a new route
 
-1. 進入 **系統管理 → 菜單管理** (`/system/menu`)
-2. 點擊 **新增選單** 按鈕
-3. 填寫表單資訊
-4. 點擊 **提交** 完成創建
+1. Enter **System Management → Menu Management** (`/system/menu`)
+2. Click the **Add Menu** button
+3. Fill in the form information
+4. Click **Submit** to complete the creation
 
-### 欄位說明
+### Field description
 
-#### 基礎資訊
+#### Basic information
 
-| 欄位         | 說明                                         |
+| Column | Description |
 | ------------ | -------------------------------------------- |
-| **父級菜單** | 建立菜單層級關係，選擇後將成為該菜單的子項   |
-| **菜單標題** | 顯示在頁面中的名稱（支持填寫多個語言的版本） |
-| **菜單Code** | **路由的唯一標識**，必須保持全局唯一性       |
+| **Parent menu** | Create a menu hierarchy relationship, and after selection, it will become a child of the menu |
+| **Menu Title** | Name displayed in the page (supports to fill in multiple languages) |
+| **Menu Code** | **Unique ID of the route**, must maintain global uniqueness |
 
-#### 菜單類型
+#### Menu Type
 
-選擇不同的類型會影響後續的配置選項：
+Selecting a different type will affect subsequent configuration options:
 
-- **目錄**
+- **Table of contents**
 
-  用於組織菜單結構，無實際功能頁面
+Used to organize menu structures, pages without actual functions
 
-- **頁面**
+- **page**
 
-  具體的功能操作頁面
+Specific function operation page
 
-- **按鈕**
+- **Button**
 
-  用於權限控制，選擇後需配置權限標識
+Used for permission control, you need to configure permission identifier after selection
 
-  *具體使用方法請參考 權限管理*
+*For specific usage methods, please refer to Permission Management*
 
-### 高級配置
+### Advanced configuration
 
-| 配置項             | 功能說明                                 |
+| Configuration Items | Function Description |
 | ------------------ | ---------------------------------------- |
-| **菜單圖示**       | 選擇顯示在側邊欄的圖示                   |
-| **外鏈**           | 填寫後點擊菜單將跳轉到外部連結           |
-| **是否快取**       | 啟用後頁面會被快取，關閉標籤頁時自動清除 |
-| **顯示在TAB欄**    | 控制是否在頂部標籤欄顯示                 |
-| **常駐TAB欄**      | 設置為常駐後標籤頁不可關閉               |
-| **顯示在側邊目錄** | 控制是否在側邊導航欄顯示                 |
-| **排序**           | 設置菜單顯示順序（數字越小越靠前）       |
-| **備註**           | 添加菜單的說明資訊                       |
-| **狀態**           | 啟用或禁用該菜單                         |
+| **Menu Illustration** | Select the icon displayed in the sidebar |
+| **Outside link** | After filling in, click on the menu to jump to external link |
+| **Cached or not** | After enabled, the page will be cached and will be automatically cleared when the tab is closed |
+| **Show in the TAB column** | Controls whether it is displayed in the top tab bar |
+| **Resident TAB column** | After setting it to resident, the tab page cannot be closed |
+| **Show in the side directory** | Controls whether it is displayed in the side navigation bar |
+| **Sort** | Set menu display order (the smaller the number, the higher the number) |
+| **Remarks** | Instructions for adding menus |
+| **Status** | Enable or disable this menu |
 
-## 編輯路由
+## Edit the route
 
-1. 進入 **系統管理 → 菜單管理** (`/system/menu`)
-2. 找到需要編輯的路由，點擊 **編輯** 按鈕
-3. 填寫表單資訊
-4. 點擊 **提交** 完成編輯
+1. Enter **System Management → Menu Management** (`/system/menu`)
+2. Find the route you need to edit and click the **Edit** button
+3. Fill in the form information
+4. Click **Submit** to finish editing
 
-## 使用建議
+## Recommendations for use
 
-1. **規劃菜單結構**：先創建目錄，再在目錄下添加頁面和按鈕
-2. **Code命名規範**：使用有意義的英文標識，保持唯一性
-3. **權限控制**：按鈕類型的菜單需配合權限標識使用
-4. **快取策略**：對常用但數據更新不頻繁的頁面啟用快取
+1. **Planning menu structure**: Create a directory first, then add pages and buttons under the directory
+2. **Code Naming Specification**: Use meaningful English logos to maintain uniqueness
+3. **Permission Control**: The button type menu must be used with the permission identifier
+4. **Cached policy**: Enable cache for frequently used pages but infrequent data updates

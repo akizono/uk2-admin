@@ -1,31 +1,31 @@
-# 權限控制
+# Permission control
 
-## 概述
+## Overview
 
-本系統提供了三種權限控制方式，用於在不同場景下控制用戶的訪問權限：
+This system provides three permission control methods for controlling user access rights in different scenarios:
 
-1. **`usePermi`** - 基於權限字串的權限控制
-2. **`v-hasPermi`** - 基於權限字串的指令式權限控制
-3. **`useHasRole`** - 基於用戶角色的權限控制
+1. **`usePermi`** - Permission control based on permission strings
+2. **`v-hasPermi`** - Instructive permission control based on permission strings
+3. **`useHasRole`** - Permission control based on user role
 
-## 權限控制方式對比
+## Comparison of permission control methods
 
-| 方式 | 用途 | 數據來源 | 適用場景 | 空值處理 |
+| Method | Purpose | Data Source | Applicable Scenarios | NULL value processing |
 |------|------|----------|----------|----------|
-| `usePermi` | 函數式權限判斷 | 路由權限列表 | 組件內邏輯判斷 | 空值返回 `true` |
-| `v-hasPermi` | 指令式權限控制 | 路由權限列表 | 模板中元素顯示/隱藏 | 空值拋出錯誤 |
-| `useHasRole` | 角色權限判斷 | 用戶角色資訊 | 基於角色的權限控制 | 空值返回 `false` |
+| `usePermi`| Functional permission judgment | Routing permission list | Logical judgment within the component | null value return`true` |
+| `v-hasPermi`| Instructive permission control | Routing permission list | Show/hide elements in templates | Empty value throws error |
+| `useHasRole`| Role permission judgment | User role information | Role-based permission control | NULL value return`false` |
 
-## 詳細說明
+## Detailed description
 
-### 1. usePermi - 權限字串控制
+### 1. usePermi - permission string control
 
-#### 設計原理
-- 基於後端返回的權限字串列表進行權限判斷
-- 權限數據來源於用戶登入後從菜單介面獲取的 `permission` 欄位
-- 支持單個權限字串或權限字串數組的判斷
+#### Design Principles
+- Permission judgment is made based on the permission string list returned by the backend
+- The permission data comes from the user's login after logging in.`permission`Column
+- Supports judgment of a single permission string or permission string array
 
-#### 使用方法
+#### How to use
 ```vue
 <script setup lang="ts">
 import { usePermi } from '@/hooks'
@@ -53,19 +53,19 @@ const canManage = hasPermi(['system:user:edit', 'system:user:delete'])
 </template>
 ```
 
-#### 空值處理
-- **`permission` 為 `undefined` 或 `null`**：返回 `true`（允許訪問）
-- **`routePermissions` 為空**：返回 `false`（拒絕訪問）
-- **`permission` 為空數組**：返回 `false`（拒絕訪問）
+#### Null value processing
+- **`permission`for`undefined`or`null`**:return`true`(Access allowed)
+- **`routePermissions`Empty**: Return`false`(access denied)
+- **`permission`Empty array**: Return`false`(access denied)
 
-### 2. v-hasPermi - 指令式權限控制
+### 2. v-hasPermi - Instructional permission control
 
-#### 設計原理
-- 基於 Vue 指令實現的權限控制
-- 在模板中直接使用，會直接移除不符合權限的 DOM 元素
-- 權限數據來源與 `usePermi` 相同
+#### Design Principles
+- Permission control based on Vue instruction
+- Use it directly in a template and removes DOM elements that do not meet permissions.
+- Authorization data source and`usePermi`same
 
-#### 使用方法
+#### How to use
 ```vue
 <template>
   <div>
@@ -81,19 +81,19 @@ const canManage = hasPermi(['system:user:edit', 'system:user:delete'])
 </template>
 ```
 
-#### 空值處理
-- **`value` 為空或非數組**：拋出錯誤 `"v-hasPermi Directive with no explicit role attached"`
-- **`value` 為空數組**：拋出錯誤
-- **權限不匹配**：直接移除 DOM 元素
+#### Null value processing
+- **`value`Empty or non-array**: Throw an error`"v-hasPermi Directive with no explicit role attached"`
+- **`value`Empty array**: Throw an error
+- **Permission mismatch**: Remove DOM elements directly
 
-### 3. useHasRole - 角色權限控制
+### 3. useHasRole - Role permission control
 
-#### 設計原理
-- 基於用戶角色進行權限判斷
-- 支持超級管理員特殊權限（`super_admin` 擁有所有權限）
-- 角色數據來源於用戶登入資訊中的 `role` 欄位
+#### Design Principles
+- Permission judgment based on user role
+- Supports special permissions for super administrators (`super_admin`Have all permissions)
+- Role data comes from user login information`role`Column
 
-#### 使用方法
+#### How to use
 ```vue
 <script setup lang="ts">
 import { useHasRole } from '@/hooks'
@@ -121,14 +121,14 @@ const canAccess = hasRole(['admin', 'manager'])
 </template>
 ```
 
-#### 空值處理
-- **`permission` 為空或非數組**：返回 `false`
-- **`authStore.user?.role` 為空**：返回 `false`
-- **`permission` 為空數組**：返回 `false`
+#### Null value processing
+- **`permission`Empty or non-array**: Return`false`
+- **`authStore.user?.role`Empty**: Return`false`
+- **`permission`Empty array**: Return`false`
 
-## 實際使用範例
+## Practical usage examples
 
-### 完整範例
+### Complete example
 ```vue
 <script setup lang="ts">
 import { useHasRole, usePermi } from '@/hooks'
@@ -180,38 +180,38 @@ const userRoles = authStore.user?.role || []
 </template>
 ```
 
-## 踩坑注意事項
+## Things to note when stepping on a pit
 
-### 1. 空值處理差異
-- **`usePermi`**：空值返回 `true`，可能導致權限控制失效
-- **`v-hasPermi`**：空值拋出錯誤，會中斷程序執行
-- **`useHasRole`**：空值返回 `false`，較為安全
+### 1. Null value processing difference
+- **`usePermi`**: Return empty value`true`, may cause permission control to be invalid
+- **`v-hasPermi`**: An error thrown by an empty value will interrupt the program execution
+- **`useHasRole`**: Return empty value`false`, relatively safe
 
-### 2. 數據來源不同
-- **`usePermi` 和 `v-hasPermi`**：使用 `routeStore.permissions`（來自菜單介面）
-- **`useHasRole`**：使用 `authStore.user.role`（來自用戶資訊）
+### 2. Different sources of data
+- **`usePermi`and`v-hasPermi`**:use`routeStore.permissions`(From the menu interface)
+- **`useHasRole`**:use`authStore.user.role`(From user information)
 
-### 3. 權限更新時機
-- 權限數據在用戶登入時初始化
-- 切換用戶角色後需要重新登入才能更新權限
-- 權限變更需要重新調用 `initAuthRoute()` 方法
+### 3. Permission update timing
+- Permission data is initialized when the user logs in
+- After switching user roles, you need to log in again to update permissions
+- The permission change needs to be re-called`initAuthRoute()`method
 
-### 4. 超級管理員特殊處理
-- `useHasRole` 中 `super_admin` 角色擁有所有權限
-- 其他權限控制方式不包含此特殊邏輯
+### 4. Super Administrator special handling
+- `useHasRole`middle`super_admin`Roles have all permissions
+- Other permission control methods do not include this special logic
 
-### 5. 性能考慮
-- `v-hasPermi` 會直接操作 DOM，性能較好但無法動態更新
-- `usePermi` 和 `useHasRole` 支持響應式更新，但需要重新渲染
+### 5. Performance considerations
+- `v-hasPermi`Will operate the DOM directly, with good performance but cannot be updated dynamically
+- `usePermi`and`useHasRole`Supports responsive updates, but re-rendering is required
 
-## 最佳實踐
+## Best Practices
 
-### 1. 權限控制選擇
-- **頁面級權限**：使用 `usePermi` 或 `useHasRole`
-- **組件級權限**：使用 `v-hasPermi` 指令
-- **功能級權限**：使用 `usePermi` 函數
+### 1. Permission control selection
+- **Page-level permissions**: Use`usePermi`or`useHasRole`
+- **Component-level permissions**: Use`v-hasPermi`instruction
+- **Functional Level Permissions**: Use`usePermi`function
 
-### 2. 錯誤處理
+### 2. Error handling
 ```vue
 <script setup lang="ts">
 import { usePermi } from '@/hooks'
@@ -231,7 +231,7 @@ function safeHasPermi(permission: string | string[]) {
 </script>
 ```
 
-### 3. 權限檢查
+### 3. Permission Check
 ```vue
 <script setup lang="ts">
 import { usePermi } from '@/hooks'
@@ -247,16 +247,16 @@ const canManage = canEdit && canDelete
 </script>
 ```
 
-## 常見問題
+## Frequently Asked Questions
 
-### Q: 為什麼 `usePermi` 空值返回 `true`？
-A: 這是為了向後相容，避免在權限數據未載入時阻斷用戶操作。建議在生產環境中明確檢查權限數據是否已載入。
+### Q: Why`usePermi`Return empty value`true`？
+A: This is for backward compatibility and avoid blocking user operations when permission data is not loaded. It is recommended to clearly check whether the permission data has been loaded in the production environment.
 
-### Q: `v-hasPermi` 和 `usePermi` 有什麼區別？
-A: `v-hasPermi` 是指令，會直接操作 DOM；`usePermi` 是函數，返回布林值用於條件渲染。指令性能更好，函數更靈活。
+### Q:`v-hasPermi`and`usePermi`What's the difference?
+A:`v-hasPermi`It is a command that will directly operate the DOM;`usePermi`is a function, returning a Bollinger value for conditional rendering. The instructions have better performance and more flexible functions.
 
-### Q: 如何處理權限數據非同步載入？
-A: 可以在權限數據載入完成前顯示載入狀態，或使用 `v-if` 配合權限檢查來控制組件渲染時機。
+### Q: How to deal with asynchronous loading of permission data?
+A: You can display the load status before the permission data is loaded, or use`v-if`Cooperate with permission checks to control component rendering timing.
 
-### Q: 超級管理員權限如何實現？
-A: 在 `useHasRole` 中，如果用戶角色包含 `super_admin`，則直接返回 `true`，繞過具體的權限檢查。
+### Q: How to implement super administrator permissions?
+A: In`useHasRole`If the user role contains`super_admin`, then return directly`true`, bypass specific permission checks.

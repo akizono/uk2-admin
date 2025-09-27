@@ -1,9 +1,9 @@
 # UnoCSS
 
-- [UnoCSS](https://unocss.dev/)：即時按需原子CSS引擎
-- [Interactive Docs](https://unocss.dev/interactive/)：Unocss互動式類名查詢文件
-- [tailwindcss](https://www.tailwindcss.cn/docs/installation)：tailwindcss文件
+- [UnoCSS](https://unocss.dev/): Instant on-demand atomic CSS engine
+- [Interactive Docs](https://unocss.dev/interactive/): Unocss interactive class name query file
+- [tailwindcss](https://www.tailwindcss.cn/docs/installation): tailwindcss file
 
-二者非常在使用上非常相近，但 UnoCSS 更輕量，並且對拓展和訂製更加友好。unocss文件內容基本是關於配置方面，而tailwindcss文件內容基本是關於使用方面。具體應該使用什麼類名在tailwindcss文件中查詢體驗更好。
+The two are very similar in use, but UnoCSS is lighter and more expandable and custom-friendly. The content of the unocss file is basically about configuration, while the content of the tailwindcss file is basically about usage. What class name should be used to query in tailwindcss file to better experience.
 
-直接使用unocss的交互查詢文件體驗會很不好，因為命名規則在沒有大致掌握的情況下怎麼查？查什麼？一些縮寫在直接查詢屬性時也不會體現。互動式文件更適合在掌握類名規則後使用。
+The experience of using unocss interactive query files directly will be very bad, because how to check the naming rules without a rough understanding? What to check? Some abbreviations will not be reflected when directly querying attributes. Interactive files are more suitable for use after mastering the class name rules.

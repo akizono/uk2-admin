@@ -4,9 +4,6 @@
 
 UK2-admin 是一個基於Nest.js、Vue3、Vite6、Typescript、Naive UI 的簡潔乾淨後台管理模板，用簡單的方式實現完整功能，並盡可能的考慮代碼規範，易讀易理解無過度封裝，方便二次開發。
 
-- [Nova-Admin 預覽](https://nova-admin-site.netlify.app/)
-- [Nova-Admin 文件](https://nova-admin-docs.netlify.app/)
-
 ## 項目說明
 
 UK2-admin 基於 Nova-admin 進行輕量二次開發，整合了作者自己編寫的 Nest.js 後端。它延續了清晰簡潔的結構設計與易於理解的代碼風格，沒有過度封裝，便於快速上手和訂製擴展。
@@ -15,6 +12,6 @@ UK2-admin 基於 Nova-admin 進行輕量二次開發，整合了作者自己編�
 
 ### 這個版本的演變主要包括以下內容
 
-- [ ] 使用 Axios 替換了 Alova
-- [ ] 完善的前後端代碼，例如菜單、權限、用戶、角色、部門、字典、日誌、文件管理等。
-- [ ] 基於個人的使用場景，封裝了通用的 DataTable組件。
+- 使用 Axios 替換了 Alova
+- 完善的前後端代碼，例如菜單、權限、用戶、角色、部門、字典、日誌、文件管理等。
+- 基於個人的使用場景，封裝了通用的 DataTable組件。

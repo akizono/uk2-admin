@@ -1,19 +1,19 @@
-# 請求服務配置
+# Request service configuration
 
-## 修改後台地址
+## Modify the background address
 
-項目中默認提供了三種請求環境，如果需要修改，可以修改`src\typings\env.d.ts`文件，增加`ServiceEnvType`類型
+There are three request environments provided by default in the project. If you need to modify it, you can modify it.`src\typings\env.d.ts`File, add`ServiceEnvType`type
 
-::: code-group
+:::code-group
 
 ```ts [src\typings\env.d.ts]
 type ServiceEnvType = 'dev' | 'test' | 'prod'
 ```
 :::
 
-在根目錄中的 .env 文件中可以配置不同的後臺地址。如下例子，dev為開發環境，test為測試環境，prod為生產環境，為每個環境下配置了不同的後台地址
+Different background addresses can be configured in the .env file in the root directory. The following example is: dev is the development environment, test is the test environment, and prod is the production environment, and different background addresses are configured for each environment.
 
-::: code-group
+:::code-group
 
 ```shell[.env.dev]
 # API 請求基礎路徑
@@ -38,15 +38,15 @@ VITE_API_URL = '/admin-api'
 ```
 :::
 
-## API 基本使用方式
+## Basic API usage
 
-在 UK2-admin 中，我們採用了一套清晰規範的 API 請求方式，讓前後端交互更加類型安全和易於維護。
+In UK2-admin, we adopt a clear and standardized API request method to make front-end and back-end interactions more type-safe and easy to maintain.
 
-1. 創建 API 文件
+1. Create API file
 
-   在 `src/api/`目錄下為每個模組創建獨立的 API 文件，例如角色管理的 API：
+exist`src/api/`Create independent API files for each module in the directory, such as the role management API:
 
-::: code-group
+:::code-group
 ```ts[src/api/role.ts]
 import request from '@/utils/request'
 
@@ -67,7 +67,7 @@ export const RoleApi = {
 ```
 :::
 
-然後在頁面或其他地方中引入並使用定義好的 API
+Then introduce and use the defined API on the page or elsewhere
 
 ```ts
 import type { RoleVO } from '@/api/system/role'
@@ -86,22 +86,22 @@ onMounted(() => {
 })
 ```
 
-類型系統說明
+Type system description
 
-在上面的案例中出現了兩個核心類型來規範前後端交互
+In the above case, two core types appear to regulate front-end and back-end interactions
 
-- Api.BaseVO: 基礎數據類型，所有VO都應繼承此類型
-- ApiResponse\<T\>: 響應包裝類型，確保類型安全
+- Api.BaseVO: Basic data type, all VOs should inherit this type
+- ApiResponse\<T\>: Respond to the wrapper type to ensure type safety
 
-您可以參照上面的代碼範例直接使用這些類型而無需關心實現細節，如需深入了解可查看相關文件: [api/base.d.ts](../api/base.d.ts) 和 [api/response.d.ts](../api/response.d.ts) 。
+You can refer to the above code example to use these types directly without caring about implementation details. If you need to have an in-depth understanding, you can view the relevant files:[api/base.d.ts](../api/base.d.ts)and[api/response.d.ts](../api/response.d.ts) 。
 
-## 完整的增刪改查 API 範例
+## Complete API examples
 
-接下來的範例將展示如何創建一個完整的增刪改查 API，這將幫助您快速上手 UK2-admin 的 API 使用。
+The following examples will show how to create a complete add-on, delete, modify, and check API, which will help you quickly get started with the use of UK2-admin's API.
 
-在`src/api/system/role/index.ts`文件中，我們創建了一個完整的增刪改查 API，覆蓋了大多數情況。
+exist`src/api/system/role/index.ts`In the file, we created a complete add, delete, modify and search API, covering most cases.
 
-::: code-group
+:::code-group
 
 ```ts[src/api/system/role/index.ts]
 import request from '@/utils/request'
@@ -152,7 +152,7 @@ export const RoleApi = {
 ```
 :::
 
-::: code-group
+:::code-group
 ```ts[獲取角色分頁列表]
 import type { RoleVO } from '@/api/system/role'
 
@@ -313,32 +313,32 @@ async function deleteRole(id: string) {
 ```
 :::
 
-類型系統說明
+Type system description
 
-在上面的案例中出現了多個核心類型來規範前後端交互
+In the above case, multiple core types appear to regulate front-end and back-end interactions
 
-- Api.BaseVO: 基礎數據類型，所有VO都應繼承此類型
-- PageParams: 分頁參數類型
-- PageRes\<T\>: 分頁響應類型
-- ApiResponse\<T\>: 響應包裝類型（查詢非分頁數據專用）
+- Api.BaseVO: Basic data type, all VOs should inherit this type
+- PageParams: Pagination parameter type
+- PageRes\<T\>: Pagination response type
+- ApiResponse\<T\>: Response wrapper type (exclusive for querying non-paging data)
 
-您可以參照上面的代碼範例直接使用這些類型而無需關心實現細節，如需深入了解可查看相關文件: [api/base.d.ts](../api/base.d.ts) 、[api/response.d.ts](../api/response.d.ts) 、[api/page.d.ts](../api/page.d.ts) 、[api/page-params.d.ts](../api/page-params.d.ts) 。
+You can refer to the above code example to use these types directly without caring about implementation details. If you need to have an in-depth understanding, you can view the relevant files:[api/base.d.ts](../api/base.d.ts) 、[api/response.d.ts](../api/response.d.ts) 、[api/page.d.ts](../api/page.d.ts) 、[api/page-params.d.ts](../api/page-params.d.ts) 。
 
-## 獲取全量數據
+## Get all data
 
-我們為分頁接口提供了便捷的全量數據獲取方式，讓您可以根據實際需求靈活選擇數據獲取策略.
+We provide a convenient way to obtain full data for the paging interface, allowing you to flexibly select data acquisition strategies based on actual needs.
 
-### 常規分頁請求
+### General paging requests
 
-默認情況下，列表介面的分頁參數如下：
+By default, the paging parameters of the list interface are as follows:
 
-currentPage: 預設為 1（第一頁）
+CurrentPage: Preset to 1 (first page)
 
-pageSize: 預設為 10（每頁10條）
+pageSize: Preset to 10 (10 items per page)
 
-### 獲取全部數據
+### Get all data
 
-當您需要一次性獲取所有數據時，只需將 pageSize參數設置為 -1：
+When you need to get all the data at once, just set the pageSize parameter to -1:
 
 ```ts
 import type { RoleVO } from '@/api/system/role'
@@ -357,9 +357,9 @@ onMounted(() => {
 })
 ```
 
-## 不需要攜帶token的介面
+## No need to carry a token interface
 
-默認情況下，所有請求都會攜帶token，如果某些介面不需要攜帶token，你可以像這樣定義
+By default, all requests will carry tokens. If some interfaces do not need to carry tokens, you can define them like this
 
 ```ts
 export const RoleApi = {
@@ -375,11 +375,11 @@ export const RoleApi = {
 }
 ```
 
-## 自訂錯誤提示處理
+## Custom error prompt processing
 
-通常系統會自動處理常見的 HTTP 錯誤狀態碼並在頁面上提示（如 400 表示請求格式錯誤，409 表示請求衝突等）。但在某些特定業務場景下，您可能需要自訂更友好的錯誤提示資訊。
+Usually, the system will automatically process common HTTP error status codes and prompt them on the page (such as 400 means the request format is erroneous, 409 means the request conflict, etc.). But in certain business scenarios, you may need to customize more friendly error message.
 
-當需要針對特定介面返回特定的錯誤提示時，可以通過請求頭 `specify-error-message` 來定義：
+When a specific error message needs to be returned for a specific interface, the request header can be used`specify-error-message`To define:
 
 ```ts
 export function sendRegisterEmail(data: { email: string }) {
@@ -397,15 +397,15 @@ export function sendRegisterEmail(data: { email: string }) {
 }
 ```
 
-## 自動將介面的值轉換為當前的語言
+## Automatically convert the interface's value to the current language
 
-在系統中，通過 DataTable 組件創建數據時，可以指定某些欄位在各種語言下的展示的值。
+In the system, when creating data through the DataTable component, you can specify the values ​​for the display of certain fields in various languages.
 
-### 標準 GET 請求的問題
+### Issues with standard GET requests
 
-當使用常規的 request.get 方法時，多語言欄位會返回原始的多語言 ID 和完整的語言包數據。介面並不會將多語言欄位轉換為當前的語言，這種方式需要開發者手動處理語言轉換，增加了開發複雜度。
+When using the regular request.get method, the multilingual field returns the original multilingual ID and complete language pack data. The interface does not convert multilingual fields to the current language. This method requires developers to manually handle language conversion, which increases development complexity.
 
-::: code-group
+:::code-group
 ```ts[get請求]
 // 以下是字典類型請求中搬運過來的代碼
 import request from '@/utils/request'
@@ -468,9 +468,9 @@ export const DictTypeApi = {
 ```
 :::
 
-但是好消息是，我們提供了 getByLang方法來自動完成多語言欄位的轉換。
+But the good news is that we provide the getByLang method to automatically complete the conversion of multilingual fields.
 
-::: code-group
+:::code-group
 ```ts[get請求]
 // 以下是字典類型請求中搬運過來的代碼
 import request from '@/utils/request'

@@ -12,6 +12,7 @@ export const enUSConfig = {
     nav: [
       { text: 'Home', link: '/enUS/' },
       { text: 'Web Guide', link: '/enUS/web-guide/guide/introduction' },
+      { text: 'Backend Guide', link: '/enUS/nest-guide/guide/introduction' },
       { text: 'Development', link: '/enUS/dev/vc-plugins' },
     ],
 
@@ -41,7 +42,42 @@ export const enUSConfig = {
             { text: 'UnoCSS', link: '/enUS/web-guide/extended-use/unocss' },
           ],
         },
+        {
+          text: 'Components',
+          items: [
+            { text: 'DataTable', link: '/enUS/web-guide/components/data-table' },
+          ],
+        },
       ],
+
+      '/enUS/nest-guide/': [
+        {
+          text: 'Guide',
+          items: [
+            { text: 'Introduction', link: '/enUS/nest-guide/guide/introduction' },
+            { text: 'Quick Start', link: '/enUS/nest-guide/guide/quick-start' },
+            { text: 'API Docs', link: '/enUS/nest-guide/guide/api-docs' },
+            { text: 'Project Structure', link: '/enUS/nest-guide/guide/project-intro' },
+          ],
+        },
+        {
+          text: 'Extended Use',
+          items: [
+            { text: 'Base Entity（base.entity）', link: '/enUS/nest-guide/extended-use/base.entity' },
+            { text: 'Base Request DTO（base.req.dto）', link: '/enUS/nest-guide/extended-use/base.req.dto' },
+            { text: 'Base Service（base.service）', link: '/enUS/nest-guide/extended-use/base.service' },
+            { text: 'Multi-language Fields', link: '/enUS/nest-guide/extended-use/multilingual-fields' },
+            { text: 'Verify Code Integration Guide', link: '/enUS/nest-guide/extended-use/verify-code-integration' },
+          ],
+        },
+        {
+          text: 'Basic Usage',
+          items: [
+            { text: 'Module Creation Guide', link: '/enUS/nest-guide/basic-usage/module-creation-guide' },
+          ],
+        },
+      ],
+
       '/enUS/dev/': [
         {
           text: 'Development Tools',

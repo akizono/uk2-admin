@@ -1,30 +1,30 @@
-# 自訂主題
+# Custom theme
 
-## 界面布局
+## Interface layout
 
-修改`src\store\app\index.ts`,修改你需要自訂的變數
+Revise`src\store\app\index.ts`, modify the variables you need to customize
 
-- `footerText`: 設置頁尾文本，一般用來顯示版權資訊，預設為 `Copyright © 2024 chansee97`
-- `theme`: 全局組件庫主題變數覆蓋，具體可參考下一個小節，預設為 `themeConfig`
-- `primaryColor`: 主題色配置，預設為 `#18a058`
-- `collapsed`: 是否展開或摺疊，預設為 `false`
-- `grayMode`: 是否啟用灰色模式，預設為 `false`
-- `colorWeak`: 是否啟用色盲模式，預設為 `false`
-- `loadFlag`: 頁面重載標記，無需修改
-- `showLogo`: 是否顯示logo，預設為 `true`
-- `showTabs`: 是否顯示選項卡，預設為 `true`
-- `showFooter`: 是否顯示頁尾，預設為 `true`
-- `showProgress`: 是否顯示進度條，預設為 `true`
-- `showBreadcrumb`: 是否顯示麵包屑導航，預設為 `true`
-- `showBreadcrumbIcon`: 是否顯示麵包屑導航圖示，預設為 `true`
-- `showWatermark`: 是否顯示浮水印，預設為 `false`
-- `showSetting`: 是否顯示顯示設置窗口，預設為 `false`
-- `transitionAnimation`: 過渡動畫類型，預設為 `'fade-slide'`
-- `layoutMode`: 界面布局類型，預設為 `'vertical'`
+- `footerText`: Set the end of the page text, which is generally used to display copyright information, and is preset to`Copyright © 2024 chansee97`
+- `theme`: Global component library topic variable coverage, please refer to the next section for details, preset as`themeConfig`
+- `primaryColor`: Theme color configuration, preset to`#18a058`
+- `collapsed`: Whether to expand or collapse, preset to`false`
+- `grayMode`: Whether to enable gray mode, preset to`false`
+- `colorWeak`: Whether to enable color blind mode, preset to`false`
+- `loadFlag`: Page overload tags, no modification required
+- `showLogo`: Whether to display the logo, preset to`true`
+- `showTabs`: Whether to display the tab, preset to`true`
+- `showFooter`: Whether to display the end of the page, preset to`true`
+- `showProgress`: Whether to display the progress bar, preset to`true`
+- `showBreadcrumb`: Whether to display breadcrumb navigation, preset to`true`
+- `showBreadcrumbIcon`: Whether to display the breadcrumb navigation diagram, preset to`true`
+- `showWatermark`: Whether to display a watermark, preset to`false`
+- `showSetting`: Whether to display the display setting window, preset to`false`
+- `transitionAnimation`: Transition animation type, preset to`'fade-slide'`
+- `layoutMode`: Interface layout type, preset to`'vertical'`
 
-## 組件庫樣式
+## Component library styles
 
-修改`src\store\app\theme.json`,添加你需要的樣式變數，具體可參考[Naive-UI](https://www.naiveui.com/zh-CN/light/docs/customize-theme)
+Revise`src\store\app\theme.json`, add the style variables you need, please refer to[Naive-UI](https://www.naiveui.com/zh-CN/light/docs/customize-theme)
 
 ```json
 {

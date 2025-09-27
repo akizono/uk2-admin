@@ -12,6 +12,7 @@ export const zhTWConfig = {
     nav: [
       { text: '首頁', link: '/zhTW/' },
       { text: '前端指南', link: '/zhTW/web-guide/guide/introduction' },
+      { text: '後端指南', link: '/zhTW/nest-guide/guide/introduction' },
       { text: '開發配置', link: '/zhTW/dev/vc-plugins' },
     ],
 
@@ -48,6 +49,35 @@ export const zhTWConfig = {
           ],
         },
       ],
+
+      '/zhTW/nest-guide/': [
+        {
+          text: '指南',
+          items: [
+            { text: '介紹', link: '/zhTW/nest-guide/guide/introduction' },
+            { text: '快速啟動', link: '/zhTW/nest-guide/guide/quick-start' },
+            { text: '介面文件', link: '/zhTW/nest-guide/guide/api-docs' },
+            { text: '專案結構', link: '/zhTW/nest-guide/guide/project-intro' },
+          ],
+        },
+        {
+          text: '擴展使用',
+          items: [
+            { text: '基礎實體（base.entity）', link: '/zhTW/nest-guide/extended-use/base.entity' },
+            { text: '基礎請求 DTO（base.req.dto）', link: '/zhTW/nest-guide/extended-use/base.req.dto' },
+            { text: '基礎服務（base.service）', link: '/zhTW/nest-guide/extended-use/base.service' },
+            { text: '多語言欄位', link: '/zhTW/nest-guide/extended-use/multilingual-fields' },
+            { text: '驗證碼發送服務集成指南', link: '/zhTW/nest-guide/extended-use/verify-code-integration' },
+          ],
+        },
+        {
+          text: '基礎用法',
+          items: [
+            { text: '模組創建指南', link: '/zhTW/nest-guide/basic-usage/module-creation-guide' },
+          ],
+        },
+      ],
+
       '/zhTW/dev/': [
         {
           text: '開發工具',
