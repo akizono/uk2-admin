@@ -1,6 +1,6 @@
 import { createDiscreteApi } from 'naive-ui'
 
-import { login, logout as logoutApi } from '@/api/system/auth'
+import { login, type LoginVO, logout as logoutApi } from '@/api/system/auth'
 import { type Token, UserApi, type UserVO } from '@/api/system/user'
 import { router } from '@/router'
 import { $t, local } from '@/utils'
@@ -61,8 +61,15 @@ export const useAuthStore = defineStore('auth-store', {
     },
 
     /** 處理使用者登入 */
-    async login(username: string, password: string) {
-      const { data: result } = await login({ username, password })
+    async login(username: string, password: string, verifyCode?: string, svgCaptchaId?: string) {
+      const loginData: LoginVO = { username, password }
+
+      if (verifyCode)
+        loginData.verifyCode = verifyCode
+      if (svgCaptchaId)
+        loginData.svgCaptchaId = svgCaptchaId
+
+      const { data: result } = await login(loginData)
 
       await this.handleLoginInfo(result)
       this.tipsBindEmailOrMobile(result)

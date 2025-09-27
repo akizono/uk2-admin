@@ -6,6 +6,8 @@ import request from '@/utils/request'
 export interface LoginVO {
   username: string
   password: string
+  verifyCode?: string
+  svgCaptchaId?: string
 }
 
 export interface RefreshTokenVO {
@@ -27,8 +29,19 @@ export function login(data: LoginVO): ApiResponse<UserVO> {
     data,
     headers: {
       'skip-auth-token': true, // 跳過 Token 驗證
+      'specify-error-message': [
+        { code: 400, message: $t('login.verifyCodeError') },
+      ],
     },
   })
+}
+
+// 獲取用於登入的圖形驗證碼
+export function getLoginImageVerifyCode(): ApiResponse<{
+  svg: string
+  svgCaptchaId: string
+}> {
+  return request.get({ url: '/system/auth/get-login-image-verify-code' })
 }
 
 // 登出
