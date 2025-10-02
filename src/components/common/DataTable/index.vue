@@ -539,7 +539,7 @@ function handleResetSearch() {
           // 如果有 API，載入選項
           if (item.selectOptions.api) {
             try {
-              const { data: result } = await item.selectOptions.api({ pageSize: 0, currentPage: 1 })
+              const { data: result } = await item.selectOptions.api({ pageSize: 200, currentPage: 1 })
               if (result.list.length > 0) {
                 await setOptionsWithNextTick(
                   item.name,
