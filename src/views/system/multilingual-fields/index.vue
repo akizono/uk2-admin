@@ -3,12 +3,11 @@ import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NTime } from 'naive-ui'
-
 import { getLanguageList } from '@/api/system/lang'
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { $t } from '@/utils'
+import { NTime } from 'naive-ui'
 
 defineOptions({
   name: 'Multilingual Field Settings',

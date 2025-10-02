@@ -18,39 +18,38 @@
 ### 步驟 1: 創建模塊
 
 ```bash
-# 在 src/modules/admin-api/system/ 目錄下創建新模塊
-nest g module modules/admin-api/system/product
+# 在 src/modules/platform-api/system/ 目錄下創建新模塊
+nest g module modules/platform-api/system/product
 ```
 
 ### 步驟 2: 創建控制器
 
 ```bash
-nest g controller modules/admin-api/system/product
+nest g controller modules/platform-api/system/product
 ```
 
 ### 步驟 3: 創建服務
 
 ```bash
-nest g service modules/admin-api/system/product
+nest g service modules/platform-api/system/product
 ```
 
 ### 步驟 4: 創建目錄結構
 
 ```bash
 # 創建必要的目錄
-mkdir src/modules/admin-api/system/product/dto
-mkdir src/modules/admin-api/system/product/entity
+mkdir src/modules/platform-api/system/product/dto
+mkdir src/modules/platform-api/system/product/entity
 ```
 
 ## 2. 創建實體 (Entity)
 
-### 文件位置: `src/modules/admin-api/system/product/entity/product.entity.ts`
+### 文件位置: `src/modules/platform-api/system/product/entity/product.entity.ts`
 
 ```typescript
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-
 import { BaseEntity } from '@/common/entities/base.entity'
-import { CategoryEntity } from '@/modules/admin-api/system/category/entity/category.entity'
+import { CategoryEntity } from '@/modules/platform-api/system/category/entity/category.entity'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('system_product')
 export class ProductEntity extends BaseEntity {
@@ -98,16 +97,15 @@ export class ProductEntity extends BaseEntity {
 
 ## 3. 創建 DTO 文件
 
-### 請求 DTO: `src/modules/admin-api/system/product/dto/product.req.dto.ts`
+### 請求 DTO: `src/modules/platform-api/system/product/dto/product.req.dto.ts`
 
 ```typescript
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
-import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
-
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { EnvHelper } from '@/utils/env-helper'
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 
 class ProductReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID', required: true })
@@ -182,7 +180,7 @@ export class UpdateProductReqDto extends PartialType(
 ) {}
 ```
 
-### 響應 DTO: `src/modules/admin-api/system/product/dto/product.res.dto.ts`
+### 響應 DTO: `src/modules/platform-api/system/product/dto/product.res.dto.ts`
 
 ```typescript
 import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
@@ -235,14 +233,13 @@ export class FindOneProductResDto extends SingleResponseDto(ProductResDtoReturn)
 
 ## 4. 創建服務 (Service)
 
-### 文件位置: `src/modules/admin-api/system/product/product.service.ts`
+### 文件位置: `src/modules/platform-api/system/product/product.service.ts`
 
 ```typescript
+import { _delete, create, find, findOne, update } from '@/common/services/base.service'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-
-import { _delete, create, find, findOne, update } from '@/common/services/base.service'
 
 import { CreateProductReqDto, FindProductReqDto, UpdateProductReqDto } from './dto/product.req.dto'
 import { ProductEntity } from './entity/product.entity'
@@ -359,24 +356,23 @@ export class ProductService {
 
 ## 5. 創建控制器 (Controller)
 
-### 文件位置: `src/modules/admin-api/system/product/product.controller.ts`
+### 文件位置: `src/modules/platform-api/system/product/product.controller.ts`
 
 ```typescript
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors } from '@nestjs/common'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
-
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { MsgResponseDto } from '@/utils/response-dto'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors } from '@nestjs/common'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { CreateProductReqDto, FindProductReqDto, UpdateProductReqDto } from './dto/product.req.dto'
 import { CreateProductResDto, FindOneProductResDto, FindProductResDto } from './dto/product.res.dto'
 import { ProductService } from './product.service'
 
-@Controller('/admin-api/system/product')
+@Controller('/platform-api/system/product')
 @UseInterceptors(TransformInterceptor)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -463,7 +459,7 @@ export class ProductController {
 
 ## 6. 配置模塊 (Module)
 
-### 文件位置: `src/modules/admin-api/system/product/product.module.ts`
+### 文件位置: `src/modules/platform-api/system/product/product.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common'
@@ -484,7 +480,7 @@ export class ProductModule {}
 
 ## 7. 註冊到主模塊
 
-### 修改 `src/modules/admin-api/system/system.module.ts`
+### 修改 `src/modules/platform-api/system/system.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common'
@@ -515,7 +511,7 @@ export class SystemModule {}
 
 ```typescript
 // 測試創建產品
-POST /admin-api/system/product/create
+POST /platform-api/system/product/create
 {
   "name": "iPhone 15",
   "code": "IPHONE15",
@@ -528,13 +524,13 @@ POST /admin-api/system/product/create
 }
 
 // 測試查詢產品列表
-GET /admin-api/system/product/list?pageSize=10&currentPage=1
+GET /platform-api/system/product/list?pageSize=10&currentPage=1
 
 // 測試查詢單一產品
-GET /admin-api/system/product/get/1
+GET /platform-api/system/product/get/1
 
 // 測試更新產品
-PUT /admin-api/system/product/update
+PUT /platform-api/system/product/update
 {
   "id": "1",
   "name": "iPhone 15 Pro",
@@ -542,7 +538,7 @@ PUT /admin-api/system/product/update
 }
 
 // 測試刪除產品
-DELETE /admin-api/system/product/delete/1
+DELETE /platform-api/system/product/delete/1
 ```
 
 ## 進階功能

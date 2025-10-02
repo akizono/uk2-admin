@@ -4,8 +4,6 @@ import type { FileVO } from '@/api/operations/file'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
-import { useDebounceFn } from '@vueuse/core'
-
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
 import AsyncDictLabel from '@/components/common/AsyncDictLabel/index.vue'
 import FileUpload from '@/components/common/FileUpload/index.vue'
@@ -13,6 +11,7 @@ import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
 import { useLanguageStore } from '@/store/model/language'
 import { $t } from '@/utils'
+import { useDebounceFn } from '@vueuse/core'
 
 const props = defineProps<{
   modalWidth?: string // 模態框的寬度

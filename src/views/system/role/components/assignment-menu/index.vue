@@ -2,14 +2,13 @@
 import type { MenuVO } from '@/api/system/menu'
 import type { RoleVO } from '@/api/system/role'
 
-import { ElTree } from 'element-plus'
-import { useDialog } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import { RoleMenuApi } from '@/api/system/role-menu'
 import { useAppStore } from '@/store/'
 import { $t } from '@/utils'
 import { arrayToTree, sortTreeData } from '@/utils/array'
+import { ElTree } from 'element-plus'
+import { useDialog } from 'naive-ui'
 
 const appStore = useAppStore()
 const dialog = useDialog()

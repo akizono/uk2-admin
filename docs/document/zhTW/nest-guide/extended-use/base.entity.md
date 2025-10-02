@@ -43,9 +43,8 @@
 其他實體類可以通過繼承 `BaseEntity` 來獲取這些基礎欄位：
 
 ```typescript
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-
 import { BaseEntity } from '@/common/entities/base.entity'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('users')
 export class User extends BaseEntity {

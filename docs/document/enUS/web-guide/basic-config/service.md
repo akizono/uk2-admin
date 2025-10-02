@@ -20,21 +20,21 @@ Different background addresses can be configured in the .env file in the root di
 VITE_BASE_URL = 'http://127.0.0.1:3022'
 
 # API 端點路徑
-VITE_API_URL = '/admin-api'
+VITE_API_URL = '/platform-api'
 ```
 ```shell[.env.prod]
 # API 請求基礎路徑
 VITE_BASE_URL = 'http://127.0.0.1:3033'
 
 # API 端點路徑
-VITE_API_URL = '/admin-api'
+VITE_API_URL = '/platform-api'
 ```
 ```shell[.env.test]
 # API 請求基礎路徑
 VITE_BASE_URL = 'http://127.0.0.1:3044'
 
 # API 端點路徑
-VITE_API_URL = '/admin-api'
+VITE_API_URL = '/platform-api'
 ```
 :::
 

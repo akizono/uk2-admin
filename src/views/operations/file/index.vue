@@ -2,10 +2,10 @@
 import type { FileVO } from '@/api/operations/file'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns } from 'naive-ui'
-import { $t } from '@/utils'
 
 import { FileApi } from '@/api/operations/file'
 import DataTable from '@/components/common/DataTable/index.vue'
+import { $t } from '@/utils'
 import { downloadFile } from '@/utils/download'
 import { NButton, NImage, NTime } from 'naive-ui'
 import IconParkOutlineUpload from '~icons/icon-park-outline/upload'
@@ -51,7 +51,7 @@ const neckSlot = [
         fileUploadRef.value.openModal()
       }}
     >
-    { $t('file.uploadFileAction') }
+      { $t('file.uploadFileAction') }
     </NButton>
   </>,
 ]

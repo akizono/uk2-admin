@@ -24,7 +24,7 @@
 
 用於統一管理所有API請求的基礎路徑前綴。
 
-比如你後端服務的API地址是 `http://127.0.0.1:3000/admin-api`，那麼你應該將這個值設置為 `/admin-api`。
+比如你後端服務的API地址是 `http://127.0.0.1:3000/platform-api`，那麼你應該將這個值設置為 `/platform-api`。
 
 ### VITE_BASE_PATH
 

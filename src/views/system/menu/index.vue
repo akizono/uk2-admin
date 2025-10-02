@@ -3,12 +3,11 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',

@@ -1,9 +1,8 @@
 import type { App } from 'vue'
 
-import { createI18n } from 'vue-i18n'
-
 import { local } from '@/utils'
 import { defaultLang } from '@/utils/tools/defaultLang'
+import { createI18n } from 'vue-i18n'
 
 import enUS from '../../locales/enUS.json'
 import zhCN from '../../locales/zhCN.json'

@@ -2,11 +2,10 @@
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NButton, NSwitch } from 'naive-ui'
-
 import { DictTypeApi, type DictTypeVO } from '@/api/system/dict-type'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NButton, NSwitch } from 'naive-ui'
 
 import DictData from './components/dict-data/index.vue'
 

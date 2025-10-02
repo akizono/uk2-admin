@@ -1,10 +1,9 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import type { ProLayoutMode } from 'pro-naive-ui'
 
+import { router } from '@/router'
 import { colord } from 'colord'
 import { set } from 'radash'
-
-import { router } from '@/router'
 
 import { useRouteStore } from '../router'
 import themeConfig from './theme.json'

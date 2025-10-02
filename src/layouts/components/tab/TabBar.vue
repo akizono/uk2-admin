@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { RouteLocationNormalized } from 'vue-router'
 
+import { useTabScroll } from '@/hooks'
+import { useAppStore, useTabStore } from '@/store'
+import { $t } from '@/utils'
 import { useDraggable } from 'vue-draggable-plus'
 import IconClose from '~icons/icon-park-outline/close'
 import IconDelete from '~icons/icon-park-outline/delete-four'
@@ -8,10 +11,6 @@ import IconFullwith from '~icons/icon-park-outline/fullwidth'
 import IconRedo from '~icons/icon-park-outline/redo'
 import IconLeft from '~icons/icon-park-outline/to-left'
 import IconRight from '~icons/icon-park-outline/to-right'
-
-import { useTabScroll } from '@/hooks'
-import { useAppStore, useTabStore } from '@/store'
-import { $t } from '@/utils'
 
 import ContentFullScreen from './ContentFullScreen.vue'
 import DropTabs from './DropTabs.vue'

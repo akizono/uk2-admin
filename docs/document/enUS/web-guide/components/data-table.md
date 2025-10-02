@@ -563,12 +563,11 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
@@ -914,13 +913,12 @@ import type { UserCreate, UserQuery, UserUpdate, UserVO } from '@/api/system/use
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NButton, NSwitch, NTag } from 'naive-ui'
-
 import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NButton, NSwitch, NTag } from 'naive-ui'
 
 defineOptions({
   name: 'User Management',

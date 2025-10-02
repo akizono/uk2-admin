@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { NButton, NModal, NSpace } from 'naive-ui'
-
 import { useBoolean } from '@/hooks'
 import { $t } from '@/utils'
+import { NButton, NModal, NSpace } from 'naive-ui'
 
 defineProps<{
   title: string

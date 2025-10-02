@@ -1,11 +1,10 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
-import axios from 'axios'
-import qs from 'qs'
-
 import { loginUrl, refreshTokenMethod, refreshTokenMethodUrl } from '@/api/system/auth'
 import { useAuthStore } from '@/store'
 import { $t, local } from '@/utils'
+import axios from 'axios'
+import qs from 'qs'
 
 import { config } from './config'
 import * as handle from './handle'

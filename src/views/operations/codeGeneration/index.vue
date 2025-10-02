@@ -2,10 +2,9 @@
 import type { CodeGenerationVO } from '@/api/operations/codeGeneration'
 import type { DataTableColumns, FormInst, NDataTable } from 'naive-ui'
 
-import { NButton, NPopconfirm, NSpace, useDialog } from 'naive-ui'
-
 import { CodeGenerationApi } from '@/api/operations/codeGeneration'
 import { useBoolean } from '@/hooks'
+import { NButton, NPopconfirm, NSpace, useDialog } from 'naive-ui'
 
 import ModuleGenerateInfo from './components/ModuleGenerateInfo/index.vue'
 import TableModal from './components/TableModal/index.vue'

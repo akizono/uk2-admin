@@ -24,7 +24,7 @@ This is the basic address of the backend service, for example, the address of yo
 
 The basic path prefix used to uniformly manage all API requests.
 
-For example, the API address of your backend service is`http://127.0.0.1:3000/admin-api`, then you should set this value to`/admin-api`。
+For example, the API address of your backend service is`http://127.0.0.1:3000/platform-api`, then you should set this value to`/platform-api`。
 
 ### VITE_BASE_PATH
 

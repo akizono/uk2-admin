@@ -1,11 +1,10 @@
 import type { MenuOption } from 'naive-ui'
 import type { RouteRecordRaw } from 'vue-router'
 
-import { clone, min } from 'radash'
-import { RouterLink } from 'vue-router'
-
 import Layout from '@/layouts/index.vue'
 import { arrayToTree, renderIcon } from '@/utils'
+import { clone, min } from 'radash'
+import { RouterLink } from 'vue-router'
 
 function standardizedRoutes(route: AppRoute.RowRoute[]) {
   return clone(route).map((item: any) => {

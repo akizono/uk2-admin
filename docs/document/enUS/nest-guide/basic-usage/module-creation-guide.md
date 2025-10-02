@@ -18,39 +18,38 @@ This guide will teach you how to create a complete re-reference module from scra
 ### Step 1: Create a module
 
 ```bash
-# 在 src/modules/admin-api/system/ 目錄下創建新模塊
-nest g module modules/admin-api/system/product
+# 在 src/modules/platform-api/system/ 目錄下創建新模塊
+nest g module modules/platform-api/system/product
 ```
 
 ### Step 2: Create a controller
 
 ```bash
-nest g controller modules/admin-api/system/product
+nest g controller modules/platform-api/system/product
 ```
 
 ### Step 3: Create a Service
 
 ```bash
-nest g service modules/admin-api/system/product
+nest g service modules/platform-api/system/product
 ```
 
 ### Step 4: Create a directory structure
 
 ```bash
 # 創建必要的目錄
-mkdir src/modules/admin-api/system/product/dto
-mkdir src/modules/admin-api/system/product/entity
+mkdir src/modules/platform-api/system/product/dto
+mkdir src/modules/platform-api/system/product/entity
 ```
 
 ## 2. Create an Entity
 
-### File location:`src/modules/admin-api/system/product/entity/product.entity.ts`
+### File location:`src/modules/platform-api/system/product/entity/product.entity.ts`
 
 ```typescript
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-
 import { BaseEntity } from '@/common/entities/base.entity'
-import { CategoryEntity } from '@/modules/admin-api/system/category/entity/category.entity'
+import { CategoryEntity } from '@/modules/platform-api/system/category/entity/category.entity'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('system_product')
 export class ProductEntity extends BaseEntity {
@@ -98,16 +97,15 @@ export class ProductEntity extends BaseEntity {
 
 ## 3. Create a DTO file
 
-### Request DTO:`src/modules/admin-api/system/product/dto/product.req.dto.ts`
+### Request DTO:`src/modules/platform-api/system/product/dto/product.req.dto.ts`
 
 ```typescript
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
-import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
-
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { EnvHelper } from '@/utils/env-helper'
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 
 class ProductReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID', required: true })
@@ -182,7 +180,7 @@ export class UpdateProductReqDto extends PartialType(
 ) {}
 ```
 
-### Response DTO:`src/modules/admin-api/system/product/dto/product.res.dto.ts`
+### Response DTO:`src/modules/platform-api/system/product/dto/product.res.dto.ts`
 
 ```typescript
 import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
@@ -235,14 +233,13 @@ export class FindOneProductResDto extends SingleResponseDto(ProductResDtoReturn)
 
 ## 4. Create a Service
 
-### File location:`src/modules/admin-api/system/product/product.service.ts`
+### File location:`src/modules/platform-api/system/product/product.service.ts`
 
 ```typescript
+import { _delete, create, find, findOne, update } from '@/common/services/base.service'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-
-import { _delete, create, find, findOne, update } from '@/common/services/base.service'
 
 import { CreateProductReqDto, FindProductReqDto, UpdateProductReqDto } from './dto/product.req.dto'
 import { ProductEntity } from './entity/product.entity'
@@ -359,24 +356,23 @@ export class ProductService {
 
 ## 5. Create a controller
 
-### File location:`src/modules/admin-api/system/product/product.controller.ts`
+### File location:`src/modules/platform-api/system/product/product.controller.ts`
 
 ```typescript
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors } from '@nestjs/common'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
-
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { MsgResponseDto } from '@/utils/response-dto'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors } from '@nestjs/common'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { CreateProductReqDto, FindProductReqDto, UpdateProductReqDto } from './dto/product.req.dto'
 import { CreateProductResDto, FindOneProductResDto, FindProductResDto } from './dto/product.res.dto'
 import { ProductService } from './product.service'
 
-@Controller('/admin-api/system/product')
+@Controller('/platform-api/system/product')
 @UseInterceptors(TransformInterceptor)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -463,7 +459,7 @@ export class ProductController {
 
 ## 6. Configuration module (Module)
 
-### File location:`src/modules/admin-api/system/product/product.module.ts`
+### File location:`src/modules/platform-api/system/product/product.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common'
@@ -484,7 +480,7 @@ export class ProductModule {}
 
 ## 7. Register to the main module
 
-### Revise`src/modules/admin-api/system/system.module.ts`
+### Revise`src/modules/platform-api/system/system.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common'
@@ -515,7 +511,7 @@ export class SystemModule {}
 
 ```typescript
 // 測試創建產品
-POST /admin-api/system/product/create
+POST /platform-api/system/product/create
 {
   "name": "iPhone 15",
   "code": "IPHONE15",
@@ -528,13 +524,13 @@ POST /admin-api/system/product/create
 }
 
 // 測試查詢產品列表
-GET /admin-api/system/product/list?pageSize=10&currentPage=1
+GET /platform-api/system/product/list?pageSize=10&currentPage=1
 
 // 測試查詢單一產品
-GET /admin-api/system/product/get/1
+GET /platform-api/system/product/get/1
 
 // 測試更新產品
-PUT /admin-api/system/product/update
+PUT /platform-api/system/product/update
 {
   "id": "1",
   "name": "iPhone 15 Pro",
@@ -542,7 +538,7 @@ PUT /admin-api/system/product/update
 }
 
 // 測試刪除產品
-DELETE /admin-api/system/product/delete/1
+DELETE /platform-api/system/product/delete/1
 ```
 
 ## Advanced functions

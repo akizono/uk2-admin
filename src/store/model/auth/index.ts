@@ -1,9 +1,8 @@
-import { createDiscreteApi } from 'naive-ui'
-
 import { login, type LoginVO, logout as logoutApi } from '@/api/system/auth'
 import { type Token, UserApi, type UserVO } from '@/api/system/user'
 import { router } from '@/router'
 import { $t, local } from '@/utils'
+import { createDiscreteApi } from 'naive-ui'
 
 import { useRouteStore } from '../../router'
 import { useTabStore } from '../tab'
