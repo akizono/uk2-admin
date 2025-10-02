@@ -21,51 +21,51 @@ export interface MenuVO extends Api.BaseVO {
 export const MenuApi = {
   /** 獲取選單分頁列表 */
   getMenuList: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
-    return await request.get({ url: '/system/menu/list', params })
+    return await request.get({ url: '/platform-api/system/menu/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「選單分頁列表」 */
   getMenuListByLang: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
-    return await request.getByLang({ url: '/system/menu/list', params })
+    return await request.getByLang({ url: '/platform-api/system/menu/list', params })
   },
 
   /** 獲取選單資料 */
   getMenu: async (id: string): ApiResponse<MenuVO> => {
-    return await request.get({ url: `/system/menu/get/${id}` })
+    return await request.get({ url: `/platform-api/system/menu/get/${id}` })
   },
 
   /** 獲取「當前系統語言」版本的「選單資料」 */
   getMenuByLang: async (id: string): ApiResponse<MenuVO> => {
-    return await request.getByLang({ url: `/system/menu/get/${id}` })
+    return await request.getByLang({ url: `/platform-api/system/menu/get/${id}` })
   },
 
   /** 獲取使用者有權限的菜單 */
   getUserMenus: async (params: PageParams & Partial<MenuVO>): PageRes<MenuVO> => {
-    return await request.get({ url: '/system/menu/user-menus', params })
+    return await request.get({ url: '/platform-api/system/menu/user-menus', params })
   },
 
   /** 新增選單 */
   createMenu: async (data: MenuVO) => {
-    return await request.post({ url: '/system/menu/create', data })
+    return await request.post({ url: '/platform-api/system/menu/create', data })
   },
 
   /** 修改選單 */
   updateMenu: async (data: MenuVO) => {
-    return await request.put({ url: '/system/menu/update', data, isFilterEmpty: false })
+    return await request.put({ url: '/platform-api/system/menu/update', data, isFilterEmpty: false })
   },
 
   /** 刪除選單 */
   deleteMenu: async (id: string) => {
-    return await request.delete({ url: `/system/menu/delete/${id}` })
+    return await request.delete({ url: `/platform-api/system/menu/delete/${id}` })
   },
 
   /** 封鎖選單 */
   blockMenu: async (id: string) => {
-    return await request.put({ url: `/system/menu/block/${id}` })
+    return await request.put({ url: `/platform-api/system/menu/block/${id}` })
   },
 
   /** 解封選單 */
   unblockMenu: async (id: string) => {
-    return await request.put({ url: `/system/menu/unblock/${id}` })
+    return await request.put({ url: `/platform-api/system/menu/unblock/${id}` })
   },
 }

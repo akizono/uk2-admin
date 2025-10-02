@@ -10,46 +10,46 @@ export interface DictTypeVO extends Api.BaseVO {
 export const DictTypeApi = {
   /** 獲取字典類型分頁列表 */
   getDictTypeList: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
-    return await request.get({ url: '/system/dict-type/list', params })
+    return await request.get({ url: '/platform-api/system/dict-type/list', params })
   },
 
   /** 獲取「當前系統語言」版本的「字典類型分頁列表」 */
   getDictTypeListByLang: async (params: PageParams & Partial<DictTypeVO>): PageRes<DictTypeVO> => {
-    return await request.getByLang({ url: '/system/dict-type/list', params })
+    return await request.getByLang({ url: '/platform-api/system/dict-type/list', params })
   },
 
   /** 獲取字典類型資料 */
   getDictType: async (id: string): ApiResponse<DictTypeVO> => {
-    return await request.get({ url: `/system/dict-type/get/${id}` })
+    return await request.get({ url: `/platform-api/system/dict-type/get/${id}` })
   },
 
   /** 獲取「當前系統語言」版本的「字典類型資料」 */
   getDictTypeByLang: async (id: string): ApiResponse<DictTypeVO> => {
-    return await request.getByLang({ url: `/system/dict-type/get/${id}` })
+    return await request.getByLang({ url: `/platform-api/system/dict-type/get/${id}` })
   },
 
   /** 新增字典類型 */
   createDictType: async (data: DictTypeVO) => {
-    return await request.post({ url: '/system/dict-type/create', data })
+    return await request.post({ url: '/platform-api/system/dict-type/create', data })
   },
 
   /** 修改字典類型 */
   updateDictType: async (data: DictTypeVO) => {
-    return await request.put({ url: '/system/dict-type/update', data, isFilterEmpty: false })
+    return await request.put({ url: '/platform-api/system/dict-type/update', data, isFilterEmpty: false })
   },
 
   /** 刪除字典類型 */
   deleteDictType: async (id: string) => {
-    return await request.delete({ url: `/system/dict-type/delete/${id}` })
+    return await request.delete({ url: `/platform-api/system/dict-type/delete/${id}` })
   },
 
   /** 封鎖字典類型 */
   blockDictType: async (id: string) => {
-    return await request.put({ url: `/system/dict-type/block/${id}` })
+    return await request.put({ url: `/platform-api/system/dict-type/block/${id}` })
   },
 
   /** 解封字典類型 */
   unblockDictType: async (id: string) => {
-    return await request.put({ url: `/system/dict-type/unblock/${id}` })
+    return await request.put({ url: `/platform-api/system/dict-type/unblock/${id}` })
   },
 }

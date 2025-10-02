@@ -31,43 +31,43 @@ export interface UserVO extends Api.BaseVO {
 export const UserApi = {
   /** 獲取使用者分頁列表 */
   getUserList: async (params: PageParams & Partial<UserVO>): PageRes<UserVO> => {
-    return await request.get({ url: '/system/user/list', params })
+    return await request.get({ url: '/platform-api/system/user/list', params })
   },
 
   /** 獲取使用者資料 */
   getUser: async (id: string): ApiResponse<UserVO> => {
-    return await request.get({ url: `/system/user/get/${id}` })
+    return await request.get({ url: `/platform-api/system/user/get/${id}` })
   },
 
   /** 新增使用者 */
   createUser: async (data: UserVO) => {
-    return await request.post({ url: '/system/user/create', data })
+    return await request.post({ url: '/platform-api/system/user/create', data })
   },
 
   /** 修改使用者個人資訊 */
   updateUser: async (data: Partial<UserVO> & { password?: string }) => {
-    return await request.put({ url: '/system/user/update', data, isFilterEmpty: false })
+    return await request.put({ url: '/platform-api/system/user/update', data, isFilterEmpty: false })
   },
 
   /** 刪除使用者 */
   deleteUser: async (id: string) => {
-    return await request.delete({ url: `/system/user/delete/${id}` })
+    return await request.delete({ url: `/platform-api/system/user/delete/${id}` })
   },
 
   /** 封鎖使用者 */
   blockUser: async (id: string) => {
-    return await request.put({ url: `/system/user/block/${id}` })
+    return await request.put({ url: `/platform-api/system/user/block/${id}` })
   },
 
   /** 解封使用者 */
   unblockUser: async (id: string) => {
-    return await request.put({ url: `/system/user/unblock/${id}` })
+    return await request.put({ url: `/platform-api/system/user/unblock/${id}` })
   },
 
   /** 發送用於綁定信箱的「驗證碼」到使用者信箱 */
   sendBindEmail: async (data: { email: string }) => {
     return await request.post({
-      url: '/system/user/send-bind-email',
+      url: '/platform-api/system/user/send-bind-email',
       data,
       headers: {
         'specify-error-message': [
@@ -81,7 +81,7 @@ export const UserApi = {
   /** 發送用於綁定手機號碼的「驗證碼」到使用者手機 */
   sendBindMobile: async (data: { mobile: string }) => {
     return await request.post({
-      url: '/system/user/send-bind-mobile',
+      url: '/platform-api/system/user/send-bind-mobile',
       data,
       headers: {
         'specify-error-message': [
@@ -100,7 +100,7 @@ export const UserApi = {
     mobile?: string
   }) => {
     return await request.put({
-      url: '/system/user/bind-email-or-mobile',
+      url: '/platform-api/system/user/bind-email-or-mobile',
       data,
       headers: {
         'specify-error-message': [
@@ -112,18 +112,18 @@ export const UserApi = {
 
   /** 修改個人資訊 */
   updatePersonalInfo: async (data: Partial<Omit<UserVO, keyof Api.BaseVO | 'id' | 'username' | 'email' | 'mobile' | 'role' | 'roleIds' | 'roleNames' | 'token'>>) => {
-    return await request.put({ url: '/system/user/update-personal-info', data })
+    return await request.put({ url: '/platform-api/system/user/update-personal-info', data })
   },
 
   /** 獲取個人資訊 */
   getPersonalInfo: async (): ApiResponse<UserVO> => {
-    return await request.get({ url: '/system/user/get-personal-info' })
+    return await request.get({ url: '/platform-api/system/user/get-personal-info' })
   },
 
   /** 修改個人密碼 */
   updatePersonalPassword: async (data: { oldPassword: string, newPassword: string }) => {
     return await request.put({
-      url: '/system/user/update-personal-password',
+      url: '/platform-api/system/user/update-personal-password',
       data,
       headers: {
         'specify-error-message': [

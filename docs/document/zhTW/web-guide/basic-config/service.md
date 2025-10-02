@@ -60,7 +60,7 @@ export interface RoleVO extends Api.BaseVO {
 export const RoleApi = {
   /** 獲取角色資料 */
   getRole: async (id: string): ApiResponse<RoleVO> => {
-    return await request.get({ url: `/system/role/get/${id}` })
+    return await request.get({ url: `/platform-api/system/role/get/${id}` })
   },
 }
 
@@ -116,37 +116,37 @@ export interface RoleVO extends Api.BaseVO {
 export const RoleApi = {
   /** 獲取角色分頁列表 */
   getRoleList: async (params: PageParams & Partial<RoleVO>): PageRes<RoleVO> => {
-    return await request.get({ url: '/system/role/list', params })
+    return await request.get({ url: '/platform-api/system/role/list', params })
   },
 
   /** 獲取角色資料 */
   getRole: async (id: string): ApiResponse<RoleVO> => {
-    return await request.get({ url: `/system/role/get/${id}` })
+    return await request.get({ url: `/platform-api/system/role/get/${id}` })
   },
 
   /** 新增角色 */
   createRole: async (data: RoleVO) => {
-    return await request.post({ url: '/system/role/create', data })
+    return await request.post({ url: '/platform-api/system/role/create', data })
   },
 
   /** 修改角色 */
   updateRole: async (data: RoleVO) => {
-    return await request.put({ url: '/system/role/update', data })
+    return await request.put({ url: '/platform-api/system/role/update', data })
   },
 
   /** 刪除角色 */
   deleteRole: async (id: string) => {
-    return await request.delete({ url: `/system/role/delete/${id}` })
+    return await request.delete({ url: `/platform-api/system/role/delete/${id}` })
   },
 
   /** 封鎖角色 */
   blockRole: async (id: string) => {
-    return await request.put({ url: `/system/role/block/${id}` })
+    return await request.put({ url: `/platform-api/system/role/block/${id}` })
   },
 
   /** 解封角色 */
   unblockRole: async (id: string) => {
-    return await request.put({ url: `/system/role/unblock/${id}` })
+    return await request.put({ url: `/platform-api/system/role/unblock/${id}` })
   },
 }
 ```
@@ -366,7 +366,7 @@ export const RoleApi = {
   /** 獲取角色資料 */
   getRole: async (id: string): ApiResponse<RoleVO> => {
     return await request.get({
-      url: `/system/role/get/${id}`,
+      url: `/platform-api/system/role/get/${id}`,
       headers: {
         'skip-auth-token': true, // 跳過 Token 驗證
       },
@@ -384,7 +384,7 @@ export const RoleApi = {
 ```ts
 export function sendRegisterEmail(data: { email: string }) {
   return request.post({
-    url: '/system/auth/send-register-email',
+    url: '/platform-api/system/auth/send-register-email',
     data,
     headers: {
       // 指定錯誤訊息
@@ -421,7 +421,7 @@ export const DictTypeApi = {
   /** 獲取字典類型資料 */
   getDictType: async (id: string): ApiResponse<DictTypeVO> => {
     return await request.get({ // 注意這裡是get方法
-       url: `/system/dict-type/get/${id}`
+       url: `/platform-api/system/dict-type/get/${id}`
     })
   },
 }
@@ -486,7 +486,7 @@ export const DictTypeApi = {
   /** 獲取字典類型資料 */
   getDictType: async (id: string): ApiResponse<DictTypeVO> => {
     return await request.getByLang({ // 注意這裡是getByLang方法
-       url: `/system/dict-type/get/${id}`
+       url: `/platform-api/system/dict-type/get/${id}`
     })
   },
 }

@@ -9,7 +9,7 @@ export interface RoleMenuVO extends Api.BaseVO {
 export const RoleMenuApi = {
   /** 獲取 RoleMenu分頁列表 */
   getRoleMenuList: async (params: PageParams & Partial<RoleMenuVO>): PageRes<RoleMenuVO> => {
-    return await request.get({ url: '/system/role-menu/list', params })
+    return await request.get({ url: '/platform-api/system/role-menu/list', params })
   },
 
   /** 批次更新 */
@@ -17,6 +17,6 @@ export const RoleMenuApi = {
     roleId: string
     menuIds: string[]
   }): Promise<void> => {
-    return await request.put({ url: '/system/role-menu/batch-update', data })
+    return await request.put({ url: '/platform-api/system/role-menu/batch-update', data })
   },
 }
