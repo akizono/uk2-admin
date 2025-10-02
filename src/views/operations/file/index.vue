@@ -22,7 +22,7 @@ const fileUploadRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['operations:file:create'],
-  page: ['operations:file:page'],
+  page: ['operations:file:query'],
   delete: ['operations:file:delete'],
 }
 

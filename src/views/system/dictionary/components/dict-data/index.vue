@@ -19,7 +19,7 @@ const filterColumnValue = ref<string>('')
 /** 權限配置 */
 const permission = {
   create: ['system:dict-data:create'],
-  page: ['system:dict-data:page'],
+  page: ['system:dict-data:query'],
   update: ['system:dict-data:update'],
   delete: ['system:dict-data:delete'],
   block: ['system:dict-data:block'],

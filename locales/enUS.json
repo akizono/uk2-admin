@@ -900,13 +900,13 @@
     "permissionExample": "Permission Examples",
     "currentPermission": "Current permissions",
     "vHasPermiDirectiveUsage": "v-hasPermi directive usage(using permissions to determine)",
-    "onlySystemDeptPagePermiVisible": "Visible only with system:dept:page permissions",
+    "onlySystemDeptPagePermiVisible": "Visible only with system:dept:query permissions",
     "useHasRoleFunctionUsage": "Use the useHasRole function (uses roles to determine)",
     "superAdminVisible": "Visible to super_admin",
     "commonVisible": "common visible",
     "superAdminAndCommonVisible": "Visible to super_admin and common",
     "usePermiFunctionUsage": "usePermi function usage (using permissions to judge)",
-    "systemDeptPageVisible": "system:dept:page is visible"
+    "systemDeptPageVisible": "system:dept:query is visible"
   },
   "QRCode": {
     "qrCodeExample": "Using naiveUI - QR Code implementation"

@@ -19,7 +19,7 @@ defineOptions({
 
 /** 權限配置 */
 const permission = {
-  page: ['system:multilingual-fields:page'],
+  page: ['system:multilingual-fields:query'],
   update: ['system:multilingual-fields:update'],
   delete: ['system:multilingual-fields:delete'],
   block: ['system:multilingual-fields:block'],

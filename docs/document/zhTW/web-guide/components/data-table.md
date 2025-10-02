@@ -62,7 +62,7 @@ const options = {
 ```typescript
 const permission = {
   create: ['system:user:create'], // 新增權限
-  page: ['system:user:page'], // 查看列表權限
+  page: ['system:user:query'], // 查看列表權限
   update: ['system:user:update'], // 編輯權限
   delete: ['system:user:delete'], // 刪除權限
   block: ['system:user:block'], // 封鎖權限
@@ -580,7 +580,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:menu:create'],
-  page: ['system:menu:page'],
+  page: ['system:menu:query'],
   update: ['system:menu:update'],
   delete: ['system:menu:delete'],
   block: ['system:menu:block'],
@@ -930,7 +930,7 @@ const dataTableRef = ref()
 // 權限配置
 const permission = {
   create: ['system:user:create'],
-  page: ['system:user:page'],
+  page: ['system:user:query'],
   update: ['system:user:update'],
   delete: ['system:user:delete'],
   block: ['system:user:block'],
@@ -1202,7 +1202,7 @@ export const routes = [
     meta: {
       title: '用戶管理',
       icon: 'user',
-      permissions: ['system:user:page'],
+      permissions: ['system:user:query'],
     },
   },
 ]

@@ -41,14 +41,14 @@ async function toggleUserRole(role: string) {
     </n-button-group>
     <n-h2>{{ $t('permission.vHasPermiDirectiveUsage') }}</n-h2>
     <n-space>
-      <n-button v-hasPermi="['system:dept:page']">
+      <n-button v-hasPermi="['system:dept:query']">
         {{ $t('permission.onlySystemDeptPagePermiVisible') }}
       </n-button>
     </n-space>
 
     <n-h2>{{ $t('permission.usePermiFunctionUsage') }}</n-h2>
     <n-space>
-      <n-button v-if="hasPermi(['system:dept:page'])">
+      <n-button v-if="hasPermi(['system:dept:query'])">
         {{ $t('permission.systemDeptPageVisible') }}
       </n-button>
     </n-space>

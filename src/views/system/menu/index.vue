@@ -20,7 +20,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:menu:create'],
-  page: ['system:menu:page'],
+  page: ['system:menu:query'],
   update: ['system:menu:update'],
   delete: ['system:menu:delete'],
   block: ['system:menu:block'],
@@ -176,7 +176,7 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: $t('menu.routePermission'),
     type: 'input',
-    placeholder: 'Eg: system:user:page',
+    placeholder: 'Eg: system:user:query',
     helpInfo: `${$t('menu.helpInfo')}`,
     showCondition: {
       field: 'type',

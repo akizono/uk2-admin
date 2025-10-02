@@ -20,7 +20,7 @@ const modalRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:dict-type:create'],
-  page: ['system:dict-type:page'],
+  page: ['system:dict-type:query'],
   update: ['system:dict-type:update'],
   delete: ['system:dict-type:delete'],
   block: ['system:dict-type:block'],

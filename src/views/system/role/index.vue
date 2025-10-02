@@ -22,7 +22,7 @@ const assignmentMenuRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:role:create'],
-  page: ['system:role:page'],
+  page: ['system:role:query'],
   update: ['system:role:update'],
   delete: ['system:role:delete'],
   block: ['system:role:block'],

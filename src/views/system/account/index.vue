@@ -41,7 +41,7 @@ function handleCreateSuccess(params: TableRow) {
 /** 權限配置 */
 const permission = {
   create: ['system:user:create'],
-  page: ['system:user:page'],
+  page: ['system:user:query'],
   update: ['system:user:update'],
   delete: ['system:user:delete'],
   block: ['system:user:block'],

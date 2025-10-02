@@ -20,7 +20,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:dept:create'],
-  page: ['system:dept:page'],
+  page: ['system:dept:query'],
   update: ['system:dept:update'],
   delete: ['system:dept:delete'],
   block: ['system:dept:block'],
