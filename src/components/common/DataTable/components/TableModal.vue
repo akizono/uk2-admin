@@ -646,7 +646,13 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
     })
 
     props.initFormData.forEach(async (item: InitFormData) => {
-      formData.value[item.name] = item.value
+      // 對於檔案欄位，確保初始值為陣列
+      if (item.type === 'file') {
+        formData.value[item.name] = Array.isArray(item.value) ? item.value : []
+      }
+      else {
+        formData.value[item.name] = item.value
+      }
       formDataMapping.value[item.name] = item
 
       // 如果有 rulesType ，添加驗證類型屬性
@@ -762,6 +768,17 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
       // 如果數據是數字，則將數據轉換為數字
       if (formDataMapping.value[key].type === 'input-number') {
         formData.value[key] = Number(formData.value[key])
+      }
+
+      // 對於檔案欄位，確保值為陣列
+      if (formDataMapping.value[key].type === 'file') {
+        if (typeof formData.value[key] === 'string') {
+          // 如果是字串（URL），轉換為 FileVO 格式
+          formData.value[key] = formData.value[key] ? [{ url: formData.value[key] }] : []
+        }
+        else if (!Array.isArray(formData.value[key])) {
+          formData.value[key] = []
+        }
       }
     }
 
