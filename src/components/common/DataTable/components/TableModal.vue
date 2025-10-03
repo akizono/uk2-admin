@@ -871,6 +871,8 @@ function closeModal() {
                   :filetype="item.fileOptions.filetype"
                   :file-extension="item.fileOptions.fileExtension"
                   :auto-upload="false"
+                  :hide-delete-button="item.fileOptions.hideDeleteButton"
+                  :show-preview="item.fileOptions.showPreview"
                   disabled
                 />
               </template>
@@ -924,6 +926,8 @@ function closeModal() {
                   :filetype="item.fileOptions.filetype"
                   :file-extension="item.fileOptions.fileExtension"
                   :auto-upload="item.fileOptions.autoUpload"
+                  :hide-delete-button="item.fileOptions.hideDeleteButton"
+                  :show-preview="item.fileOptions.showPreview"
                 />
                 <template v-else-if="item.type === 'select'">
                   <!-- 如果數據中包含 children，使用樹狀選擇器 -->

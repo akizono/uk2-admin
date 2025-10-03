@@ -12,9 +12,13 @@ const props = withDefaults(defineProps<{
   fileExtension?: string[]
   autoUpload: boolean
   disabled?: boolean
+  hideDeleteButton?: boolean
+  showPreview?: boolean
 }>(), {
   modelValue: () => [],
   fileExtension: () => [],
+  hideDeleteButton: false,
+  showPreview: false,
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -355,7 +359,7 @@ onBeforeUnmount(() => {
             <n-image
               :src="getImageSrc(item)"
               object-fit="cover"
-              preview-disabled
+              :preview-disabled="!showPreview"
             />
           </template>
           <!-- 非圖片文件 -->
@@ -394,7 +398,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- 刪除按鈕 -->
-          <div class="delete-button" @click="removeFile(index)">
+          <div v-if="!hideDeleteButton" class="delete-button" @click="removeFile(index)">
             <icon-park-outline-close />
           </div>
         </div>
@@ -429,7 +433,7 @@ onBeforeUnmount(() => {
             </n-button>
           </div>
         </div>
-        <div v-if="!disabled" class="file-actions">
+        <div v-if="!disabled && !hideDeleteButton" class="file-actions">
           <n-button quaternary circle size="small" @click="removeFile(index)">
             <template #icon>
               <icon-park-outline-close />
