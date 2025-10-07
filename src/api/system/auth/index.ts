@@ -22,7 +22,7 @@ interface RegisterVO extends UserVO {
 }
 
 // 登入（使用帳號密碼）
-export const loginUrl = '/system/auth/login'
+export const loginUrl = '/platform-api/system/auth/login'
 export function login(data: LoginVO): ApiResponse<UserVO> {
   return request.post({
     url: loginUrl,
@@ -41,13 +41,13 @@ export function getLoginImageVerifyCode(): ApiResponse<{
   svg: string
   svgCaptchaId: string
 }> {
-  return request.get({ url: '/system/auth/get-login-image-verify-code' })
+  return request.get({ url: '/platform-api/system/auth/get-login-image-verify-code' })
 }
 
 // 登出
 export function logout() {
   return request.get({
-    url: '/system/auth/logout',
+    url: '/platform-api/system/auth/logout',
     headers: {
       'refresh-token': `Bearer ${local.get('refreshToken')}`,
     },
@@ -72,7 +72,7 @@ export function refreshTokenMethod(): ApiResponse<RefreshTokenVO> {
 // 發送註冊的「驗證碼」到使用者信箱
 export function sendRegisterEmail(data: { email: string }) {
   return request.post({
-    url: '/system/auth/send-register-email',
+    url: '/platform-api/system/auth/send-register-email',
     data,
     headers: {
       'specify-error-message': [
@@ -86,7 +86,7 @@ export function sendRegisterEmail(data: { email: string }) {
 // 發送註冊的「驗證碼」到使用者手機
 export function sendRegisterMobile(data: { mobile: string }) {
   return request.post({
-    url: '/system/auth/send-register-mobile',
+    url: '/platform-api/system/auth/send-register-mobile',
     data,
     headers: {
       'specify-error-message': [
@@ -100,7 +100,7 @@ export function sendRegisterMobile(data: { mobile: string }) {
 // 註冊
 export function register(data: RegisterVO) {
   return request.post({
-    url: '/system/auth/register',
+    url: '/platform-api/system/auth/register',
     data,
     headers: {
       'specify-error-message': [
@@ -117,7 +117,7 @@ export function register(data: RegisterVO) {
 // 檢查使用者是否擁有手機號碼或者信箱
 export function checkUserHasMobileOrEmail(params: { username: string }): ApiResponse<{ hasMobile: boolean, hasEmail: boolean }> {
   return request.get({
-    url: '/system/auth/check-user-has-mobile-or-email',
+    url: '/platform-api/system/auth/check-user-has-mobile-or-email',
     params,
     headers: {
       'specify-error-message': [
@@ -130,7 +130,7 @@ export function checkUserHasMobileOrEmail(params: { username: string }): ApiResp
 // 發送找回密碼的「驗證碼」到使用者信箱
 export function sendResetPasswordEmail(data: { username: string }) {
   return request.post({
-    url: '/system/auth/send-reset-password-email',
+    url: '/platform-api/system/auth/send-reset-password-email',
     data,
     headers: {
       'specify-error-message': [
@@ -143,7 +143,7 @@ export function sendResetPasswordEmail(data: { username: string }) {
 // 發送找回密碼的「驗證碼」到使用者手機
 export function sendResetPasswordMobile(data: { username: string }) {
   return request.post({
-    url: '/system/auth/send-reset-password-mobile',
+    url: '/platform-api/system/auth/send-reset-password-mobile',
     data,
     headers: {
       'specify-error-message': [
@@ -161,7 +161,7 @@ export function updatePassword(data: {
   verifyCodeType: VerifyCodeType
 }) {
   return request.post({
-    url: '/system/auth/update-password',
+    url: '/platform-api/system/auth/update-password',
     data,
     headers: {
       'specify-error-message': [

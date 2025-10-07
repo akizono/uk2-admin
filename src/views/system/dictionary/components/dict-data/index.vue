@@ -3,12 +3,11 @@ import type { DictTypeVO } from '@/api/system/dict-type'
 import type { InitFormData } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { DictDataApi, type DictDataVO } from '@/api/system/dict-data'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
 import { wrapOptionsToPromise } from '@/utils/initFormData'
+import { NSwitch } from 'naive-ui'
 
 const { hasPermi } = usePermi()
 
@@ -20,7 +19,7 @@ const filterColumnValue = ref<string>('')
 /** 權限配置 */
 const permission = {
   create: ['system:dict-data:create'],
-  page: ['system:dict-data:page'],
+  page: ['system:dict-data:query'],
   update: ['system:dict-data:update'],
   delete: ['system:dict-data:delete'],
   block: ['system:dict-data:block'],

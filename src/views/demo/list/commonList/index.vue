@@ -2,12 +2,11 @@
 import type { User } from '@/api/demo/system'
 import type { DataTableColumns, FormInst } from 'naive-ui'
 
-import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
-
 import { fetchUserPage } from '@/api/demo/system'
 import { Gender } from '@/constants'
 import { useBoolean } from '@/hooks'
 import { $t } from '@/utils'
+import { NButton, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
 
 import TableModal from './components/TableModal.vue'
 

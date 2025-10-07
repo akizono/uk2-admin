@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { FormInst } from 'naive-ui'
 
-import { onBeforeUnmount } from 'vue'
-
 import { UserApi } from '@/api/system/user'
 import { CountryCallingCodes } from '@/constants'
 import { Regex } from '@/constants/Regex'
 import { useAuthStore } from '@/store/model/auth'
 import { $t, local } from '@/utils'
+import { onBeforeUnmount } from 'vue'
 
 const props = withDefaults(defineProps<{
   show: boolean

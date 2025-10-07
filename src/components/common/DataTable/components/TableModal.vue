@@ -4,8 +4,6 @@ import type { FileVO } from '@/api/operations/file'
 import type { MultilingualFieldsVO } from '@/api/system/multilingual-fields/'
 import type { FormRules } from 'naive-ui'
 
-import { useDebounceFn } from '@vueuse/core'
-
 import { MultilingualFieldsApi } from '@/api/system/multilingual-fields/'
 import AsyncDictLabel from '@/components/common/AsyncDictLabel/index.vue'
 import FileUpload from '@/components/common/FileUpload/index.vue'
@@ -13,6 +11,7 @@ import { useBoolean } from '@/hooks'
 import { useDictStore } from '@/store'
 import { useLanguageStore } from '@/store/model/language'
 import { $t } from '@/utils'
+import { useDebounceFn } from '@vueuse/core'
 
 const props = defineProps<{
   modalWidth?: string // 模態框的寬度
@@ -647,7 +646,13 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
     })
 
     props.initFormData.forEach(async (item: InitFormData) => {
-      formData.value[item.name] = item.value
+      // 對於檔案欄位，確保初始值為陣列
+      if (item.type === 'file') {
+        formData.value[item.name] = Array.isArray(item.value) ? item.value : []
+      }
+      else {
+        formData.value[item.name] = item.value
+      }
       formDataMapping.value[item.name] = item
 
       // 如果有 rulesType ，添加驗證類型屬性
@@ -764,6 +769,17 @@ function resetFormData(data?: TableRow, parent?: TableRow) {
       if (formDataMapping.value[key].type === 'input-number') {
         formData.value[key] = Number(formData.value[key])
       }
+
+      // 對於檔案欄位，確保值為陣列
+      if (formDataMapping.value[key].type === 'file') {
+        if (typeof formData.value[key] === 'string') {
+          // 如果是字串（URL），轉換為 FileVO 格式
+          formData.value[key] = formData.value[key] ? [{ url: formData.value[key] }] : []
+        }
+        else if (!Array.isArray(formData.value[key])) {
+          formData.value[key] = []
+        }
+      }
     }
 
     // 回填多語言欄位
@@ -855,6 +871,8 @@ function closeModal() {
                   :filetype="item.fileOptions.filetype"
                   :file-extension="item.fileOptions.fileExtension"
                   :auto-upload="false"
+                  :hide-delete-button="item.fileOptions.hideDeleteButton"
+                  :show-preview="item.fileOptions.showPreview"
                   disabled
                 />
               </template>
@@ -908,6 +926,8 @@ function closeModal() {
                   :filetype="item.fileOptions.filetype"
                   :file-extension="item.fileOptions.fileExtension"
                   :auto-upload="item.fileOptions.autoUpload"
+                  :hide-delete-button="item.fileOptions.hideDeleteButton"
+                  :show-preview="item.fileOptions.showPreview"
                 />
                 <template v-else-if="item.type === 'select'">
                   <!-- 如果數據中包含 children，使用樹狀選擇器 -->

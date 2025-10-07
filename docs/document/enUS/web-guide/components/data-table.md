@@ -62,7 +62,7 @@ Permission configuration is one of the core functions of DataTable, which is use
 ```typescript
 const permission = {
   create: ['system:user:create'], // 新增權限
-  page: ['system:user:page'], // 查看列表權限
+  page: ['system:user:query'], // 查看列表權限
   update: ['system:user:update'], // 編輯權限
   delete: ['system:user:delete'], // 刪除權限
   block: ['system:user:block'], // 封鎖權限
@@ -563,12 +563,11 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
@@ -581,7 +580,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:menu:create'],
-  page: ['system:menu:page'],
+  page: ['system:menu:query'],
   update: ['system:menu:update'],
   delete: ['system:menu:delete'],
   block: ['system:menu:block'],
@@ -914,13 +913,12 @@ import type { UserCreate, UserQuery, UserUpdate, UserVO } from '@/api/system/use
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NButton, NSwitch, NTag } from 'naive-ui'
-
 import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NButton, NSwitch, NTag } from 'naive-ui'
 
 defineOptions({
   name: 'User Management',
@@ -932,7 +930,7 @@ const dataTableRef = ref()
 // 權限配置
 const permission = {
   create: ['system:user:create'],
-  page: ['system:user:page'],
+  page: ['system:user:query'],
   update: ['system:user:update'],
   delete: ['system:user:delete'],
   block: ['system:user:block'],
@@ -1204,7 +1202,7 @@ export const routes = [
     meta: {
       title: '用戶管理',
       icon: 'user',
-      permissions: ['system:user:page'],
+      permissions: ['system:user:query'],
     },
   },
 ]

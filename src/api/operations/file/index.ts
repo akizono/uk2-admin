@@ -12,7 +12,7 @@ export interface FileVO extends Api.BaseVO {
 export const FileApi = {
   /** 獲取檔案分頁列表 */
   getFileList: async (params: PageParams & Partial<FileVO>): PageRes<FileVO> => {
-    return await request.get({ url: '/operations/file/list', params })
+    return await request.get({ url: '/platform-api/operations/file/list', params })
   },
 
   /** 上傳檔案 */
@@ -33,7 +33,7 @@ export const FileApi = {
 
       // 使用自訂請求系統進行上傳，保持所有攔截器功能
       const response = await request.post({
-        url: '/operations/file/upload',
+        url: '/platform-api/operations/file/upload',
         data: formData,
       })
 
@@ -49,6 +49,6 @@ export const FileApi = {
 
   /** 刪除檔案 */
   deleteFile: async (id: string) => {
-    return await request.delete({ url: `/operations/file/delete/${id}` })
+    return await request.delete({ url: `/platform-api/operations/file/delete/${id}` })
   },
 }

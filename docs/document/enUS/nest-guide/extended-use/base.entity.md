@@ -43,9 +43,8 @@
 Other entity classes can be inherited`BaseEntity`To get these basic fields:
 
 ```typescript
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-
 import { BaseEntity } from '@/common/entities/base.entity'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('users')
 export class User extends BaseEntity {

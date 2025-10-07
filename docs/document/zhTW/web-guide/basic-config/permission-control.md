@@ -150,15 +150,15 @@ const userRoles = authStore.user?.role || []
     <!-- 使用 v-hasPermi 指令 -->
     <n-h2>指令式權限控制</n-h2>
     <n-space>
-      <n-button v-hasPermi="['system:dept:page']">
-        部門管理（需要 system:dept:page 權限）
+      <n-button v-hasPermi="['system:dept:query']">
+        部門管理（需要 system:dept:query 權限）
       </n-button>
     </n-space>
 
     <!-- 使用 usePermi 函數 -->
     <n-h2>函數式權限控制</n-h2>
     <n-space>
-      <n-button v-if="hasPermi(['system:dept:page'])">
+      <n-button v-if="hasPermi(['system:dept:query'])">
         部門管理（函數判斷）
       </n-button>
     </n-space>

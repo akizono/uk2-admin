@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { useAppStore } from '@/store'
+import { $t } from '@/utils'
 import { NFlex } from 'naive-ui'
 import IconAuto from '~icons/icon-park-outline/laptop-computer'
 import IconMoon from '~icons/icon-park-outline/moon'
 import IconSun from '~icons/icon-park-outline/sun-one'
-
-import { useAppStore } from '@/store'
-import { $t } from '@/utils'
 
 const appStore = useAppStore()
 

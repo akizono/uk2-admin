@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { naiveI18nOptions } from '@/utils'
 import hljs from 'highlight.js/lib/core'
 import diff from 'highlight.js/lib/languages/diff'
 import typescript from 'highlight.js/lib/languages/typescript'
 import { darkTheme } from 'naive-ui'
-
-import { naiveI18nOptions } from '@/utils'
 
 import { useAppStore } from './store'
 import { useLanguageStore } from './store/model/language'

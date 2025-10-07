@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/store'
+import { $t } from '@/utils'
 import IconBookOpen from '~icons/icon-park-outline/book-open'
 import IconGithub from '~icons/icon-park-outline/github'
 import IconLogout from '~icons/icon-park-outline/logout'
 import IconUser from '~icons/icon-park-outline/user'
-
-import { useAuthStore } from '@/store'
-import { $t } from '@/utils'
 
 const { user, logout } = useAuthStore()
 const router = useRouter()

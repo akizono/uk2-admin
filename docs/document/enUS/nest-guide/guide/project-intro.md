@@ -59,7 +59,7 @@ src/
 │   ├── services/         # 基礎服務
 │   └── subscribers/      # 訂閱者
 ├── modules/              # 業務模組
-│   └── admin-api/        # 管理後台 API
+│   └── platform-api/        # 管理後台 API
 │       ├── system/       # 系統管理模組
 │       └── operations/   # 運營管理模組
 ├── utils/                # 工具類

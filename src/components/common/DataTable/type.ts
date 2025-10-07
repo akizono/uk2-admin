@@ -126,6 +126,10 @@ export interface InitFormData {
      * 如果不開啟，則會以數組的形式上傳
      */
     singleFile?: boolean
+    /** 是否隱藏刪除按鈕 */
+    hideDeleteButton?: boolean
+    /** 是否開啟預覽功能 */
+    showPreview?: boolean
   }
   /** rules規則中的type屬性 */
   rulesType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'integer'

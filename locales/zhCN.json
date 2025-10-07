@@ -900,13 +900,13 @@
     "permissionExample": "权限示例",
     "currentPermission": "当前权限",
     "vHasPermiDirectiveUsage": "v-hasPermi 指令用法(使用权限来判断)",
-    "onlySystemDeptPagePermiVisible": "仅包含system:dept:page权限可见",
+    "onlySystemDeptPagePermiVisible": "仅包含system:dept:query权限可见",
     "useHasRoleFunctionUsage": "useHasRole 函数用法(使用角色来判断)",
     "superAdminVisible": "super_admin可见",
     "commonVisible": "common可见",
     "superAdminAndCommonVisible": "super_admin和common可见",
     "usePermiFunctionUsage": "usePermi 函数用法(使用权限来判断)",
-    "systemDeptPageVisible": "system:dept:page可见"
+    "systemDeptPageVisible": "system:dept:query可见"
   },
   "QRCode": {
     "qrCodeExample": "使用naiveUI - QR Code 实现"

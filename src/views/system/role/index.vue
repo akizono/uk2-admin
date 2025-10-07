@@ -2,12 +2,11 @@
 import type { RoleVO } from '@/api/system/role'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
-import { type DataTableColumns, type FormRules, NButton, NSwitch } from 'naive-ui'
-
 import { RoleApi } from '@/api/system/role'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { type DataTableColumns, type FormRules, NButton, NSwitch } from 'naive-ui'
 
 import AssignmentMenu from './components/assignment-menu/index.vue'
 
@@ -23,7 +22,7 @@ const assignmentMenuRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:role:create'],
-  page: ['system:role:page'],
+  page: ['system:role:query'],
   update: ['system:role:update'],
   delete: ['system:role:delete'],
   block: ['system:role:block'],

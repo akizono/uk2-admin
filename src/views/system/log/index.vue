@@ -13,7 +13,7 @@ defineOptions({
 
 /** 權限配置 */
 const permission = {
-  page: ['system:log:page'],
+  page: ['system:log:query'],
 }
 
 /** 初始化查詢參數 */

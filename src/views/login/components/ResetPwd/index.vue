@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { FormInst } from 'naive-ui'
 
-import { onBeforeUnmount } from 'vue'
-
 import { checkUserHasMobileOrEmail, sendResetPasswordEmail, sendResetPasswordMobile, updatePassword } from '@/api/system/auth'
 import { $t } from '@/utils'
+import { onBeforeUnmount } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 function toLogin() {

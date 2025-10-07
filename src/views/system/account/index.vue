@@ -4,8 +4,6 @@ import type { UserVO } from '@/api/system/user'
 import type { InitFormData, InitQueryParams, TableRow } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NButton, NSwitch } from 'naive-ui'
-
 import { DeptApi } from '@/api/system/dept'
 import { RoleApi } from '@/api/system/role'
 import { UserApi } from '@/api/system/user'
@@ -13,6 +11,7 @@ import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
 import { createCopyableDialog } from '@/utils/dialog'
+import { NButton, NSwitch } from 'naive-ui'
 
 import UpdatePassword from './components/update-password/index.vue'
 
@@ -42,7 +41,7 @@ function handleCreateSuccess(params: TableRow) {
 /** 權限配置 */
 const permission = {
   create: ['system:user:create'],
-  page: ['system:user:page'],
+  page: ['system:user:query'],
   update: ['system:user:update'],
   delete: ['system:user:delete'],
   block: ['system:user:block'],

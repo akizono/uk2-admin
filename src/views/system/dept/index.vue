@@ -2,13 +2,12 @@
 import type { DeptVO } from '@/api/system/dept'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 
-import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
-
 import { DeptApi } from '@/api/system/dept'
 import { UserApi } from '@/api/system/user'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { type DataTableColumns, type FormRules, NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Department Management',
@@ -21,7 +20,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:dept:create'],
-  page: ['system:dept:page'],
+  page: ['system:dept:query'],
   update: ['system:dept:update'],
   delete: ['system:dept:delete'],
   block: ['system:dept:block'],

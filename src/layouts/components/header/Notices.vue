@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { group } from 'radash'
-
 import { $t } from '@/utils'
+import { group } from 'radash'
 
 import NoticeList from '../common/NoticeList.vue'
 

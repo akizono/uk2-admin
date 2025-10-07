@@ -1,10 +1,9 @@
 import type { Language } from '@/modules/i18n'
 
-import { createDiscreteApi } from 'naive-ui'
-
 import { language } from '@/modules/i18n'
 import { $t, local, session, setLocale } from '@/utils'
 import { defaultLang } from '@/utils/tools/defaultLang'
+import { createDiscreteApi } from 'naive-ui'
 
 import { useTabStore } from '../tab'
 

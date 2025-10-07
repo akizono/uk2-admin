@@ -3,12 +3,11 @@ import type { MenuVO } from '@/api/system/menu'
 import type { InitFormData, InitQueryParams } from '@/components/common/DataTable/type'
 import type { DataTableColumns, FormRules } from 'naive-ui'
 
-import { NSwitch } from 'naive-ui'
-
 import { MenuApi } from '@/api/system/menu'
 import DataTable from '@/components/common/DataTable/index.vue'
 import { usePermi } from '@/hooks'
 import { $t } from '@/utils'
+import { NSwitch } from 'naive-ui'
 
 defineOptions({
   name: 'Menu Settings',
@@ -21,7 +20,7 @@ const dataTableRef = ref()
 /** 權限配置 */
 const permission = {
   create: ['system:menu:create'],
-  page: ['system:menu:page'],
+  page: ['system:menu:query'],
   update: ['system:menu:update'],
   delete: ['system:menu:delete'],
   block: ['system:menu:block'],
@@ -177,7 +176,7 @@ const initFormData: InitFormData[] = [
     span: 1,
     label: $t('menu.routePermission'),
     type: 'input',
-    placeholder: 'Eg: system:user:page',
+    placeholder: 'Eg: system:user:query',
     helpInfo: `${$t('menu.helpInfo')}`,
     showCondition: {
       field: 'type',
