@@ -12,9 +12,13 @@ const props = withDefaults(defineProps<{
   fileExtension?: string[]
   autoUpload: boolean
   disabled?: boolean
+  hideDeleteButton?: boolean
+  showPreview?: boolean
 }>(), {
   modelValue: () => [],
   fileExtension: () => [],
+  hideDeleteButton: false,
+  showPreview: false,
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -42,6 +46,11 @@ const { bool: isUploading, setTrue: startUploading, setFalse: stopUploading } = 
 
 // 儲存創建的臨時URL，以便在組件銷毀時釋放
 const objectURLs = ref<string[]>([])
+
+// 節流處理的上傳操作
+function throttledUpload() {
+  useThrottleAction('file-upload', 500, uploadFiles)
+}
 
 // 初始化文件列表
 function initFileList() {
@@ -135,7 +144,7 @@ function handleFileSelect(event: Event) {
   // 如果設置為自動上傳，則立即上傳文件
   if (props.autoUpload) {
     // console.log('自動上傳模式，立即上傳')
-    uploadFiles()
+    throttledUpload()
   }
   else {
     // console.log('非自動上傳模式，等待用戶點擊提交')
@@ -256,7 +265,7 @@ function retryUpload(index: number) {
 
   // 如果是自動上傳模式，立即上傳
   if (props.autoUpload) {
-    uploadFiles()
+    throttledUpload()
   }
 }
 
@@ -277,12 +286,6 @@ function removeFile(index: number) {
   fileList.value.splice(index, 1)
   updateModelValue()
 }
-
-// 節流處理的上傳操作
-// const throttledUpload =
-useThrottleAction('file-upload', 500, () => {
-  uploadFiles()
-})
 
 // 暴露方法
 defineExpose({
@@ -355,7 +358,7 @@ onBeforeUnmount(() => {
             <n-image
               :src="getImageSrc(item)"
               object-fit="cover"
-              preview-disabled
+              :preview-disabled="!showPreview"
             />
           </template>
           <!-- 非圖片文件 -->
@@ -394,7 +397,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- 刪除按鈕 -->
-          <div class="delete-button" @click="removeFile(index)">
+          <div v-if="!hideDeleteButton" class="delete-button" @click="removeFile(index)">
             <icon-park-outline-close />
           </div>
         </div>
@@ -429,7 +432,7 @@ onBeforeUnmount(() => {
             </n-button>
           </div>
         </div>
-        <div v-if="!disabled" class="file-actions">
+        <div v-if="!disabled && !hideDeleteButton" class="file-actions">
           <n-button quaternary circle size="small" @click="removeFile(index)">
             <template #icon>
               <icon-park-outline-close />
@@ -461,7 +464,7 @@ onBeforeUnmount(() => {
       </div>
       <n-button
         type="primary" :loading="isUploading" @click="() => {
-          uploadFiles();
+          throttledUpload();
         }"
       >
         {{ $t('fileUpload.startUpload') }}
