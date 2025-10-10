@@ -458,9 +458,19 @@ function processFormData() {
         if (processedData[item.name] && processedData[item.name].length > 0) {
           processedData[item.name] = processedData[item.name][0].url
         }
+        else {
+          // 如果沒有檔案，刪除該欄位
+          delete processedData[item.name]
+        }
       }
       else {
-        processedData[item.name] = processedData[item.name].map((item: FileVO) => item.url)
+        if (processedData[item.name] && processedData[item.name].length > 0) {
+          processedData[item.name] = processedData[item.name].map((item: FileVO) => item.url)
+        }
+        else {
+          // 如果沒有檔案，刪除該欄位
+          delete processedData[item.name]
+        }
       }
     }
 
